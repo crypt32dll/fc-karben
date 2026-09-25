@@ -1,12 +1,12 @@
-import type { Payload } from 'payload'
 import { unstable_cache } from 'next/cache'
+import type { Payload } from 'payload'
 
 import { revalidateCatalogPaths, revalidateCatalogTags } from '../cache/revalidate'
 import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/tags'
 import { createLogger } from '../logger'
 import { getPayloadClient } from '../payload'
-import { fussballDeMatchFeedSource } from './fussball-de'
 import { FIRST_TEAM_FUSSBALL_DE_ID, type MatchDto, pickNextMatch } from './dto'
+import { fussballDeMatchFeedSource } from './fussball-de'
 import { extractFussballDeTeamId } from './parse-html'
 
 const log = createLogger('MatchFeed')

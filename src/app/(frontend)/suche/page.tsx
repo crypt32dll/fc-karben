@@ -3,8 +3,8 @@ import { Suspense } from 'react'
 
 import { SearchResultsSkeleton } from '@/components/search/SearchResultsSkeleton'
 import { SearchHero, SearchResults } from '@/components/search/SiteSearch'
-import { catalogSeoToMetadata } from '@/lib/content-catalog'
 import { clubAppRoutes } from '@/lib/club-paths'
+import { catalogSeoToMetadata } from '@/lib/content-catalog'
 
 export const metadata: Metadata = catalogSeoToMetadata({
   title: 'Suche',

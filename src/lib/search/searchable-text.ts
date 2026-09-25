@@ -56,9 +56,5 @@ export function searchablePlainText(doc: SearchableDoc): string {
     layoutToPlainText(doc.layout),
   ]
 
-  return parts
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, SEARCH_BODY_MAX)
+  return parts.join(' ').replace(/\s+/g, ' ').trim().slice(0, SEARCH_BODY_MAX)
 }

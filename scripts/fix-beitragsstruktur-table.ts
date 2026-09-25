@@ -3,13 +3,12 @@
  * Usage: pnpm exec tsx --env-file=.env scripts/fix-beitragsstruktur-table.ts
  */
 import { getPayload } from 'payload'
-
-import config from '../src/payload.config'
 import {
   lexicalParagraph,
   lexicalTable,
   parseSimpleHtmlTable,
 } from '../src/lib/migration/lexical-table'
+import config from '../src/payload.config'
 
 const WXR_SNIPPET = `<strong>Übersicht Mitgliedsbeiträge Stand 01. Januar 2023</strong>:
 <table>
@@ -157,7 +156,10 @@ async function main() {
   revalidateCatalogTags(CACHE_TAGS.pages)
   revalidateCatalogPaths('/verein/beitragsstruktur', '/verein')
 
-  console.log('Updated beitragsstruktur', { id: doc.id, rows: parseSimpleHtmlTable(WXR_SNIPPET)?.length })
+  console.log('Updated beitragsstruktur', {
+    id: doc.id,
+    rows: parseSimpleHtmlTable(WXR_SNIPPET)?.length,
+  })
   process.exit(0)
 }
 

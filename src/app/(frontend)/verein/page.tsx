@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { ClubLink } from '@/components/ui/ClubLink'
+import { type ClubPageKey, clubPages, hrefForPage } from '@/lib/club-paths'
 import { catalogSeoToMetadata, getSeiteBySlug } from '@/lib/content-catalog'
-import { clubPages, hrefForPage, type ClubPageKey } from '@/lib/club-paths'
 
 export const revalidate = false
 

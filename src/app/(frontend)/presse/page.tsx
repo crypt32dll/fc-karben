@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 
 import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
 import { ClubLink } from '@/components/ui/ClubLink'
-import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
 import { clubPages, hrefForPage } from '@/lib/club-paths'
+import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
 
 export const revalidate = false
 

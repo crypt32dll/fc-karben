@@ -1,8 +1,8 @@
 import { ArrowRight, FileText, Newspaper, Search, X } from 'lucide-react'
 import { MotionPressable, Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
 import { ClubLink } from '@/components/ui/ClubLink'
-import { searchContent, type SearchHit } from '@/lib/content-catalog'
 import { clubAppRoutes, hrefForPage, hrefForSearch } from '@/lib/club-paths'
+import { type SearchHit, searchContent } from '@/lib/content-catalog'
 
 const AREA_SUGGESTIONS = [
   { href: hrefForPage('presse'), label: 'Presse', hint: 'Spielberichte & News' },
@@ -179,15 +179,15 @@ export async function SearchResults({ query }: { query: string }) {
               {AREA_SUGGESTIONS.map((item) => (
                 <StaggerItem key={item.href} as="li">
                   <MotionPressable>
-                      <ClubLink
-                        href={item.href}
-                        className="group flex min-h-11 flex-col border border-line bg-white px-4 py-4 transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
-                      >
-                        <span className="font-semibold text-navy group-hover:underline">
-                          {item.label}
-                        </span>
-                        <span className="mt-1 text-sm text-ink-soft">{item.hint}</span>
-                      </ClubLink>
+                    <ClubLink
+                      href={item.href}
+                      className="group flex min-h-11 flex-col border border-line bg-white px-4 py-4 transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                    >
+                      <span className="font-semibold text-navy group-hover:underline">
+                        {item.label}
+                      </span>
+                      <span className="mt-1 text-sm text-ink-soft">{item.hint}</span>
+                    </ClubLink>
                   </MotionPressable>
                 </StaggerItem>
               ))}

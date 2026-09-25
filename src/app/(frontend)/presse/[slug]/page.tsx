@@ -5,8 +5,8 @@ import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { Reveal } from '@/components/motion/Reveal'
 import { ClubLink } from '@/components/ui/ClubLink'
-import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
 import { hrefForPage } from '@/lib/club-paths'
+import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
 
 export const revalidate = false
 

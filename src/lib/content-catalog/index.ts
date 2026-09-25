@@ -3,11 +3,11 @@ import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 
 import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/revalidate'
-import { type MatchDto, pickNextMatch } from '../match-feed'
+import { getNextMatch as getNextMatchFromFeed, type MatchDto } from '../match-feed'
 import type { RedirectRule } from '../redirects'
 import { resolveRedirect } from '../redirects'
-import { getPublicSiteURL } from '../seo/generate'
 import { toNextMetadata } from '../seo'
+import { getPublicSiteURL } from '../seo/generate'
 import type { SocialTileDto } from '../social-feed'
 import {
   findBeitragBySlug,
@@ -21,7 +21,6 @@ import {
   findSiteSettings,
   findSocialTiles,
   findSponsoren,
-  findUpcomingMatches,
 } from './payload-adapter'
 import { decideRootSlug, type RootSlugResolution } from './resolve-root-slug'
 import { findSearchHits, type SearchHit } from './search'
@@ -203,14 +202,9 @@ export async function searchContent(query: string, limit = 24): Promise<SearchHi
   return findSearchHits(query, limit)
 }
 
+/** Thin pass-through: MatchFeed owns CMS read + cache + wall-clock pick. */
 export async function getNextMatch(): Promise<MatchDto | null> {
-  // List is tag-invalidated by daily MatchFeed cron; pickNextMatch uses wall-clock so
-  // the scoreboard advances after kickoff without waiting for the next sync.
-  const matches = await unstable_cache(() => findUpcomingMatches(), ['upcoming-matches'], {
-    revalidate: CATALOG_REVALIDATE,
-    tags: [CACHE_TAGS.matches],
-  })()
-  return pickNextMatch(matches)
+  return getNextMatchFromFeed()
 }
 
 /** Load shared block context once per page render. */

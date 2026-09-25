@@ -1,10 +1,7 @@
 import Image from 'next/image'
-
-import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
-
-import logo from '../../../public/logo.png'
-
 import { ClubLink } from '@/components/ui/ClubLink'
+import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
+import logo from '../../../public/logo.png'
 
 import { HeaderSearchLink } from './HeaderSearchLink'
 import { SiteNav } from './SiteNav'

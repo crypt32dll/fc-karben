@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { MotionPressable, Reveal } from '@/components/motion/Reveal'
-import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
 import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
+import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
 import type { MatchDto } from '@/lib/match-feed'
 import type {
   BoardBlockView,
@@ -203,9 +203,9 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
               href={team.path}
               className="club-interactive block bg-white p-7 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
             >
-            <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
-            <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
-            <p className="text-[13px] text-ink-soft">{team.league}</p>
+              <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
+              <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
+              <p className="text-[13px] text-ink-soft">{team.league}</p>
             </a>
           </MotionPressable>
         ))}

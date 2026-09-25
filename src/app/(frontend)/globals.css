@@ -117,8 +117,8 @@
   [role="button"],
   [role="link"] {
     -webkit-tap-highlight-color: color-mix(in srgb, var(--color-pitch) 18%, transparent);
-    transition-property: color, background-color, border-color, opacity, filter, box-shadow,
-      text-decoration-color;
+    transition-property:
+      color, background-color, border-color, opacity, filter, box-shadow, text-decoration-color;
     transition-duration: 150ms;
     transition-timing-function: ease;
   }
@@ -174,7 +174,7 @@
     color: var(--color-navy);
   }
 
-  .lexical-table tbody tr:nth-child(even) .lexical-table-cell:not([class*='header']),
+  .lexical-table tbody tr:nth-child(even) .lexical-table-cell:not([class*="header"]),
   .prose tbody tr:nth-child(even) td {
     background: color-mix(in srgb, var(--color-paper) 55%, white);
   }

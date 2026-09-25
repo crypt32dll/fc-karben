@@ -99,15 +99,9 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
 
       const nextTitle = force || !hasTitle ? generatedTitle : truncateSeoTitle(currentTitle)
       const nextDescription =
-        force || !hasDescription
-          ? generatedDescription
-          : truncateSeoDescription(currentDescription)
+        force || !hasDescription ? generatedDescription : truncateSeoDescription(currentDescription)
 
-      if (
-        nextTitle === currentTitle &&
-        nextDescription === currentDescription &&
-        !force
-      ) {
+      if (nextTitle === currentTitle && nextDescription === currentDescription && !force) {
         skipped += 1
         continue
       }

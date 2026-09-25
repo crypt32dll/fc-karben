@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getPublicSiteURL, allowSearchIndexing } from './generate'
-
+import { allowSearchIndexing, getPublicSiteURL } from './generate'
 
 export type SeoInput = {
   title?: string | null

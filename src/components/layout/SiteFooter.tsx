@@ -1,13 +1,12 @@
+import { ClubLink } from '@/components/ui/ClubLink'
 import {
+  type ClubPageKey,
+  type ClubTeamKey,
   clubAppRoutes,
   clubTeams,
   hrefForPage,
   hrefForTeam,
-  type ClubPageKey,
-  type ClubTeamKey,
 } from '@/lib/club-paths'
-
-import { ClubLink } from '@/components/ui/ClubLink'
 
 const footerLinkClass =
   'block min-h-11 py-2.5 text-ink-soft transition-colors motion-reduce:transition-none hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy'

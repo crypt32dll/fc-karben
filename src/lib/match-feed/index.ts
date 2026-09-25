@@ -6,6 +6,6 @@ export {
   pickNextMatch,
 } from './dto'
 export { fussballDeMatchFeedSource } from './fussball-de'
-export { extractFussballDeTeamId, parseFussballDeMatchplanHtml } from './parse-html'
 export { parseBerlinKickoff } from './kickoff'
+export { extractFussballDeTeamId, parseFussballDeMatchplanHtml } from './parse-html'
 export { getNextMatch, listUpcomingMatches, syncMatchFeed } from './sync'

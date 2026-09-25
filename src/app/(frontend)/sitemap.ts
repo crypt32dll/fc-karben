@@ -1,14 +1,16 @@
 import type { MetadataRoute } from 'next'
-
-import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
 import { clubAppRoutes, clubStaticPagePaths } from '@/lib/club-paths'
+import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
 import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = getPublicSiteURL()
-  const staticPaths = [clubAppRoutes.home === '/' ? '' : clubAppRoutes.home, ...clubStaticPagePaths()]
+  const staticPaths = [
+    clubAppRoutes.home === '/' ? '' : clubAppRoutes.home,
+    ...clubStaticPagePaths(),
+  ]
 
   const now = new Date()
   const [teams, { posts }] = await Promise.all([listMannschaften(), listBeitrage({ limit: 500 })])
