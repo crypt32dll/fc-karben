@@ -15,6 +15,7 @@
     "lint": "biome check .",
     "migrate:wxr": "tsx scripts/migrate-wxr.ts",
     "migrate:seo": "tsx scripts/generate-seo-meta.ts",
+    "audit:seo": "tsx scripts/audit-seo-content.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:unit",
