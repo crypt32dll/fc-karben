@@ -11,7 +11,7 @@ export const siteSettingsCache: CachePolicy = {
 
 export const homepageCache: CachePolicy = {
   tags: [CACHE_TAGS.homepage],
-  paths: ['/'],
+  paths: ['/', '/sitemap.xml'],
 }
 
 export const SiteSettings: GlobalConfig = {

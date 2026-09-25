@@ -6,7 +6,7 @@ import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
 
 export const postsCache: CachePolicy = {
   tags: [CACHE_TAGS.posts],
-  paths: ['/', '/presse'],
+  paths: ['/', '/presse', '/sitemap.xml'],
   pathsFromDoc: (doc) => {
     const slug = (doc as { slug?: string }).slug
     return slug ? [`/presse/${slug}`] : []

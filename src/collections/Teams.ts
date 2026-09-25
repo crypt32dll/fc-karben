@@ -5,7 +5,7 @@ import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
 
 export const teamsCache: CachePolicy = {
   tags: [CACHE_TAGS.teams],
-  paths: ['/'],
+  paths: ['/', '/sitemap.xml'],
   pathsFromDoc: (doc) => {
     const slug = (doc as { slug?: string }).slug
     return slug ? [`/${slug}`] : []

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 
-import { CACHE_TAGS, CATALOG_REVALIDATE_SECONDS } from '../cache/revalidate'
+import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/revalidate'
 import type { MatchDto } from '../match-feed'
 import type { RedirectRule } from '../redirects'
 import { resolveRedirect } from '../redirects'
@@ -88,20 +88,20 @@ export async function listBeitrage(options?: {
   return unstable_cache(
     () => findBeitrage({ limit, page }),
     ['list-beitrage', String(limit), String(page)],
-    { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CACHE_TAGS.posts] },
+    { revalidate: CATALOG_REVALIDATE, tags: [CACHE_TAGS.posts] },
   )()
 }
 
 export async function getBeitragBySlug(slug: string): Promise<CatalogPost | null> {
   return unstable_cache(() => findBeitragBySlug(slug), ['beitrag', slug], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.posts],
   })()
 }
 
 export async function getSeiteBySlug(slug: string): Promise<CatalogPage | null> {
   return unstable_cache(() => findSeiteBySlug(slug), ['seite-slug', slug], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.pages],
   })()
 }
@@ -109,56 +109,56 @@ export async function getSeiteBySlug(slug: string): Promise<CatalogPage | null> 
 export async function getSeiteByPath(pathname: string): Promise<CatalogPage | null> {
   const path = pathname.startsWith('/') ? pathname : `/${pathname}`
   return unstable_cache(() => findSeiteByPath(path), ['seite-path', path], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.pages],
   })()
 }
 
 export async function listMannschaften(): Promise<CatalogTeam[]> {
   return unstable_cache(() => findMannschaften(), ['list-mannschaften'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.teams],
   })()
 }
 
 export async function getMannschaftBySlug(slug: string): Promise<CatalogTeam | null> {
   return unstable_cache(() => findMannschaftBySlug(slug), ['mannschaft', slug], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.teams],
   })()
 }
 
 export async function listSponsoren(): Promise<CatalogSponsor[]> {
   return unstable_cache(() => findSponsoren(), ['list-sponsoren'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.sponsors],
   })()
 }
 
 export async function listSocialTiles(): Promise<SocialTileDto[]> {
   return unstable_cache(() => findSocialTiles(), ['list-social-tiles'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.socialTiles],
   })()
 }
 
 export async function getSiteSettings(): Promise<CatalogSiteSettings | null> {
   return unstable_cache(() => findSiteSettings(), ['site-settings'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.siteSettings],
   })()
 }
 
 export async function getHomepage(): Promise<CatalogHomepage | null> {
   return unstable_cache(() => findHomepage(), ['homepage'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.homepage],
   })()
 }
 
 export async function listRedirectRules(): Promise<RedirectRule[]> {
   return unstable_cache(() => findRedirectRules(), ['redirect-rules'], {
-    revalidate: CATALOG_REVALIDATE_SECONDS,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.redirects],
   })()
 }
@@ -184,7 +184,7 @@ export async function searchContent(query: string, limit = 24): Promise<SearchHi
 
 export async function getNextMatch(): Promise<MatchDto | null> {
   return unstable_cache(() => findNextMatch(), ['next-match'], {
-    revalidate: 120,
+    revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.matches],
   })()
 }

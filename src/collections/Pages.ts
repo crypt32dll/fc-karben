@@ -7,7 +7,7 @@ import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
 
 export const pagesCache: CachePolicy = {
   tags: [CACHE_TAGS.pages],
-  paths: ['/'],
+  paths: ['/', '/sitemap.xml'],
   pathsFromDoc: (doc) => {
     const d = doc as { path?: string; slug?: string }
     const out: string[] = []

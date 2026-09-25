@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
   try {
     const origin = request.nextUrl.origin
     const res = await fetch(`${origin}/api/redirects`, {
-      next: { tags: [CACHE_TAGS.redirects], revalidate: 60 },
+      next: { tags: [CACHE_TAGS.redirects] },
       signal: AbortSignal.timeout(1500),
     })
     if (res.ok) {

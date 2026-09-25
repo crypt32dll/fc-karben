@@ -9,15 +9,17 @@ import { fileURLToPath } from 'url'
 import { collections } from './collections'
 import { Homepage, homepageCache, SiteSettings, siteSettingsCache } from './globals/SiteSettings'
 import { withGlobalCache } from './lib/cache/register'
+import { normalizePostgresUrl } from './lib/postgres-url'
 import { buildPlugins } from './payload/plugins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL
-if (!connectionString) {
+const rawConnectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL
+if (!rawConnectionString) {
   throw new Error('Missing POSTGRES_URL (or DATABASE_URL) — set it in .env')
 }
+const connectionString = normalizePostgresUrl(rawConnectionString)
 
 const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 

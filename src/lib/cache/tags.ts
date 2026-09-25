@@ -13,13 +13,19 @@ export const CACHE_TAGS = {
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
 
-/** Default ISR window for ClubSite catalog reads (seconds). */
-export const CATALOG_REVALIDATE_SECONDS = 300
+/**
+ * Data Cache TTL for ContentCatalog.
+ * `false` = tag-only (on-demand via Payload hooks); no blind time expiry.
+ */
+export const CATALOG_REVALIDATE = false as const
+
+/** @deprecated Alias — prefer CATALOG_REVALIDATE. */
+export const CATALOG_REVALIDATE_SECONDS = CATALOG_REVALIDATE
 
 export type CachePolicy = {
   tags: CacheTag[]
-  /** Static paths always revalidated. */
+  /** Static paths always revalidated (Full Route Cache). */
   paths?: string[]
-  /** Extra paths derived from the changed document (Phase 1 doc-aware bust). */
+  /** Extra paths derived from the changed document. */
   pathsFromDoc?: (doc: unknown) => string[]
 }

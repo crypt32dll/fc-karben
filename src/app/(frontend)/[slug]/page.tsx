@@ -5,7 +5,7 @@ import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { catalogSeoToMetadata, resolveRootSlug } from '@/lib/content-catalog'
 
-export const revalidate = 300
+export const revalidate = false
 
 type Props = { params: Promise<{ slug: string }> }
 

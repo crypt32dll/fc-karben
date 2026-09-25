@@ -2,7 +2,7 @@ import { RenderBlocks } from '@/components/blocks/RenderBlocks'
 import { getHomepage, getRenderContextData } from '@/lib/content-catalog'
 import { defaultHomepageLayout } from '@/lib/page-builder/default-homepage-layout'
 
-export const revalidate = 300
+export const revalidate = false
 
 export default async function HomePage() {
   const [homepage, context] = await Promise.all([getHomepage(), getRenderContextData()])

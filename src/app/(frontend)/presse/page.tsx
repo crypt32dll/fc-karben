@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
 
-export const revalidate = 300
+export const revalidate = false
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getSeiteBySlug('presse')

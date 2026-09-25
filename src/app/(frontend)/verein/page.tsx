@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { catalogSeoToMetadata, getSeiteBySlug } from '@/lib/content-catalog'
 
-export const revalidate = 300
+export const revalidate = false
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getSeiteBySlug('verein')

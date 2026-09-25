@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { catalogSeoToMetadata, getSeiteByPath, getSeiteBySlug } from '@/lib/content-catalog'
 
-export const revalidate = 300
+export const revalidate = false
 
 type Props = { params: Promise<{ segment: string }> }
 
