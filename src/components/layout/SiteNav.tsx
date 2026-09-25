@@ -110,14 +110,6 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         hidden={!open}
         className="absolute left-0 top-full z-50 min-w-[12rem] border border-line bg-white py-1 shadow-sm"
       >
-        <ClubLink
-          href={item.href}
-          role="menuitem"
-          className="block min-h-11 px-3 py-2.5 text-sm font-semibold text-ink hover:bg-paper hover:text-navy focus-visible:bg-paper focus-visible:outline-none"
-          onClick={() => setOpen(false)}
-        >
-          Übersicht
-        </ClubLink>
         {item.children?.map((child) => (
           <ClubLink
             key={child.href}
