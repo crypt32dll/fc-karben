@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import type { ReactNode } from 'react'
 
+import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
 import type { MatchDto } from '@/lib/match-feed'
@@ -24,7 +25,13 @@ import { type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
 export type RenderContext = {
   nextMatch?: MatchDto | null
   socialTiles?: SocialTileDto[]
-  notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
+  notices?: Array<{
+    title: string
+    publishedAt?: string | null
+    path: string
+    featuredImageUrl?: string | null
+    featuredImageAlt?: string | null
+  }>
   teams?: CatalogTeam[]
   sponsors?: CatalogSponsor[]
 }
@@ -281,7 +288,14 @@ function SocialGridFromBlock({
               href={tile.url || 'https://www.instagram.com/fckarben/'}
               className="relative aspect-square overflow-hidden bg-navy"
             >
-              <Image src={tile.imageUrl} alt={tile.caption || ''} fill className="object-cover" />
+              <Image
+                src={tile.imageUrl}
+                alt={tile.caption || ''}
+                fill
+                className="object-cover"
+                loading="lazy"
+                sizes="(max-width: 768px) 50vw, 33vw"
+              />
             </a>
           ) : (
             <div
@@ -409,7 +423,13 @@ function PostListFromBlock({
   notices,
 }: {
   block: PostListBlockView
-  notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
+  notices?: Array<{
+    title: string
+    publishedAt?: string | null
+    path: string
+    featuredImageUrl?: string | null
+    featuredImageAlt?: string | null
+  }>
 }) {
   const limit = block.limit ?? 6
   return (
@@ -425,7 +445,12 @@ function PostListFromBlock({
       <div className="grid gap-7 md:grid-cols-3">
         {(notices || []).slice(0, limit).map((n) => (
           <a key={n.path} href={n.path} className="border border-line">
-            <div className="h-[170px] bg-navy" />
+            <FeaturedMedia
+              src={n.featuredImageUrl}
+              alt={n.featuredImageAlt || n.title}
+              aspectClassName="h-[170px] aspect-auto"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
             <div className="p-5">
               <span className="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-pitch">
                 {n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('de-DE') : ''}
@@ -452,6 +477,7 @@ function ImageFromBlock({ block }: { block: ImageBlockView }) {
             fill
             className="object-cover"
             sizes="(max-width: 1120px) 100vw, 1120px"
+            loading="lazy"
           />
         </div>
       ) : (

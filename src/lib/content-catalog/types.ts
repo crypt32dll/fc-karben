@@ -21,6 +21,8 @@ export type CatalogPost = {
   updatedAt?: string | null
   path: string
   content?: CatalogBody | null
+  featuredImageUrl?: string | null
+  featuredImageAlt?: string | null
   categories?: Array<{ title: string; slug: string }>
   seo?: CatalogSeo
 }

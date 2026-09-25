@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
 
@@ -47,6 +48,12 @@ export default async function PresseArtikelPage({ params }: Props) {
           })}
         </time>
       ) : null}
+      <FeaturedMedia
+        src={post.featuredImageUrl}
+        alt={post.featuredImageAlt || post.title}
+        priority
+        className="mt-8"
+      />
       <div className="mt-10">
         <LexicalContent data={post.content} />
       </div>

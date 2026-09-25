@@ -6,7 +6,7 @@ import { getPayloadClient } from '../payload'
 import { type RedirectRule, redirectRulesSchema } from '../redirects'
 import type { SocialTileDto } from '../social-feed'
 import { mapCatalogBody } from './body'
-import { mapCategories, mapSeo, mapTeamsForGrid, postPath } from './mappers'
+import { mapCategories, mapFeaturedImage, mapSeo, mapTeamsForGrid, postPath } from './mappers'
 import type {
   CatalogHomepage,
   CatalogPage,
@@ -49,17 +49,22 @@ export async function findBeitrage(
     overrideAccess: true,
   })
 
-  const posts: CatalogPost[] = result.docs.map((doc) => ({
-    id: String(doc.id),
-    title: doc.title,
-    slug: doc.slug,
-    excerpt: doc.excerpt,
-    publishedAt: doc.publishedAt,
-    updatedAt: doc.updatedAt,
-    path: postPath(doc.slug),
-    seo: docMeta(doc),
-    categories: mapCategories(doc.categories),
-  }))
+  const posts: CatalogPost[] = result.docs.map((doc) => {
+    const featured = mapFeaturedImage(doc.featuredImage)
+    return {
+      id: String(doc.id),
+      title: doc.title,
+      slug: doc.slug,
+      excerpt: doc.excerpt,
+      publishedAt: doc.publishedAt,
+      updatedAt: doc.updatedAt,
+      path: postPath(doc.slug),
+      featuredImageUrl: featured.featuredImageUrl,
+      featuredImageAlt: featured.featuredImageAlt,
+      seo: docMeta(doc),
+      categories: mapCategories(doc.categories),
+    }
+  })
 
   return { posts, totalDocs: result.totalDocs, totalPages: result.totalPages }
 }
@@ -85,6 +90,7 @@ export async function findBeitragBySlug(
   const doc = result.docs[0]
   if (!doc) return null
 
+  const featured = mapFeaturedImage(doc.featuredImage)
   return {
     id: String(doc.id),
     title: doc.title,
@@ -94,6 +100,8 @@ export async function findBeitragBySlug(
     updatedAt: doc.updatedAt,
     path: postPath(doc.slug),
     content: mapCatalogBody(doc.content),
+    featuredImageUrl: featured.featuredImageUrl,
+    featuredImageAlt: featured.featuredImageAlt,
     seo: docMeta(doc),
     categories: mapCategories(doc.categories),
   }

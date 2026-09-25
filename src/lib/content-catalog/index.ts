@@ -228,6 +228,8 @@ export async function getRenderContextData() {
       title: p.title,
       publishedAt: p.publishedAt,
       path: p.path,
+      featuredImageUrl: p.featuredImageUrl,
+      featuredImageAlt: p.featuredImageAlt,
     })),
   }
 }

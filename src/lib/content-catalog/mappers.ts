@@ -20,6 +20,21 @@ export function mapSeo(meta: unknown): CatalogSeo | undefined {
   return parsed.data
 }
 
+/** Resolve Payload upload relation → URL + alt for ClubSite images. */
+export function mapFeaturedImage(media: unknown): {
+  featuredImageUrl: string | null
+  featuredImageAlt: string | null
+} {
+  if (!media || typeof media !== 'object') {
+    return { featuredImageUrl: null, featuredImageAlt: null }
+  }
+  const m = media as { url?: string | null; alt?: string | null }
+  return {
+    featuredImageUrl: typeof m.url === 'string' && m.url.length > 0 ? m.url : null,
+    featuredImageAlt: typeof m.alt === 'string' ? m.alt : null,
+  }
+}
+
 export function mapPostsForList(
   docs: Array<{
     id: string | number
