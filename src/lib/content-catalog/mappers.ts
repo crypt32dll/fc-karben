@@ -1,28 +1,23 @@
+import { postPath, teamPath } from '../club-paths'
 import { createLogger } from '../logger'
+import { payloadMetaSchema } from './schemas'
 import type { CatalogPost, CatalogSeo, CatalogTeam } from './types'
 
 const log = createLogger('ContentCatalog')
 
-export function postPath(slug: string): string {
-  return `/presse/${slug}`
-}
+export { postPath, teamPath }
 
-export function teamPath(slug: string): string {
-  return `/${slug}`
-}
-
-export function mapSeo(seo: Record<string, unknown> | null | undefined): CatalogSeo | undefined {
-  if (!seo) return undefined
-  const og = seo.ogImage as { url?: string } | number | string | null | undefined
-  const ogImageUrl = typeof og === 'object' && og && 'url' in og ? og.url : undefined
-  return {
-    metaTitle: (seo.metaTitle as string) || null,
-    metaDescription: (seo.metaDescription as string) || null,
-    noIndex: Boolean(seo.noIndex),
-    noFollow: Boolean(seo.noFollow),
-    canonicalOverride: (seo.canonicalOverride as string) || null,
-    ogImageUrl: ogImageUrl || null,
+/** Map Payload SEO plugin `meta` group (or legacy `seo` group) to CatalogSeo. */
+export function mapSeo(meta: unknown): CatalogSeo | undefined {
+  if (!meta || typeof meta !== 'object') return undefined
+  const parsed = payloadMetaSchema.safeParse(meta)
+  if (!parsed.success) {
+    log.warn('Invalid SEO meta dropped', {
+      issues: parsed.error.issues.map((i) => i.message),
+    })
+    return undefined
   }
+  return parsed.data
 }
 
 export function mapPostsForList(

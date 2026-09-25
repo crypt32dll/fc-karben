@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
-import { seoFields } from '../fields/seo'
 import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Teams: CollectionConfig = {
@@ -85,6 +84,5 @@ export const Teams: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
     },
-    seoFields,
   ],
 }

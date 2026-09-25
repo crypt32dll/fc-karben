@@ -1,3 +1,5 @@
+import type { PageLayoutView } from '../page-builder'
+
 export type CatalogSeo = {
   metaTitle?: string | null
   metaDescription?: string | null
@@ -26,7 +28,7 @@ export type CatalogPage = {
   slug: string
   path: string
   content?: unknown
-  layout?: unknown[] | null
+  layout?: PageLayoutView | null
   seo?: CatalogSeo
   updatedAt?: string | null
 }
@@ -87,5 +89,5 @@ export type CatalogHomepage = {
   heroPrimaryCta?: { label?: string | null; href?: string | null }
   heroSecondaryCta?: { label?: string | null; href?: string | null }
   vereinIntro?: string | null
-  layout?: unknown[] | null
+  layout?: PageLayoutView | null
 }

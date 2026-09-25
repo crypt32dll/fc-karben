@@ -1,8 +1,18 @@
+import { z } from 'zod'
+
 export type RedirectRule = {
   from: string
   to: string
   permanent?: boolean
 }
+
+export const redirectRuleSchema = z.object({
+  from: z.string().min(1),
+  to: z.string().min(1),
+  permanent: z.boolean().optional(),
+})
+
+export const redirectRulesSchema = z.array(redirectRuleSchema)
 
 export function normalizePath(path: string): string {
   if (!path) return '/'
@@ -47,8 +57,11 @@ export function resolveRedirect(
   pathname: string,
   rules: RedirectRule[],
 ): { to: string; permanent: boolean } | null {
+  const parsed = redirectRulesSchema.safeParse(rules)
+  const safeRules = parsed.success ? parsed.data : []
+
   const from = normalizePath(pathname)
-  const hit = rules.find((r) => normalizePath(r.from) === from)
+  const hit = safeRules.find((r) => normalizePath(r.from) === from)
   if (hit) {
     const to = normalizePath(hit.to)
     if (!isSafeRedirectTarget(to)) return null

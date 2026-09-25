@@ -11,7 +11,7 @@ export async function CmsPageBody({ page }: { page: CatalogPage }) {
       <h1 className="text-5xl text-navy">{page.title}</h1>
       {hasBlocks && context ? (
         <div className="mt-10 -mx-8 max-w-none md:mx-0">
-          <RenderBlocks blocks={page.layout as never} context={context} />
+          <RenderBlocks blocks={page.layout} context={context} />
         </div>
       ) : (
         <div className="mt-8">

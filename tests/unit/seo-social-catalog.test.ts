@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapPostsForList } from '../../src/lib/content-catalog/index'
+import { mapPostsForList } from '../../src/lib/content-catalog/mappers'
 import { cleanSeoValue, extractSeoFromMeta } from '../../src/lib/migration/wxr'
 import {
   absoluteUrl,

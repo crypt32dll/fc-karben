@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 
 import { CACHE_TAGS, CATALOG_REVALIDATE_SECONDS } from '../cache/revalidate'
+import type { MatchDto } from '../match-feed'
 import type { RedirectRule } from '../redirects'
 import { toNextMetadata } from '../seo'
 import type { SocialTileDto } from '../social-feed'
@@ -11,6 +12,7 @@ import {
   findHomepage,
   findMannschaftBySlug,
   findMannschaften,
+  findNextMatch,
   findRedirectRules,
   findSeiteByPath,
   findSeiteBySlug,
@@ -18,6 +20,7 @@ import {
   findSocialTiles,
   findSponsoren,
 } from './payload-adapter'
+import { findSearchHits, type SearchHit } from './search'
 import type {
   CatalogHomepage,
   CatalogPage,
@@ -29,6 +32,7 @@ import type {
 } from './types'
 
 export { mapPostsForList, mapTeamsForGrid, postPath, teamPath } from './mappers'
+export type { SearchHit } from './search'
 export { DEFAULT_TEAMS } from './seed-teams'
 export type {
   CatalogHomepage,
@@ -155,18 +159,31 @@ export async function listRedirectRules(): Promise<RedirectRule[]> {
   })()
 }
 
+export async function searchContent(query: string, limit = 24): Promise<SearchHit[]> {
+  return findSearchHits(query, limit)
+}
+
+export async function getNextMatch(): Promise<MatchDto | null> {
+  return unstable_cache(() => findNextMatch(), ['next-match'], {
+    revalidate: 120,
+    tags: [CACHE_TAGS.matches],
+  })()
+}
+
 /** Load shared block context once per page render. */
 export async function getRenderContextData() {
-  const [teams, sponsors, socialTiles, { posts }] = await Promise.all([
+  const [teams, sponsors, socialTiles, { posts }, nextMatch] = await Promise.all([
     listMannschaften(),
     listSponsoren(),
     listSocialTiles(),
     listBeitrage({ limit: 6 }),
+    getNextMatch(),
   ])
   return {
     teams,
     sponsors,
     socialTiles,
+    nextMatch,
     notices: posts.map((p) => ({
       title: p.title,
       publishedAt: p.publishedAt,

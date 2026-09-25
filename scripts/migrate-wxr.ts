@@ -167,6 +167,11 @@ async function seedTeams(payload: Payload) {
 }
 
 async function upsertRedirect(payload: Payload, from: string, to: string) {
+  const data = {
+    from,
+    to: { type: 'custom' as const, url: to },
+    type: '308' as const,
+  }
   const existing = await payload.find({
     collection: 'redirects',
     where: { from: { equals: from } },
@@ -177,14 +182,14 @@ async function upsertRedirect(payload: Payload, from: string, to: string) {
     await payload.update({
       collection: 'redirects',
       id: existing.docs[0].id,
-      data: { to, permanent: true },
+      data,
       overrideAccess: true,
       context: { disableRevalidate: true },
     })
   } else {
     await payload.create({
       collection: 'redirects',
-      data: { from, to, permanent: true },
+      data,
       overrideAccess: true,
       context: { disableRevalidate: true },
     })
@@ -320,9 +325,9 @@ async function applyMigration() {
         slug,
         path: pathname,
         content,
-        seo: {
-          metaTitle: page.seo.metaTitle,
-          metaDescription: page.seo.metaDescription,
+        meta: {
+          title: page.seo.metaTitle,
+          description: page.seo.metaDescription,
         },
         _status: 'published',
       })
@@ -365,9 +370,9 @@ async function applyMigration() {
         categories: categoryIds,
         featuredImage,
         publishedAt,
-        seo: {
-          metaTitle: post.seo.metaTitle,
-          metaDescription:
+        meta: {
+          title: post.seo.metaTitle,
+          description:
             post.seo.metaDescription || stripHtml(post.excerpt).slice(0, 160) || undefined,
         },
         _status: 'published',

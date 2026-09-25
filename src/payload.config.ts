@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 
 import { collections } from './collections'
 import { Homepage, SiteSettings } from './globals/SiteSettings'
+import { buildPlugins } from './payload/plugins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,6 +24,8 @@ const r2Configured = Boolean(
     process.env.R2_SECRET_ACCESS_KEY &&
     process.env.R2_ENDPOINT,
 )
+
+const plugins = await buildPlugins(r2Configured)
 
 export default buildConfig({
   admin: {
@@ -48,6 +51,7 @@ export default buildConfig({
     },
   }),
   plugins: [
+    ...plugins,
     ...(r2Configured
       ? [
           s3Storage({

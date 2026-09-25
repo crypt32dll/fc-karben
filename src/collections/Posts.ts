@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor, publishedOrStaff } from '../access'
-import { seoFields, wpIdField } from '../fields/seo'
+import { wpIdField } from '../fields/seo'
 import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Posts: CollectionConfig = {
@@ -58,7 +58,6 @@ export const Posts: CollectionConfig = {
       relationTo: 'categories',
       hasMany: true,
     },
-    seoFields,
     wpIdField,
   ],
 }

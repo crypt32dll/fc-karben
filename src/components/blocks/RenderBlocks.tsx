@@ -1,13 +1,25 @@
+import Image from 'next/image'
 import type { ReactNode } from 'react'
 
+import { LexicalContent } from '@/components/cms/LexicalContent'
 import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
-import { type MatchDto, pickNextMatch } from '@/lib/match-feed'
+import type { MatchDto } from '@/lib/match-feed'
+import type {
+  BoardBlockView,
+  CtaBlockView,
+  DownloadsBlockView,
+  HeroBlockView,
+  ImageBlockView,
+  LayoutBlockView,
+  PostListBlockView,
+  RichTextBlockView,
+  ScoreboardBlockView,
+  SocialGridBlockView,
+  SpacerBlockView,
+  SponsorsBlockView,
+  TeamGridBlockView,
+} from '@/lib/page-builder'
 import { type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
-
-type BlockBase = {
-  id?: string | null
-  blockType: string
-}
 
 export type RenderContext = {
   nextMatch?: MatchDto | null
@@ -29,7 +41,7 @@ export function RenderBlocks({
   blocks,
   context = {},
 }: {
-  blocks: BlockBase[] | null | undefined
+  blocks: LayoutBlockView[] | null | undefined
   context?: RenderContext
 }) {
   if (!blocks?.length) return null
@@ -40,50 +52,36 @@ export function RenderBlocks({
         const key = block.id || `${block.blockType}-${index}`
         switch (block.blockType) {
           case 'hero':
-            return <HeroFromBlock key={key} block={block as never} />
+            return <HeroFromBlock key={key} block={block} />
           case 'richText':
-            return <RichTextFromBlock key={key} block={block as never} />
+            return <RichTextFromBlock key={key} block={block} />
           case 'cta':
-            return <CtaFromBlock key={key} block={block as never} />
+            return <CtaFromBlock key={key} block={block} />
           case 'teamGrid':
-            return (
-              <TeamGridFromBlock key={key} block={block as never} teams={context.teams || []} />
-            )
+            return <TeamGridFromBlock key={key} block={block} teams={context.teams || []} />
           case 'scoreboard':
-            return (
-              <ScoreboardFromBlock
-                key={key}
-                block={block as never}
-                match={context.nextMatch ?? pickNextMatch([])}
-              />
-            )
+            return <ScoreboardFromBlock key={key} block={block} match={context.nextMatch ?? null} />
           case 'socialGrid':
             return (
               <SocialGridFromBlock
                 key={key}
-                block={block as never}
-                tiles={selectSocialTiles(context.socialTiles || [], 6)}
+                block={block}
+                tiles={selectSocialTiles(context.socialTiles || [], block.maxTiles ?? 6)}
                 notices={context.notices || []}
               />
             )
           case 'sponsors':
-            return (
-              <SponsorsFromBlock
-                key={key}
-                block={block as never}
-                sponsors={context.sponsors || []}
-              />
-            )
+            return <SponsorsFromBlock key={key} block={block} sponsors={context.sponsors || []} />
           case 'board':
-            return <BoardFromBlock key={key} block={block as never} />
+            return <BoardFromBlock key={key} block={block} />
           case 'downloads':
-            return <DownloadsFromBlock key={key} block={block as never} />
+            return <DownloadsFromBlock key={key} block={block} />
           case 'spacer':
-            return <SpacerFromBlock key={key} block={block as never} />
+            return <SpacerFromBlock key={key} block={block} />
           case 'postList':
-            return <PostListFromBlock key={key} block={block as never} notices={context.notices} />
+            return <PostListFromBlock key={key} block={block} notices={context.notices} />
           case 'image':
-            return <ImageFromBlock key={key} block={block as never} />
+            return <ImageFromBlock key={key} block={block} />
           default:
             return null
         }
@@ -92,17 +90,7 @@ export function RenderBlocks({
   )
 }
 
-function HeroFromBlock({
-  block,
-}: {
-  block: {
-    eyebrow?: string
-    title?: string
-    lead?: string
-    primaryCta?: { label?: string; href?: string }
-    secondaryCta?: { label?: string; href?: string }
-  }
-}) {
+function HeroFromBlock({ block }: { block: HeroBlockView }) {
   return (
     <section className="relative overflow-hidden bg-navy text-white">
       <div className="relative z-10 mx-auto max-w-[1120px] px-8 pb-16 pt-24">
@@ -140,28 +128,16 @@ function HeroFromBlock({
   )
 }
 
-function RichTextFromBlock({ block }: { block: { heading?: string; body?: unknown } }) {
+function RichTextFromBlock({ block }: { block: RichTextBlockView }) {
   return (
     <Wrap>
       {block.heading ? <h2 className="mb-6 text-[38px] text-navy">{block.heading}</h2> : null}
-      <div className="prose prose-neutral max-w-3xl text-ink">
-        <p className="text-ink-soft text-sm">Inhalt aus dem Page Builder.</p>
-      </div>
+      <LexicalContent data={block.body} />
     </Wrap>
   )
 }
 
-function CtaFromBlock({
-  block,
-}: {
-  block: {
-    heading?: string
-    text?: string
-    buttonLabel?: string
-    buttonHref?: string
-    variant?: string
-  }
-}) {
+function CtaFromBlock({ block }: { block: CtaBlockView }) {
   const bg =
     block.variant === 'pitch'
       ? 'bg-pitch text-white'
@@ -173,27 +149,22 @@ function CtaFromBlock({
       <div className={`rounded-[2px] p-10 ${bg}`}>
         <h2 className="text-3xl">{block.heading}</h2>
         {block.text ? <p className="mt-3 max-w-xl opacity-90">{block.text}</p> : null}
-        {block.buttonHref && block.buttonLabel ? (
-          <a
-            href={block.buttonHref}
-            className="mt-6 inline-flex rounded-[2px] bg-white px-5 py-3 text-sm font-semibold text-navy"
-          >
-            {block.buttonLabel}
-          </a>
-        ) : null}
+        <a
+          href={block.buttonHref}
+          className="mt-6 inline-flex rounded-[2px] bg-white px-5 py-3 text-sm font-semibold text-navy"
+        >
+          {block.buttonLabel}
+        </a>
       </div>
     </Wrap>
   )
 }
 
-function TeamGridFromBlock({
-  block,
-  teams,
-}: {
-  block: { eyebrow?: string; heading?: string }
-  teams: CatalogTeam[]
-}) {
-  if (!teams.length) return null
+function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: CatalogTeam[] }) {
+  const filtered = block.teamIds?.length
+    ? teams.filter((t) => block.teamIds?.includes(t.id))
+    : teams
+  if (!filtered.length) return null
   return (
     <Wrap>
       <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
@@ -213,7 +184,7 @@ function TeamGridFromBlock({
         </a>
       </div>
       <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-        {teams.slice(0, 4).map((team) => (
+        {filtered.slice(0, 4).map((team) => (
           <a
             key={team.id}
             href={team.path}
@@ -233,7 +204,7 @@ function ScoreboardFromBlock({
   block,
   match,
 }: {
-  block: { label?: string; fallbackText?: string }
+  block: ScoreboardBlockView
   match: MatchDto | null
 }) {
   return (
@@ -273,7 +244,7 @@ function SocialGridFromBlock({
   tiles,
   notices,
 }: {
-  block: { eyebrow?: string; heading?: string }
+  block: SocialGridBlockView
   tiles: SocialTileDto[]
   notices: Array<{ title: string; publishedAt?: string | null; path: string }>
 }) {
@@ -294,8 +265,25 @@ function SocialGridFromBlock({
         </a>
       </div>
       <div className="mb-10 grid grid-cols-3 gap-0.5 md:grid-cols-6">
-        {(tiles.length ? tiles : Array.from({ length: 6 }).map((_, i) => ({ id: `ph-${i}` }))).map(
-          (tile) => (
+        {(tiles.length
+          ? tiles
+          : Array.from({ length: block.maxTiles ?? 6 }).map((_, i) => ({
+              id: `ph-${i}`,
+              imageUrl: null as string | null,
+              url: null as string | null,
+              caption: null as string | null,
+              sortOrder: i,
+            }))
+        ).map((tile) =>
+          tile.imageUrl ? (
+            <a
+              key={tile.id}
+              href={tile.url || 'https://www.instagram.com/fckarben/'}
+              className="relative aspect-square overflow-hidden bg-navy"
+            >
+              <Image src={tile.imageUrl} alt={tile.caption || ''} fill className="object-cover" />
+            </a>
+          ) : (
             <div
               key={tile.id}
               className="aspect-square bg-navy odd:bg-navy-mid even:bg-navy-deep"
@@ -333,7 +321,7 @@ function SponsorsFromBlock({
   block,
   sponsors,
 }: {
-  block: { eyebrow?: string }
+  block: SponsorsBlockView
   sponsors: CatalogSponsor[]
 }) {
   return (
@@ -365,11 +353,7 @@ function SponsorsFromBlock({
   )
 }
 
-function BoardFromBlock({
-  block,
-}: {
-  block: { heading?: string; members?: Array<{ role: string; name: string; detail?: string }> }
-}) {
+function BoardFromBlock({ block }: { block: BoardBlockView }) {
   return (
     <Wrap>
       <h2 className="mb-8 text-[38px] text-navy">{block.heading || 'Vorstand'}</h2>
@@ -388,18 +372,26 @@ function BoardFromBlock({
   )
 }
 
-function DownloadsFromBlock({
-  block,
-}: {
-  block: { heading?: string; files?: Array<{ label: string }> }
-}) {
+function DownloadsFromBlock({ block }: { block: DownloadsBlockView }) {
   return (
     <Wrap>
       <h2 className="mb-6 text-[38px] text-navy">{block.heading || 'Formulare'}</h2>
       <ul className="space-y-2">
         {(block.files || []).map((f) => (
-          <li key={f.label} className="border border-line px-4 py-3 font-semibold text-navy">
-            {f.label}
+          <li key={f.label}>
+            {f.url ? (
+              <a
+                href={f.url}
+                className="block border border-line px-4 py-3 font-semibold text-navy hover:bg-paper"
+                download
+              >
+                {f.label}
+              </a>
+            ) : (
+              <span className="block border border-line px-4 py-3 font-semibold text-ink-soft">
+                {f.label}
+              </span>
+            )}
           </li>
         ))}
       </ul>
@@ -407,7 +399,7 @@ function DownloadsFromBlock({
   )
 }
 
-function SpacerFromBlock({ block }: { block: { size?: string } }) {
+function SpacerFromBlock({ block }: { block: SpacerBlockView }) {
   const h = block.size === 'sm' ? 'h-8' : block.size === 'lg' ? 'h-24' : 'h-16'
   return <div className={h} aria-hidden />
 }
@@ -416,9 +408,10 @@ function PostListFromBlock({
   block,
   notices,
 }: {
-  block: { eyebrow?: string; heading?: string }
+  block: PostListBlockView
   notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
 }) {
+  const limit = block.limit ?? 6
   return (
     <Wrap>
       <div className="mb-8">
@@ -430,7 +423,7 @@ function PostListFromBlock({
         <h2 className="text-[38px] text-navy">{block.heading || 'Presse'}</h2>
       </div>
       <div className="grid gap-7 md:grid-cols-3">
-        {(notices || []).slice(0, 6).map((n) => (
+        {(notices || []).slice(0, limit).map((n) => (
           <a key={n.path} href={n.path} className="border border-line">
             <div className="h-[170px] bg-navy" />
             <div className="p-5">
@@ -448,10 +441,22 @@ function PostListFromBlock({
   )
 }
 
-function ImageFromBlock({ block }: { block: { caption?: string } }) {
+function ImageFromBlock({ block }: { block: ImageBlockView }) {
   return (
     <Wrap>
-      <div className="aspect-[16/9] bg-navy-mid" />
+      {block.imageUrl ? (
+        <div className="relative aspect-[16/9] overflow-hidden bg-navy-mid">
+          <Image
+            src={block.imageUrl}
+            alt={block.imageAlt || block.caption || ''}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1120px) 100vw, 1120px"
+          />
+        </div>
+      ) : (
+        <div className="aspect-[16/9] bg-navy-mid" />
+      )}
       {block.caption ? <p className="mt-2 text-sm text-ink-soft">{block.caption}</p> : null}
     </Wrap>
   )

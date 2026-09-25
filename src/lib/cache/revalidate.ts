@@ -13,6 +13,7 @@ export const CACHE_TAGS = {
   redirects: 'redirects',
   homepage: 'homepage',
   siteSettings: 'site-settings',
+  matches: 'matches',
 } as const
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]

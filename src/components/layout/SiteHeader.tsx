@@ -8,6 +8,7 @@ const nav = [
   { href: '/#mannschaften', label: 'Mannschaften' },
   { href: '/verein', label: 'Verein' },
   { href: '/presse', label: 'Presse' },
+  { href: '/suche', label: 'Suche' },
   { href: '/sponsoren', label: 'Sponsoren' },
   { href: '/anfahrt', label: 'Anfahrt' },
 ]

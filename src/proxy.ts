@@ -12,7 +12,7 @@ import {
  * Edge redirects: built-in WP rules first, then cached CMS redirect map.
  * Matcher excludes /_next, /api, /admin, and files with extensions.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Fast built-in: dated WP permalinks (no network)

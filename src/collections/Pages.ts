@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { pageBlocks } from '../blocks'
-import { seoFields, wpIdField } from '../fields/seo'
+import { wpIdField } from '../fields/seo'
 import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Pages: CollectionConfig = {
@@ -77,10 +77,6 @@ export const Pages: CollectionConfig = {
               relationTo: 'media',
             },
           ],
-        },
-        {
-          label: 'SEO',
-          fields: [seoFields],
         },
       ],
     },

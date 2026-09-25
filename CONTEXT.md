@@ -19,6 +19,9 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **MigrationPipeline** | WXR extract → transform → load into Payload |
 | **ClubSite** | Public Next.js App Router frontend |
 | **Page Builder** | Payload `blocks` layout on `pages` (and homepage sections) so editors compose pages without code |
+| **LayoutView** | Zod-validated page-builder DTO (discriminated union on `blockType`) consumed by `RenderBlocks` |
+| **clubPaths** | Canonical path helpers (`postPath`, `teamPath`, `pathForDoc`) shared by SEO, redirects, search, catalog |
+| **SeoSurface** | Metadata, JSON-LD, sitemap, robots — fed by Payload SEO plugin `meta` via ContentCatalog |
 | **wpId** | Stable WordPress ID used for idempotent migration upserts |
 
 ## Roles

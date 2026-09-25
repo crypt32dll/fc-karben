@@ -56,24 +56,6 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
-      name: 'defaultSeo',
-      type: 'group',
-      fields: [
-        { name: 'metaTitle', type: 'text', defaultValue: 'FC Karben e.V.' },
-        {
-          name: 'metaDescription',
-          type: 'textarea',
-          defaultValue:
-            'FC Karben e.V. — Fußball in Karben seit 2015. Mannschaften, News und Verein.',
-        },
-        {
-          name: 'ogImage',
-          type: 'upload',
-          relationTo: 'media',
-        },
-      ],
-    },
-    {
       name: 'gscVerification',
       type: 'text',
       admin: {

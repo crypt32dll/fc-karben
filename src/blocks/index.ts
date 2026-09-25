@@ -2,6 +2,7 @@ import type { Block } from 'payload'
 
 export const HeroBlock: Block = {
   slug: 'hero',
+  interfaceName: 'HeroBlock',
   labels: { singular: 'Hero', plural: 'Hero' },
   fields: [
     { name: 'eyebrow', type: 'text' },
@@ -28,6 +29,7 @@ export const HeroBlock: Block = {
 
 export const RichTextBlock: Block = {
   slug: 'richText',
+  interfaceName: 'RichTextBlock',
   labels: { singular: 'Text', plural: 'Text' },
   fields: [
     { name: 'heading', type: 'text' },
@@ -37,6 +39,7 @@ export const RichTextBlock: Block = {
 
 export const CtaBlock: Block = {
   slug: 'cta',
+  interfaceName: 'CtaBlock',
   labels: { singular: 'Call to Action', plural: 'CTAs' },
   fields: [
     { name: 'heading', type: 'text', required: true },
@@ -58,6 +61,7 @@ export const CtaBlock: Block = {
 
 export const ImageBlock: Block = {
   slug: 'image',
+  interfaceName: 'ImageBlock',
   labels: { singular: 'Bild', plural: 'Bilder' },
   fields: [
     {
@@ -72,6 +76,7 @@ export const ImageBlock: Block = {
 
 export const TeamGridBlock: Block = {
   slug: 'teamGrid',
+  interfaceName: 'TeamGridBlock',
   labels: { singular: 'Mannschaften-Grid', plural: 'Mannschaften-Grids' },
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Unsere Teams' },
@@ -90,6 +95,7 @@ export const TeamGridBlock: Block = {
 
 export const PostListBlock: Block = {
   slug: 'postList',
+  interfaceName: 'PostListBlock',
   labels: { singular: 'Beitrags-Liste', plural: 'Beitrags-Listen' },
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Aktuelles' },
@@ -112,6 +118,7 @@ export const PostListBlock: Block = {
 
 export const ScoreboardBlock: Block = {
   slug: 'scoreboard',
+  interfaceName: 'ScoreboardBlock',
   labels: { singular: 'Nächstes Spiel', plural: 'Scoreboards' },
   fields: [
     {
@@ -129,6 +136,7 @@ export const ScoreboardBlock: Block = {
 
 export const SocialGridBlock: Block = {
   slug: 'socialGrid',
+  interfaceName: 'SocialGridBlock',
   labels: { singular: 'Social Grid', plural: 'Social Grids' },
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Live von Instagram' },
@@ -145,12 +153,14 @@ export const SocialGridBlock: Block = {
 
 export const SponsorsBlock: Block = {
   slug: 'sponsors',
+  interfaceName: 'SponsorsBlock',
   labels: { singular: 'Sponsoren', plural: 'Sponsoren' },
   fields: [{ name: 'eyebrow', type: 'text', defaultValue: 'Unsere Sponsoren' }],
 }
 
 export const DownloadsBlock: Block = {
   slug: 'downloads',
+  interfaceName: 'DownloadsBlock',
   labels: { singular: 'Downloads', plural: 'Downloads' },
   fields: [
     { name: 'heading', type: 'text', defaultValue: 'Formulare' },
@@ -172,6 +182,7 @@ export const DownloadsBlock: Block = {
 
 export const BoardBlock: Block = {
   slug: 'board',
+  interfaceName: 'BoardBlock',
   labels: { singular: 'Vorstand / Personen', plural: 'Vorstand' },
   fields: [
     { name: 'heading', type: 'text', defaultValue: 'Vorstand' },
@@ -189,6 +200,7 @@ export const BoardBlock: Block = {
 
 export const SpacerBlock: Block = {
   slug: 'spacer',
+  interfaceName: 'SpacerBlock',
   labels: { singular: 'Abstand', plural: 'Abstände' },
   fields: [
     {

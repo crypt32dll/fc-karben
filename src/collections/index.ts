@@ -5,7 +5,6 @@ import { Matches } from './Matches'
 import { Media } from './Media'
 import { Pages } from './Pages'
 import { Posts } from './Posts'
-import { Redirects } from './Redirects'
 import { SocialTiles } from './SocialTiles'
 import { Sponsors } from './Sponsors'
 import { Teams } from './Teams'
@@ -20,6 +19,5 @@ export const collections: CollectionConfig[] = [
   Teams,
   Matches,
   Sponsors,
-  Redirects,
   SocialTiles,
 ]
