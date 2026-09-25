@@ -14,6 +14,9 @@ importers:
       '@payloadcms/email-resend':
         specifier: 3.82.1
         version: 3.82.1(payload@3.82.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))
+      '@payloadcms/live-preview-react':
+        specifier: 3.82.1
+        version: 3.82.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@payloadcms/next':
         specifier: 3.82.1
         version: 3.82.1(@types/react@19.2.14)(graphql@16.14.2)(monaco-editor@0.57.0)(next@16.3.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.63.0)(@types/node@24.12.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.82.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.9.3)
@@ -1777,6 +1780,15 @@ packages:
     peerDependencies:
       graphql: ^16.8.1
       payload: 3.82.1
+
+  '@payloadcms/live-preview-react@3.82.1':
+    resolution: {integrity: sha512-E3J28sI9CzkdmwziX4z0S02eu/JtacEh65beeaNruKNSz3QM7ZIOE9WvK8Zui31SDTpZBa9WXDoHdzWGcjISSg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.1 || ^19.1.2 || ^19.2.1
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.1 || ^19.1.2 || ^19.2.1
+
+  '@payloadcms/live-preview@3.82.1':
+    resolution: {integrity: sha512-+0WyHiH093EwNfY4IvHlUD1sCU0Ez3ya4ouTl7FqSDc+S4HY3lmLLduMgxS1iGXQUptF3CLNqM5qxQpqpa7tHg==}
 
   '@payloadcms/next@3.82.1':
     resolution: {integrity: sha512-3ygV5aFmj7ZLk2r7/rb//3i09ciF1dBgajNJvWDwGzb4NJhL04LCijOJdBnWEIUZuFohpmmuwc2TbXp8cnq39g==}
@@ -6481,6 +6493,14 @@ snapshots:
       tsx: 4.21.0
     transitivePeerDependencies:
       - typescript
+
+  '@payloadcms/live-preview-react@3.82.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@payloadcms/live-preview': 3.82.1
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
+
+  '@payloadcms/live-preview@3.82.1': {}
 
   '@payloadcms/next@3.82.1(@types/react@19.2.14)(graphql@16.14.2)(monaco-editor@0.57.0)(next@16.3.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.63.0)(@types/node@24.12.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.82.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.9.3)':
     dependencies:

@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { wpIdField } from '../fields/seo'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+import { previewURLForPost } from '../lib/preview/urls'
 
 export const postsCache: CachePolicy = {
   tags: [CACHE_TAGS.posts],
@@ -18,9 +19,17 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
+    preview: (doc) => previewURLForPost(doc as { slug?: string }),
+    livePreview: {
+      url: ({ data }) => previewURLForPost(data as { slug?: string }),
+    },
   },
   versions: {
-    drafts: true,
+    drafts: {
+      autosave: {
+        interval: 375,
+      },
+    },
   },
   access: {
     read: publishedOrStaff,

@@ -3,6 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { anyone, isAdmin, isAdminOrEditor } from '../access'
 import { pageBlocks } from '../blocks'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+import { previewURLForHomepage } from '../lib/preview/urls'
 
 export const siteSettingsCache: CachePolicy = {
   tags: [CACHE_TAGS.siteSettings],
@@ -79,6 +80,19 @@ export const Homepage: GlobalConfig = {
   access: {
     read: anyone,
     update: isAdminOrEditor,
+  },
+  admin: {
+    preview: () => previewURLForHomepage(),
+    livePreview: {
+      url: () => previewURLForHomepage(),
+    },
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 375,
+      },
+    },
   },
   fields: [
     {

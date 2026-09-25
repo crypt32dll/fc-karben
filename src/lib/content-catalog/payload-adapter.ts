@@ -19,24 +19,33 @@ import type {
 
 const log = createLogger('ContentCatalog')
 
+export type CatalogReadOpts = {
+  /** When true, return latest draft (Preview / Live Preview). */
+  draft?: boolean
+}
+
 function docMeta(doc: { meta?: unknown; seo?: unknown }): CatalogSeo | undefined {
   return mapSeo((doc.meta || doc.seo) as Record<string, unknown> | undefined)
 }
 
-export async function findBeitrage(options?: {
-  limit?: number
-  page?: number
-}): Promise<{ posts: CatalogPost[]; totalDocs: number; totalPages: number }> {
+export async function findBeitrage(
+  options?: {
+    limit?: number
+    page?: number
+  } & CatalogReadOpts,
+): Promise<{ posts: CatalogPost[]; totalDocs: number; totalPages: number }> {
   const payload = await getPayloadClient()
   const limit = options?.limit ?? 24
   const page = options?.page ?? 1
+  const draft = Boolean(options?.draft)
   const result = await payload.find({
     collection: 'posts',
-    where: { _status: { equals: 'published' } },
+    where: draft ? undefined : { _status: { equals: 'published' } },
     sort: '-publishedAt',
     limit,
     page,
     depth: 1,
+    draft,
     overrideAccess: true,
   })
 
@@ -55,15 +64,22 @@ export async function findBeitrage(options?: {
   return { posts, totalDocs: result.totalDocs, totalPages: result.totalPages }
 }
 
-export async function findBeitragBySlug(slug: string): Promise<CatalogPost | null> {
+export async function findBeitragBySlug(
+  slug: string,
+  opts?: CatalogReadOpts,
+): Promise<CatalogPost | null> {
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   const result = await payload.find({
     collection: 'posts',
-    where: {
-      and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
-    },
+    where: draft
+      ? { slug: { equals: slug } }
+      : {
+          and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
+        },
     limit: 1,
     depth: 1,
+    draft,
     overrideAccess: true,
   })
   const doc = result.docs[0]
@@ -83,15 +99,22 @@ export async function findBeitragBySlug(slug: string): Promise<CatalogPost | nul
   }
 }
 
-export async function findSeiteBySlug(slug: string): Promise<CatalogPage | null> {
+export async function findSeiteBySlug(
+  slug: string,
+  opts?: CatalogReadOpts,
+): Promise<CatalogPage | null> {
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   const result = await payload.find({
     collection: 'pages',
-    where: {
-      and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
-    },
+    where: draft
+      ? { slug: { equals: slug } }
+      : {
+          and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
+        },
     limit: 1,
     depth: 1,
+    draft,
     overrideAccess: true,
   })
   const doc = result.docs[0]
@@ -109,22 +132,29 @@ export async function findSeiteBySlug(slug: string): Promise<CatalogPage | null>
   }
 }
 
-export async function findSeiteByPath(pathname: string): Promise<CatalogPage | null> {
+export async function findSeiteByPath(
+  pathname: string,
+  opts?: CatalogReadOpts,
+): Promise<CatalogPage | null> {
   const path = pathname.startsWith('/') ? pathname : `/${pathname}`
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   const result = await payload.find({
     collection: 'pages',
-    where: {
-      and: [{ path: { equals: path } }, { _status: { equals: 'published' } }],
-    },
+    where: draft
+      ? { path: { equals: path } }
+      : {
+          and: [{ path: { equals: path } }, { _status: { equals: 'published' } }],
+        },
     limit: 1,
     depth: 1,
+    draft,
     overrideAccess: true,
   })
   const doc = result.docs[0]
   if (!doc) {
     const slug = path.split('/').filter(Boolean).pop()
-    return slug ? findSeiteBySlug(slug) : null
+    return slug ? findSeiteBySlug(slug, opts) : null
   }
 
   return {
@@ -139,15 +169,21 @@ export async function findSeiteByPath(pathname: string): Promise<CatalogPage | n
   }
 }
 
-export async function findMannschaften(): Promise<CatalogTeam[]> {
+export async function findMannschaften(opts?: CatalogReadOpts): Promise<CatalogTeam[]> {
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   try {
     const result = await payload.find({
       collection: 'teams',
-      where: { active: { equals: true } },
+      where: draft
+        ? { active: { equals: true } }
+        : {
+            and: [{ active: { equals: true } }, { _status: { equals: 'published' } }],
+          },
       sort: 'sortOrder',
       limit: 20,
       depth: 0,
+      draft,
       overrideAccess: true,
     })
     return mapTeamsForGrid(result.docs)
@@ -159,16 +195,27 @@ export async function findMannschaften(): Promise<CatalogTeam[]> {
   }
 }
 
-export async function findMannschaftBySlug(slug: string): Promise<CatalogTeam | null> {
+export async function findMannschaftBySlug(
+  slug: string,
+  opts?: CatalogReadOpts,
+): Promise<CatalogTeam | null> {
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   try {
     const result = await payload.find({
       collection: 'teams',
-      where: {
-        and: [{ slug: { equals: slug } }, { active: { equals: true } }],
-      },
+      where: draft
+        ? { and: [{ slug: { equals: slug } }, { active: { equals: true } }] }
+        : {
+            and: [
+              { slug: { equals: slug } },
+              { active: { equals: true } },
+              { _status: { equals: 'published' } },
+            ],
+          },
       limit: 1,
       depth: 0,
+      draft,
       overrideAccess: true,
     })
     const doc = result.docs[0]
@@ -287,12 +334,14 @@ export async function findSiteSettings(): Promise<CatalogSiteSettings | null> {
   }
 }
 
-export async function findHomepage(): Promise<CatalogHomepage | null> {
+export async function findHomepage(opts?: CatalogReadOpts): Promise<CatalogHomepage | null> {
   const payload = await getPayloadClient()
+  const draft = Boolean(opts?.draft)
   try {
     const doc = await payload.findGlobal({
       slug: 'homepage',
       depth: 1,
+      draft,
       overrideAccess: true,
     })
     return {

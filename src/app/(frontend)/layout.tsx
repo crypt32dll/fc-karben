@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
 import { Archivo_Black, Barlow_Condensed, Inter } from 'next/font/google'
+import { draftMode } from 'next/headers'
 
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
+import { DraftModeBanner } from '@/components/preview/DraftModeBanner'
+import { RefreshRouteOnSave } from '@/components/preview/RefreshRouteOnSave'
 import { getSiteSettings } from '@/lib/content-catalog'
+import { getPublicSiteURL } from '@/lib/preview/urls'
 import { toNextMetadata } from '@/lib/seo'
 
 import './globals.css'
@@ -29,7 +33,7 @@ const inter = Inter({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+const siteUrl = getPublicSiteURL()
 const isProd = process.env.VERCEL_ENV === 'production'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -59,12 +63,20 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function FrontendLayout({ children }: { children: React.ReactNode }) {
+export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
+  const { isEnabled: isDraftPreview } = await draftMode()
+
   return (
     <html lang="de">
       <body
         className={`${barlow.variable} ${archivo.variable} ${inter.variable} font-body antialiased`}
       >
+        {isDraftPreview ? (
+          <>
+            <DraftModeBanner />
+            <RefreshRouteOnSave serverURL={getPublicSiteURL()} />
+          </>
+        ) : null}
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter />

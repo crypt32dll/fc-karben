@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
 
 import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
+import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+  const site = getPublicSiteURL()
   const staticPaths = [
     '',
     '/presse',

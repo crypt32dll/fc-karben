@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+import { previewURLForTeam } from '../lib/preview/urls'
 
 export const teamsCache: CachePolicy = {
   tags: [CACHE_TAGS.teams],
@@ -17,6 +18,17 @@ export const Teams: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'league', 'active'],
+    preview: (doc) => previewURLForTeam(doc as { slug?: string }),
+    livePreview: {
+      url: ({ data }) => previewURLForTeam(data as { slug?: string }),
+    },
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 375,
+      },
+    },
   },
   access: {
     read: anyone,

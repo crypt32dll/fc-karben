@@ -9,8 +9,7 @@ import type { Plugin } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access'
 import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 import { pathForDoc } from '../lib/club-paths'
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+import { generateSeoDescription, generateSeoTitle, getPublicSiteURL } from '../lib/seo/generate'
 
 export async function buildPlugins(): Promise<Plugin[]> {
   const plugins: Plugin[] = []
@@ -21,25 +20,22 @@ export async function buildPlugins(): Promise<Plugin[]> {
       globals: ['homepage', 'site-settings'],
       uploadsCollection: 'media',
       tabbedUI: false,
-      generateTitle: ({ doc }) => {
-        const title =
-          (doc as { title?: string; name?: string }).title ||
-          (doc as { name?: string }).name ||
-          'FC Karben'
-        return `${title} | FC Karben`
-      },
-      generateDescription: ({ doc }) => {
-        const d = doc as {
-          excerpt?: string
-          summary?: string
-          meta?: { description?: string }
-        }
-        return d.excerpt || d.summary || d.meta?.description || ''
-      },
+      generateTitle: ({ doc }) => generateSeoTitle(doc as { title?: string; name?: string }),
+      generateDescription: ({ doc }) =>
+        generateSeoDescription(
+          doc as {
+            title?: string
+            name?: string
+            excerpt?: string
+            summary?: string
+            content?: unknown
+          },
+        ),
       generateURL: ({ doc, collectionSlug, globalSlug }) => {
+        const siteUrl = getPublicSiteURL()
         if (globalSlug === 'homepage') return siteUrl
         if (globalSlug === 'site-settings') return siteUrl
-        return `${siteUrl.replace(/\/$/, '')}${pathForDoc({
+        return `${siteUrl}${pathForDoc({
           ...(doc as { slug?: string; path?: string }),
           collectionSlug: collectionSlug as string | undefined,
         })}`

@@ -1,8 +1,10 @@
 import type { MetadataRoute } from 'next'
 
+import { getPublicSiteURL } from '@/lib/seo/generate'
+
 export default function robots(): MetadataRoute.Robots {
   const isProd = process.env.VERCEL_ENV === 'production'
-  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+  const site = getPublicSiteURL()
 
   if (!isProd) {
     return {

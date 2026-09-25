@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
+import { draftMode } from 'next/headers'
 
 import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/revalidate'
 import type { MatchDto } from '../match-feed'
 import type { RedirectRule } from '../redirects'
 import { resolveRedirect } from '../redirects'
+import { getPublicSiteURL } from '../seo/generate'
 import { toNextMetadata } from '../seo'
 import type { SocialTileDto } from '../social-feed'
 import {
@@ -49,6 +51,11 @@ export type {
   CatalogTeam,
 } from './types'
 
+async function draftOpts() {
+  const { isEnabled } = await draftMode()
+  return { draft: isEnabled }
+}
+
 export function catalogSeoToMetadata(
   input: {
     title: string
@@ -59,7 +66,7 @@ export function catalogSeoToMetadata(
     seo?: CatalogSeo
     type?: 'website' | 'article'
   },
-  siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de',
+  siteUrl = getPublicSiteURL(),
 ): Metadata {
   return toNextMetadata(
     {
@@ -85,6 +92,8 @@ export async function listBeitrage(options?: {
 }): Promise<{ posts: CatalogPost[]; totalDocs: number; totalPages: number }> {
   const limit = options?.limit ?? 24
   const page = options?.page ?? 1
+  const { draft } = await draftOpts()
+  if (draft) return findBeitrage({ limit, page, draft: true })
   return unstable_cache(
     () => findBeitrage({ limit, page }),
     ['list-beitrage', String(limit), String(page)],
@@ -93,6 +102,8 @@ export async function listBeitrage(options?: {
 }
 
 export async function getBeitragBySlug(slug: string): Promise<CatalogPost | null> {
+  const { draft } = await draftOpts()
+  if (draft) return findBeitragBySlug(slug, { draft: true })
   return unstable_cache(() => findBeitragBySlug(slug), ['beitrag', slug], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.posts],
@@ -100,6 +111,8 @@ export async function getBeitragBySlug(slug: string): Promise<CatalogPost | null
 }
 
 export async function getSeiteBySlug(slug: string): Promise<CatalogPage | null> {
+  const { draft } = await draftOpts()
+  if (draft) return findSeiteBySlug(slug, { draft: true })
   return unstable_cache(() => findSeiteBySlug(slug), ['seite-slug', slug], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.pages],
@@ -108,6 +121,8 @@ export async function getSeiteBySlug(slug: string): Promise<CatalogPage | null> 
 
 export async function getSeiteByPath(pathname: string): Promise<CatalogPage | null> {
   const path = pathname.startsWith('/') ? pathname : `/${pathname}`
+  const { draft } = await draftOpts()
+  if (draft) return findSeiteByPath(path, { draft: true })
   return unstable_cache(() => findSeiteByPath(path), ['seite-path', path], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.pages],
@@ -115,6 +130,8 @@ export async function getSeiteByPath(pathname: string): Promise<CatalogPage | nu
 }
 
 export async function listMannschaften(): Promise<CatalogTeam[]> {
+  const { draft } = await draftOpts()
+  if (draft) return findMannschaften({ draft: true })
   return unstable_cache(() => findMannschaften(), ['list-mannschaften'], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.teams],
@@ -122,6 +139,8 @@ export async function listMannschaften(): Promise<CatalogTeam[]> {
 }
 
 export async function getMannschaftBySlug(slug: string): Promise<CatalogTeam | null> {
+  const { draft } = await draftOpts()
+  if (draft) return findMannschaftBySlug(slug, { draft: true })
   return unstable_cache(() => findMannschaftBySlug(slug), ['mannschaft', slug], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.teams],
@@ -150,6 +169,8 @@ export async function getSiteSettings(): Promise<CatalogSiteSettings | null> {
 }
 
 export async function getHomepage(): Promise<CatalogHomepage | null> {
+  const { draft } = await draftOpts()
+  if (draft) return findHomepage({ draft: true })
   return unstable_cache(() => findHomepage(), ['homepage'], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.homepage],

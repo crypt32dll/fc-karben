@@ -528,6 +528,7 @@ export interface Team {
   };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1406,6 +1407,7 @@ export interface TeamsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1751,6 +1753,7 @@ export interface Homepage {
      */
     canonicalOverride?: string | null;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1836,6 +1839,7 @@ export interface HomepageSelect<T extends boolean = true> {
         noFollow?: T;
         canonicalOverride?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

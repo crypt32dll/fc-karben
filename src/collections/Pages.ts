@@ -4,6 +4,7 @@ import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { pageBlocks } from '../blocks'
 import { wpIdField } from '../fields/seo'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+import { previewURLForPage } from '../lib/preview/urls'
 
 export const pagesCache: CachePolicy = {
   tags: [CACHE_TAGS.pages],
@@ -22,9 +23,17 @@ export const Pages: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    preview: (doc) => previewURLForPage(doc as { slug?: string; path?: string }),
+    livePreview: {
+      url: ({ data }) => previewURLForPage(data as { slug?: string; path?: string }),
+    },
   },
   versions: {
-    drafts: true,
+    drafts: {
+      autosave: {
+        interval: 375,
+      },
+    },
   },
   access: {
     read: publishedOrStaff,

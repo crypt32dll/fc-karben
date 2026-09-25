@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+import { getPublicSiteURL } from './generate'
+
 export type SeoInput = {
   title?: string | null
   description?: string | null
@@ -105,8 +107,7 @@ export function toNextMetadata(
   input: SeoInput,
   opts?: AbsoluteUrlOptions & { siteName?: string },
 ): Metadata {
-  const metadataBase =
-    opts?.metadataBase || process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+  const metadataBase = opts?.metadataBase || getPublicSiteURL()
   const siteName = opts?.siteName || input.siteName || 'FC Karben'
   const canonical = buildCanonical(input, { metadataBase })
   const robots = robotsFromFlags(input.noIndex, input.noFollow)

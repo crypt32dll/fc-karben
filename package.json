@@ -14,6 +14,7 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "biome check .",
     "migrate:wxr": "tsx scripts/migrate-wxr.ts",
+    "migrate:seo": "tsx scripts/generate-seo-meta.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:unit",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@payloadcms/db-postgres": "3.82.1",
     "@payloadcms/email-resend": "3.82.1",
+    "@payloadcms/live-preview-react": "3.82.1",
     "@payloadcms/next": "3.82.1",
     "@payloadcms/plugin-import-export": "3.82.1",
     "@payloadcms/plugin-mcp": "3.82.1",

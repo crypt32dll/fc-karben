@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { getPublicSiteURL } from '../seo/generate'
+
 export type RedirectRule = {
   from: string
   to: string
@@ -38,10 +40,7 @@ export function wpDatedPostToPresse(pathname: string): string | null {
 }
 
 /** Reject open redirects — only relative paths or same-origin absolute URLs. */
-export function isSafeRedirectTarget(
-  to: string,
-  siteOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de',
-): boolean {
+export function isSafeRedirectTarget(to: string, siteOrigin = getPublicSiteURL()): boolean {
   if (!to || to.startsWith('//')) return false
   if (to.startsWith('/')) return !to.startsWith('//')
   try {
