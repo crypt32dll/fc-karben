@@ -38,7 +38,7 @@ export function pickNextMatch(matches: MatchDto[], now = new Date()): MatchDto |
 
 /**
  * Normalize a minimal Fussball.de-like payload into MatchDto.
- * Real scraping/API adapter plugs in later behind MatchFeedSource.
+ * Used by unit tests and manual seed helpers.
  */
 export function normalizeFussballDeMatch(raw: {
   id: string
@@ -67,11 +67,17 @@ export function normalizeFussballDeMatch(raw: {
   }
 }
 
-/** Stub source used until live Fussball.de adapter is wired */
+/** Stub source for tests / offline */
 export const emptyMatchFeedSource: MatchFeedSource = {
   async fetchUpcoming() {
     return []
   },
 }
 
+/** 1. Mannschaft FC Karben — season 26/27 team-id on fussball.de */
 export const FIRST_TEAM_FUSSBALL_DE_ID = '01OT7G9AUK000000VV0AG80NVT74RFIN'
+
+export { fussballDeMatchFeedSource } from './fussball-de'
+export { extractFussballDeTeamId, parseFussballDeMatchplanHtml } from './parse-html'
+export { parseBerlinKickoff } from './kickoff'
+export { resolveNextMatch, syncMatchFeed } from './sync'

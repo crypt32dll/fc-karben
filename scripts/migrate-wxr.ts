@@ -141,6 +141,7 @@ async function seedTeams(payload: Payload) {
       shortLabel: team.shortLabel,
       league: team.league,
       fussballDeUrl: team.fussballDeUrl,
+      fussballDeId: team.fussballDeId || undefined,
       syncMatches: Boolean(team.syncMatches),
       active: true,
       sortOrder: index + 1,

@@ -12,7 +12,7 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **Medien** | Uploaded file in Vercel Blob (`media`), keyed by `wpId` when migrated |
 | **Redirect** | 301 from a legacy WordPress URL to a canonical club route (`redirects`) |
 | **Match** | Upcoming/past fixture for the first team (`matches`), from MatchFeed or override |
-| **MatchFeed** | Module that syncs the 1st team schedule from Fussball.de |
+| **MatchFeed** | Daily cron syncs 1st-team fixtures from fussball.de into `matches`; homepage scoreboard reads CMS (tag-revalidated after sync) |
 | **ContentCatalog** | Read seam for the ClubSite (no Payload leaks into UI); maps Lexical → **CatalogBody**; Data Cache is **tag-only** (`revalidateTag` from Payload hooks); respects Next **draftMode** for Preview / Live Preview |
 | **CatalogBody** | ClubSite-owned rich-text DTO validated at the ContentCatalog / Page Builder seam |
 | **SeoSurface** | Metadata, JSON-LD, sitemap, robots |
