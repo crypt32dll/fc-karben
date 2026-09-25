@@ -1,5 +1,6 @@
 import { pathForDoc } from '../club-paths'
 import { createLogger } from '../logger'
+import { normalizeFooterNav, normalizeNavItems } from '../navigation/defaults'
 import { mapPageLayout } from '../page-builder'
 import { getPayloadClient } from '../payload'
 import { type RedirectRule, redirectRulesSchema } from '../redirects'
@@ -66,6 +67,70 @@ export async function findBeitrage(
   })
 
   return { posts, totalDocs: result.totalDocs, totalPages: result.totalPages }
+}
+
+export async function findBeitrageByCategorySlug(
+  categorySlug: string,
+  options?: {
+    limit?: number
+    page?: number
+  } & CatalogReadOpts,
+): Promise<{ posts: CatalogPost[]; totalDocs: number; totalPages: number }> {
+  const payload = await getPayloadClient()
+  const limit = options?.limit ?? 12
+  const page = options?.page ?? 1
+  const draft = Boolean(options?.draft)
+  try {
+    const cats = await payload.find({
+      collection: 'categories',
+      where: { slug: { equals: categorySlug } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    const catId = cats.docs[0]?.id
+    if (!catId) return { posts: [], totalDocs: 0, totalPages: 0 }
+
+    const result = await payload.find({
+      collection: 'posts',
+      where: draft
+        ? { categories: { contains: catId } }
+        : {
+            and: [{ categories: { contains: catId } }, { _status: { equals: 'published' } }],
+          },
+      sort: '-publishedAt',
+      limit,
+      page,
+      depth: 1,
+      draft,
+      overrideAccess: true,
+    })
+
+    const posts: CatalogPost[] = result.docs.map((doc) => {
+      const featured = mapFeaturedImage(doc.featuredImage)
+      return {
+        id: String(doc.id),
+        title: doc.title,
+        slug: doc.slug,
+        excerpt: doc.excerpt,
+        publishedAt: doc.publishedAt,
+        updatedAt: doc.updatedAt,
+        path: postPath(doc.slug),
+        featuredImageUrl: featured.featuredImageUrl,
+        featuredImageAlt: featured.featuredImageAlt,
+        seo: docMeta(doc),
+        categories: mapCategories(doc.categories),
+      }
+    })
+
+    return { posts, totalDocs: result.totalDocs, totalPages: result.totalPages }
+  } catch (err) {
+    log.warn('findBeitrageByCategorySlug failed', {
+      categorySlug,
+      error: err instanceof Error ? err.message : String(err),
+    })
+    return { posts: [], totalDocs: 0, totalPages: 0 }
+  }
 }
 
 export async function findBeitragBySlug(
@@ -221,7 +286,7 @@ export async function findMannschaftBySlug(
             ],
           },
       limit: 1,
-      depth: 0,
+      depth: 1,
       draft,
       overrideAccess: true,
     })
@@ -324,6 +389,8 @@ export async function findSiteSettings(): Promise<CatalogSiteSettings | null> {
       address: doc.address,
       venue: doc.venue,
       social: doc.social,
+      primaryNav: normalizeNavItems(doc.primaryNav),
+      footerNav: normalizeFooterNav(doc.footerNav),
       defaultSeo: {
         metaTitle: seo?.metaTitle ?? 'FC Karben e.V.',
         metaDescription:

@@ -1,34 +1,24 @@
 import { ClubLink } from '@/components/ui/ClubLink'
-import {
-  type ClubPageKey,
-  type ClubTeamKey,
-  clubAppRoutes,
-  clubTeams,
-  hrefForPage,
-  hrefForTeam,
-} from '@/lib/club-paths'
+import { defaultFooterNav, type NavChild } from '@/lib/navigation/defaults'
+import { hrefForPage } from '@/lib/club-paths'
 
 const footerLinkClass =
   'block min-h-11 py-2.5 text-ink-soft transition-colors motion-reduce:transition-none hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy'
 
-const VEREIN_LINKS: Array<{ key: ClubPageKey; label: string }> = [
-  { key: 'vorstand', label: 'Vorstand' },
-  { key: 'vereinssatzung', label: 'Vereinssatzung' },
-  { key: 'mitgliedWerden', label: 'Mitglied werden' },
-  { key: 'beitragsstruktur', label: 'Beitragsstruktur' },
-]
+type FooterCol = { heading: string; items: NavChild[] }
 
-const TEAM_LINKS: ClubTeamKey[] = ['first', 'second', 'third', 'eJugend', 'alteHerren']
+type Props = {
+  columns?: FooterCol[] | null
+  email?: string | null
+  addressLine?: string | null
+}
 
-const KONTAKT_LINKS: Array<{ key: ClubPageKey | 'search'; label: string }> = [
-  { key: 'anfahrt', label: 'Anfahrt' },
-  { key: 'formulare', label: 'Formulare' },
-  { key: 'search', label: 'Suche' },
-]
+export function SiteFooter({ columns, email, addressLine }: Props) {
+  const cols = columns?.length ? columns : defaultFooterNav()
+  const mail = email || 'info@fc-karben.de'
 
-export function SiteFooter() {
   return (
-    <footer id="anfahrt" className="border-t border-line bg-white">
+    <footer className="border-t border-line bg-white">
       <div className="mx-auto max-w-[1120px] px-8 py-14">
         <div className="flex flex-wrap justify-between gap-10">
           <div>
@@ -36,47 +26,28 @@ export function SiteFooter() {
               FC Karben e.V.
             </div>
             <p className="mt-2 max-w-s text-sm leading-relaxed text-ink-soft">
-              Günter-Reutzel-Sportfeld · Karl-Liebknecht-Str. 48 · 61184 Karben
+              {addressLine ||
+                'Günter-Reutzel-Sportfeld · Karl-Liebknecht-Str. 48 · 61184 Karben'}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-3">
-            <div className="text-sm">
-              <h4 className="mb-1 font-semibold text-navy">Verein</h4>
-              <nav className="flex flex-col" aria-label="Footer Verein">
-                {VEREIN_LINKS.map((item) => (
-                  <ClubLink key={item.key} href={hrefForPage(item.key)} className={footerLinkClass}>
-                    {item.label}
-                  </ClubLink>
-                ))}
-              </nav>
-            </div>
-            <div className="text-sm">
-              <h4 className="mb-1 font-semibold text-navy">Mannschaften</h4>
-              <nav className="flex flex-col" aria-label="Footer Mannschaften">
-                {TEAM_LINKS.map((key) => (
-                  <ClubLink key={key} href={hrefForTeam(key)} className={footerLinkClass}>
-                    {clubTeams[key].label}
-                  </ClubLink>
-                ))}
-              </nav>
-            </div>
-            <div className="text-sm">
-              <h4 className="mb-1 font-semibold text-navy">Kontakt</h4>
-              <nav className="flex flex-col" aria-label="Footer Kontakt">
-                <a href="mailto:info@fc-karben.de" className={footerLinkClass}>
-                  info@fc-karben.de
-                </a>
-                {KONTAKT_LINKS.map((item) => (
-                  <ClubLink
-                    key={item.key}
-                    href={item.key === 'search' ? clubAppRoutes.search : hrefForPage(item.key)}
-                    className={footerLinkClass}
-                  >
-                    {item.label}
-                  </ClubLink>
-                ))}
-              </nav>
-            </div>
+            {cols.map((col) => (
+              <div key={col.heading} className="text-sm">
+                <h4 className="mb-1 font-semibold text-navy">{col.heading}</h4>
+                <nav className="flex flex-col" aria-label={`Footer ${col.heading}`}>
+                  {col.heading === 'Kontakt' ? (
+                    <a href={`mailto:${mail}`} className={footerLinkClass}>
+                      {mail}
+                    </a>
+                  ) : null}
+                  {col.items.map((item) => (
+                    <ClubLink key={item.href + item.label} href={item.href} className={footerLinkClass}>
+                      {item.label}
+                    </ClubLink>
+                  ))}
+                </nav>
+              </div>
+            ))}
           </div>
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-sm text-ink-soft">

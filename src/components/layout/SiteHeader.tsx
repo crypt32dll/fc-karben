@@ -1,47 +1,60 @@
 import Image from 'next/image'
+
 import { ClubLink } from '@/components/ui/ClubLink'
 import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
+import { defaultPrimaryNav, type NavItem } from '@/lib/navigation/defaults'
 import logo from '../../../public/logo.png'
 
 import { HeaderSearchLink } from './HeaderSearchLink'
+import { MobileNav } from './MobileNav'
 import { SiteNav } from './SiteNav'
 
-export function SiteHeader() {
+type Props = {
+  nav?: NavItem[] | null
+}
+
+export function SiteHeader({ nav }: Props) {
+  const items = nav?.length ? nav : defaultPrimaryNav()
+
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white">
-      <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-8 py-3.5">
+      <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-8 sm:py-3.5">
         <ClubLink
           href={clubAppRoutes.home}
           prefetch
-          className="flex min-w-0 items-center gap-3 rounded-[2px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+          className="flex min-w-0 items-center gap-2 rounded-[2px] sm:gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
         >
           <Image
             src={logo}
             alt="FC Karben"
             width={44}
             height={55}
-            className="h-11 w-auto"
+            className="h-9 w-auto sm:h-11"
             priority
           />
           <div className="min-w-0">
-            <div className="font-display text-[19px] font-bold uppercase tracking-wide text-navy">
+            <div className="font-display text-[17px] font-bold uppercase tracking-wide text-navy sm:text-[19px]">
               FC Karben
             </div>
-            <div className="text-[11px] font-medium tracking-wider text-ink-soft">
+            <div className="hidden text-[11px] font-medium tracking-wider text-ink-soft sm:block">
               Fußball seit 2015
             </div>
           </div>
         </ClubLink>
-        <SiteNav />
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+
+        <SiteNav items={items} />
+
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <HeaderSearchLink />
           <ClubLink
             href={hrefForPage('mitgliedWerden')}
             prefetch
-            className="inline-flex min-h-11 items-center rounded-[2px] bg-navy px-4 text-[13px] font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep sm:px-5"
+            className="hidden min-h-11 items-center rounded-[2px] bg-navy px-3 text-[13px] font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep sm:inline-flex sm:px-5"
           >
-            Mitglied werden
+            <span className="md:hidden">Mitglied</span>
+            <span className="hidden md:inline">Mitglied werden</span>
           </ClubLink>
+          <MobileNav items={items} />
         </div>
       </div>
     </header>

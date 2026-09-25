@@ -87,6 +87,28 @@ export const Teams: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'widgetSpielplanId',
+      type: 'text',
+      admin: {
+        description: 'Fussball.de widget data-id (type team-matches / Spielplan)',
+      },
+    },
+    {
+      name: 'widgetTabelleId',
+      type: 'text',
+      admin: {
+        description: 'Fussball.de widget data-id (type table / Tabelle)',
+      },
+    },
+    {
+      name: 'reportCategorySlug',
+      type: 'text',
+      admin: {
+        description:
+          'Optional: Kategorie-Slug für Spielberichte-Tab (z. B. spielberichte-1-mannschaft)',
+      },
+    },
+    {
       name: 'syncMatches',
       type: 'checkbox',
       defaultValue: false,

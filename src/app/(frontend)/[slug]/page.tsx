@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect, redirect } from 'next/navigation'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
-import { LexicalContent } from '@/components/cms/LexicalContent'
-import { catalogSeoToMetadata, resolveRootSlug } from '@/lib/content-catalog'
+import { TeamTabs } from '@/components/teams/TeamTabs'
+import { catalogSeoToMetadata, listBeitrage, resolveRootSlug } from '@/lib/content-catalog'
 
 export const revalidate = false
 
@@ -45,6 +45,10 @@ export default async function SlugPage({ params }: Props) {
 
   if (hit.kind === 'mannschaft') {
     const { team } = hit
+    const reports = team.reportCategorySlug
+      ? (await listBeitrage({ limit: 12, categorySlug: team.reportCategorySlug })).posts
+      : []
+
     return (
       <article className="mx-auto max-w-[800px] px-8 py-16">
         <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
@@ -52,22 +56,7 @@ export default async function SlugPage({ params }: Props) {
         </p>
         <h1 className="text-5xl text-navy">{team.name}</h1>
         {team.league ? <p className="mt-3 text-ink-soft">{team.league}</p> : null}
-        {team.summary ? <p className="mt-6 max-w-2xl text-lg text-ink">{team.summary}</p> : null}
-        {team.content ? (
-          <div className="mt-8">
-            <LexicalContent data={team.content} />
-          </div>
-        ) : null}
-        {team.fussballDeUrl ? (
-          <a
-            href={team.fussballDeUrl}
-            className="mt-8 inline-flex min-h-11 items-center rounded-[2px] bg-navy px-5 py-3 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Spielplan auf Fussball.de
-          </a>
-        ) : null}
+        <TeamTabs team={team} reports={reports} />
       </article>
     )
   }
@@ -82,16 +71,6 @@ export default async function SlugPage({ params }: Props) {
               Mannschaft
             </p>
             {team.league ? <p className="mt-1 text-sm text-ink-soft">{team.league}</p> : null}
-            {team.fussballDeUrl ? (
-              <a
-                href={team.fussballDeUrl}
-                className="mt-4 inline-flex min-h-11 items-center rounded-[2px] bg-navy px-4 py-2 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Spielplan auf Fussball.de
-              </a>
-            ) : null}
           </div>
         ) : null}
         <CmsPageBody page={page} />

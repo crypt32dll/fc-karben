@@ -504,6 +504,18 @@ export interface Team {
   fussballDeId?: string | null;
   fussballDeUrl?: string | null;
   /**
+   * Fussball.de widget data-id (type team-matches / Spielplan)
+   */
+  widgetSpielplanId?: string | null;
+  /**
+   * Fussball.de widget data-id (type table / Tabelle)
+   */
+  widgetTabelleId?: string | null;
+  /**
+   * Optional: Kategorie-Slug für Spielberichte-Tab (z. B. spielberichte-1-mannschaft)
+   */
+  reportCategorySlug?: string | null;
+  /**
    * Only 1. Mannschaft should sync MatchFeed
    */
   syncMatches?: boolean | null;
@@ -1394,6 +1406,9 @@ export interface TeamsSelect<T extends boolean = true> {
   trainingTimes?: T;
   fussballDeId?: T;
   fussballDeUrl?: T;
+  widgetSpielplanId?: T;
+  widgetTabelleId?: T;
+  reportCategorySlug?: T;
   syncMatches?: T;
   active?: T;
   sortOrder?: T;
@@ -1680,6 +1695,46 @@ export interface SiteSetting {
     tiktok?: string | null;
   };
   /**
+   * Hauptnavigation (Header). Leer = Standard (Home, Mannschaften mit Deeplinks, Verein, …).
+   */
+  primaryNav?:
+    | {
+        label: string;
+        /**
+         * Pfad oder URL, z. B. /1-mannschaft oder /verein/vorstand
+         */
+        href: string;
+        children?:
+          | {
+              label: string;
+              /**
+               * Pfad oder URL, z. B. /1-mannschaft oder /verein/vorstand
+               */
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Footer-Spalten. Leer = Standard (Verein, Mannschaften, Kontakt).
+   */
+  footerNav?:
+    | {
+        heading: string;
+        items: {
+          label: string;
+          /**
+           * Pfad oder URL, z. B. /1-mannschaft oder /verein/vorstand
+           */
+          href: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Google Search Console HTML tag content value
    */
   gscVerification?: string | null;
@@ -1777,6 +1832,33 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         instagram?: T;
         facebook?: T;
         tiktok?: T;
+      };
+  primaryNav?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  footerNav?:
+    | T
+    | {
+        heading?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
       };
   gscVerification?: T;
   meta?:

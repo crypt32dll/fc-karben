@@ -46,10 +46,39 @@ export type CatalogTeam = {
   league?: string | null
   summary?: string | null
   fussballDeUrl?: string | null
+  fussballDeId?: string | null
+  widgetSpielplanId?: string | null
+  widgetTabelleId?: string | null
+  reportCategorySlug?: string | null
   syncMatches?: boolean | null
+  trainingTimes?: string | null
+  photoUrl?: string | null
+  photoAlt?: string | null
+  contacts?: Array<{
+    role: string
+    name: string
+    phone?: string | null
+    email?: string | null
+  }>
   path: string
   content?: CatalogBody | null
   seo?: CatalogSeo
+}
+
+export type CatalogNavChild = {
+  label: string
+  href: string
+}
+
+export type CatalogNavItem = {
+  label: string
+  href: string
+  children?: CatalogNavChild[]
+}
+
+export type CatalogFooterColumn = {
+  heading: string
+  items: CatalogNavChild[]
 }
 
 export type CatalogNotice = {
@@ -79,6 +108,8 @@ export type CatalogSiteSettings = {
     facebook?: string | null
     tiktok?: string | null
   }
+  primaryNav: CatalogNavItem[]
+  footerNav: CatalogFooterColumn[]
   defaultSeo?: {
     metaTitle?: string | null
     metaDescription?: string | null

@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { DraftModeGate } from '@/components/preview/DraftModeGate'
 import { getSiteSettings } from '@/lib/content-catalog'
+import { defaultFooterNav, defaultPrimaryNav } from '@/lib/navigation/defaults'
 import { getPublicSiteURL } from '@/lib/preview/urls'
 import { toNextMetadata } from '@/lib/seo'
 import { allowSearchIndexing } from '@/lib/seo/generate'
@@ -62,7 +63,12 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function FrontendLayout({ children }: { children: React.ReactNode }) {
+export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSiteSettings()
+  const nav = settings?.primaryNav?.length ? settings.primaryNav : defaultPrimaryNav()
+  const footerNav = settings?.footerNav?.length ? settings.footerNav : defaultFooterNav()
+  const addressLine = [settings?.venue, settings?.address].filter(Boolean).join(' · ')
+
   return (
     <html lang="de">
       <body
@@ -77,9 +83,9 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         <Suspense fallback={null}>
           <DraftModeGate />
         </Suspense>
-        <SiteHeader />
+        <SiteHeader nav={nav} />
         <main id="main-content">{children}</main>
-        <SiteFooter />
+        <SiteFooter columns={footerNav} email={settings?.email} addressLine={addressLine || null} />
       </body>
     </html>
   )

@@ -64,23 +64,55 @@ export function mapTeamsForGrid(
     league?: string | null
     summary?: string | null
     fussballDeUrl?: string | null
+    fussballDeId?: string | null
+    widgetSpielplanId?: string | null
+    widgetTabelleId?: string | null
+    reportCategorySlug?: string | null
     syncMatches?: boolean | null
+    trainingTimes?: string | null
+    photo?: unknown
+    contacts?: Array<{
+      role?: string | null
+      name?: string | null
+      phone?: string | null
+      email?: string | null
+    }> | null
     active?: boolean | null
   }>,
 ): CatalogTeam[] {
   return docs
     .filter((d) => d.active !== false)
-    .map((doc) => ({
-      id: String(doc.id),
-      name: doc.name,
-      slug: doc.slug,
-      shortLabel: doc.shortLabel,
-      league: doc.league,
-      summary: doc.summary,
-      fussballDeUrl: doc.fussballDeUrl,
-      syncMatches: doc.syncMatches,
-      path: teamPath(doc.slug),
-    }))
+    .map((doc) => {
+      const photo = mapFeaturedImage(doc.photo)
+      return {
+        id: String(doc.id),
+        name: doc.name,
+        slug: doc.slug,
+        shortLabel: doc.shortLabel,
+        league: doc.league,
+        summary: doc.summary,
+        fussballDeUrl: doc.fussballDeUrl,
+        fussballDeId: doc.fussballDeId,
+        widgetSpielplanId: doc.widgetSpielplanId,
+        widgetTabelleId: doc.widgetTabelleId,
+        reportCategorySlug: doc.reportCategorySlug,
+        syncMatches: doc.syncMatches,
+        trainingTimes: doc.trainingTimes,
+        photoUrl: photo.featuredImageUrl,
+        photoAlt: photo.featuredImageAlt,
+        contacts: (doc.contacts || [])
+          .filter((c): c is { role: string; name: string; phone?: string | null; email?: string | null } =>
+            Boolean(c?.role && c?.name),
+          )
+          .map((c) => ({
+            role: c.role,
+            name: c.name,
+            phone: c.phone,
+            email: c.email,
+          })),
+        path: teamPath(doc.slug),
+      }
+    })
 }
 
 export function mapCategories(categories: unknown): Array<{ title: string; slug: string }> {

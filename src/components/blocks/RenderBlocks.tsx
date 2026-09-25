@@ -180,6 +180,7 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
   if (!filtered.length) return null
   return (
     <Wrap>
+      <div id="mannschaften" className="scroll-mt-[var(--header-height)]">
       <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
         <div>
           {block.eyebrow ? (
@@ -209,6 +210,7 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
             </a>
           </MotionPressable>
         ))}
+      </div>
       </div>
     </Wrap>
   )

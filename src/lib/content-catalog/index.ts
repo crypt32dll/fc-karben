@@ -12,6 +12,7 @@ import type { SocialTileDto } from '../social-feed'
 import {
   findBeitragBySlug,
   findBeitrage,
+  findBeitrageByCategorySlug,
   findHomepage,
   findMannschaftBySlug,
   findMannschaften,
@@ -88,10 +89,20 @@ export function catalogSeoToMetadata(
 export async function listBeitrage(options?: {
   limit?: number
   page?: number
+  categorySlug?: string
 }): Promise<{ posts: CatalogPost[]; totalDocs: number; totalPages: number }> {
   const limit = options?.limit ?? 24
   const page = options?.page ?? 1
+  const categorySlug = options?.categorySlug?.trim()
   const { draft } = await draftOpts()
+  if (categorySlug) {
+    if (draft) return findBeitrageByCategorySlug(categorySlug, { limit, page, draft: true })
+    return unstable_cache(
+      () => findBeitrageByCategorySlug(categorySlug, { limit, page }),
+      ['list-beitrage-cat', categorySlug, String(limit), String(page)],
+      { revalidate: CATALOG_REVALIDATE, tags: [CACHE_TAGS.posts] },
+    )()
+  }
   if (draft) return findBeitrage({ limit, page, draft: true })
   return unstable_cache(
     () => findBeitrage({ limit, page }),

@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { anyone, isAdmin, isAdminOrEditor } from '../access'
 import { pageBlocks } from '../blocks'
+import { footerNavField, primaryNavField } from '../fields/navigation'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
 import { clubAppRoutes, hrefForPage } from '../lib/club-paths'
 import { previewURLForHomepage } from '../lib/preview/urls'
@@ -66,6 +67,8 @@ export const SiteSettings: GlobalConfig = {
         { name: 'tiktok', type: 'text' },
       ],
     },
+    primaryNavField,
+    footerNavField,
     {
       name: 'gscVerification',
       type: 'text',
