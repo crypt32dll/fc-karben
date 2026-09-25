@@ -21,7 +21,7 @@ import { getPayload, type Payload } from 'payload'
 import { createLogger } from '../src/lib/logger'
 import { canonicalizePageSlug, prepareHtmlForLexical } from '../src/lib/migration/html-to-lexical'
 import { lexicalTable, parseSimpleHtmlTable } from '../src/lib/migration/lexical-table'
-import { downloadFile, mapWithConcurrency } from '../src/lib/migration/media-loader'
+import { externalMediaStub, mapWithConcurrency } from '../src/lib/migration/media-loader'
 import { DEFAULT_TEAMS } from '../src/lib/migration/seed-teams'
 import {
   attachments,
@@ -309,8 +309,8 @@ async function applyMigration() {
         mediaUrlBySource.set(att.attachmentUrl, url)
         return
       }
-      const downloaded = await downloadFile(att.attachmentUrl)
-      if (!downloaded) return
+      // Register public WP URL only — binaries stay on the club webspace (no Blob copy).
+      const stub = externalMediaStub(att.attachmentUrl)
       try {
         const doc = await payload.create({
           collection: 'media',
@@ -319,15 +319,12 @@ async function applyMigration() {
             wpId: att.id,
             wpSourceUrl: att.attachmentUrl,
           },
-          file: downloaded,
+          file: stub,
           overrideAccess: true,
           context: { disableRevalidate: true },
         })
         mediaIdByWpId.set(att.id, doc.id)
-        const url =
-          typeof doc.url === 'string'
-            ? doc.url
-            : `/api/media/file/${doc.filename || downloaded.name}`
+        const url = typeof doc.url === 'string' && doc.url.length > 0 ? doc.url : att.attachmentUrl
         mediaUrlBySource.set(att.attachmentUrl, url)
         imported += 1
       } catch (err) {

@@ -54,8 +54,14 @@ export function MobileNav({ items }: Props) {
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[60] bg-white" id={panelId} role="dialog" aria-modal="true" aria-label="Hauptnavigation">
-          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+        <div
+          className="fixed inset-x-0 top-0 z-[60] flex h-dvh flex-col bg-white"
+          id={panelId}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Hauptnavigation"
+        >
+          <div className="flex shrink-0 items-center justify-between border-b border-line px-4 py-3">
             <span className="font-display text-lg font-bold uppercase text-navy">Menü</span>
             <button
               ref={closeRef}
@@ -67,7 +73,10 @@ export function MobileNav({ items }: Props) {
               <X className="size-5" aria-hidden />
             </button>
           </div>
-          <nav className="overflow-y-auto px-4 py-4" aria-label="Mobile Hauptnavigation">
+          <nav
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+            aria-label="Mobile Hauptnavigation"
+          >
             <ul className="flex flex-col gap-1">
               {items.map((item) => (
                 <li key={item.href + item.label}>

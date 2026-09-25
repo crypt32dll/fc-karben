@@ -6,7 +6,7 @@ Next.js 16 + Payload CMS 3 website for **FC Karben e.V.**
 
 - Next.js App Router + Payload Admin (`/admin`)
 - **Postgres** via Neon (`POSTGRES_URL`) — no Docker required
-- **Vercel Blob** for media. Locally without `BLOB_READ_WRITE_TOKEN` → Payload local disk under `media/`
+- **1&1 SFTP** for media (HTTPS via `MEDIA_PUBLIC_BASE_URL`). Locally without SFTP env → Payload disk under `media/`
 - Biome, Vitest, Playwright, GitHub Actions CI
 - **Page Builder** blocks for editors
 
@@ -18,7 +18,7 @@ Next.js 16 + Payload CMS 3 website for **FC Karben e.V.**
 ```bash
 cp .env.example .env
 # set POSTGRES_URL + PAYLOAD_SECRET
-# on Vercel: create a Blob store → BLOB_READ_WRITE_TOKEN
+# on Vercel: set SFTP_* + MEDIA_PUBLIC_BASE_URL
 pnpm install
 pnpm dev
 ```
@@ -32,15 +32,17 @@ pnpm generate:importmap
 pnpm generate:types
 ```
 
-## Media (Vercel Blob)
+## Media (1&1 SFTP)
 
-Production media uses `@payloadcms/storage-vercel-blob` with `clientUploads: true`.
+Production media uses a custom SFTP adapter (`src/storage/sftp-storage.ts`) with `@payloadcms/plugin-cloud-storage`.
 
-1. In the Vercel project: **Storage → Create → Blob**
-2. Ensure `BLOB_READ_WRITE_TOKEN` is set (often linked automatically)
+1. Set `SFTP_HOST`, `SFTP_PORT`, `SFTP_USER`, `SFTP_PASSWORD`, `SFTP_BASE_PATH`
+2. Set `MEDIA_PUBLIC_BASE_URL` to the HTTPS origin that serves that path (e.g. `https://fc-karben.de/wp-content/uploads`)
 3. Redeploy; run `pnpm generate:importmap` after plugin changes
 
-Locally, omit the token to keep uploads on disk under `media/`.
+Locally, omit SFTP env to keep uploads on disk under `media/`.
+
+WXR migration registers legacy attachment URLs (`wpSourceUrl`) without copying binaries into another object store.
 
 ## Scripts
 

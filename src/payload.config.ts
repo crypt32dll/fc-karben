@@ -1,17 +1,17 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { EXPERIMENTAL_TableFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-import path from 'path'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
-import { fileURLToPath } from 'url'
 
 import { collections } from './collections'
 import { Homepage, homepageCache, SiteSettings, siteSettingsCache } from './globals/SiteSettings'
 import { withGlobalCache } from './lib/cache/register'
 import { normalizePostgresUrl } from './lib/postgres-url'
 import { buildPlugins } from './payload/plugins'
+import { isSftpConfigured, sftpStorage } from './storage/sftp-storage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -22,12 +22,12 @@ if (!rawConnectionString) {
 }
 const connectionString = normalizePostgresUrl(rawConnectionString)
 
-const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 const resendConfigured = Boolean(process.env.RESEND_API_KEY)
+const sftpConfigured = isSftpConfigured()
 
-if (process.env.VERCEL && !blobConfigured) {
+if (process.env.VERCEL && !sftpConfigured) {
   throw new Error(
-    'Vercel deploy requires BLOB_READ_WRITE_TOKEN (create a Blob store in the Vercel project)',
+    'Vercel deploy requires SFTP_HOST, SFTP_USER, and SFTP_PASSWORD (1&1 media webspace)',
   )
 }
 
@@ -86,17 +86,12 @@ export default buildConfig({
   }),
   plugins: [
     ...plugins,
-    ...(blobConfigured
+    ...(sftpConfigured
       ? [
-          vercelBlobStorage({
+          sftpStorage({
             collections: {
               media: true,
-              exports: true,
-              imports: true,
             },
-            token: process.env.BLOB_READ_WRITE_TOKEN as string,
-            // Bypass ~4.5MB Vercel function body limit for admin uploads
-            clientUploads: true,
           }),
         ]
       : []),

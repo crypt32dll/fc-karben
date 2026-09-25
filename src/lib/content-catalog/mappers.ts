@@ -28,9 +28,13 @@ export function mapFeaturedImage(media: unknown): {
   if (!media || typeof media !== 'object') {
     return { featuredImageUrl: null, featuredImageAlt: null }
   }
-  const m = media as { url?: string | null; alt?: string | null }
+  const m = media as { url?: string | null; alt?: string | null; wpSourceUrl?: string | null }
+  const url =
+    (typeof m.url === 'string' && m.url.length > 0 && m.url) ||
+    (typeof m.wpSourceUrl === 'string' && m.wpSourceUrl.length > 0 && m.wpSourceUrl) ||
+    null
   return {
-    featuredImageUrl: typeof m.url === 'string' && m.url.length > 0 ? m.url : null,
+    featuredImageUrl: url,
     featuredImageAlt: typeof m.alt === 'string' ? m.alt : null,
   }
 }
@@ -101,8 +105,11 @@ export function mapTeamsForGrid(
         photoUrl: photo.featuredImageUrl,
         photoAlt: photo.featuredImageAlt,
         contacts: (doc.contacts || [])
-          .filter((c): c is { role: string; name: string; phone?: string | null; email?: string | null } =>
-            Boolean(c?.role && c?.name),
+          .filter(
+            (
+              c,
+            ): c is { role: string; name: string; phone?: string | null; email?: string | null } =>
+              Boolean(c?.role && c?.name),
           )
           .map((c) => ({
             role: c.role,

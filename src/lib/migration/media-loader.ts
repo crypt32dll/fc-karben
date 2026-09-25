@@ -37,6 +37,30 @@ export type DownloadedFile = {
   size: number
 }
 
+/** Filename for Payload upload docs from a public URL. */
+export function filenameFromUrl(url: string): string {
+  try {
+    const base = decodeURIComponent(new URL(url).pathname.split('/').pop() || '')
+    return base || `file-${Date.now()}`
+  } catch {
+    return `file-${Date.now()}`
+  }
+}
+
+/**
+ * Zero-byte stub so Payload can create a media doc that only references an
+ * existing public URL (SFTP adapter skips remote write when size === 0 + wpSourceUrl).
+ */
+export function externalMediaStub(url: string): DownloadedFile {
+  const name = filenameFromUrl(url)
+  return {
+    data: Buffer.alloc(0),
+    mimetype: mimeFromUrl(url),
+    name,
+    size: 0,
+  }
+}
+
 export async function downloadFile(
   url: string,
   options?: { timeoutMs?: number; allowedHosts?: Set<string> },

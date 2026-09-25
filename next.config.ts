@@ -9,15 +9,10 @@ const dirname = path.dirname(__filename)
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Legacy WP uploads (migration / hotlink fallback)
+      // Club media on 1&1 webspace (legacy WP + Payload SFTP uploads)
       { protocol: 'https', hostname: 'fc-karben.de', pathname: '/wp-content/**' },
       { protocol: 'https', hostname: 'www.fc-karben.de', pathname: '/wp-content/**' },
-      // Vercel Blob store for Payload media
-      {
-        protocol: 'https',
-        hostname: '*.public.blob.vercel-storage.com',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: 'media.fc-karben.de', pathname: '/**' },
     ],
     localPatterns: [
       { pathname: '/api/media/file/**' },
