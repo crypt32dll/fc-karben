@@ -1,5 +1,5 @@
 import { createLogger } from '../logger'
-import type { MatchDto, MatchFeedSource } from './index'
+import type { MatchDto, MatchFeedSource } from './dto'
 import { extractFussballDeTeamId, parseFussballDeMatchplanHtml } from './parse-html'
 
 const log = createLogger('MatchFeed')

@@ -12,7 +12,8 @@ export const Matches: CollectionConfig = {
   slug: 'matches',
   admin: {
     useAsTitle: 'externalId',
-    defaultColumns: ['kickoff', 'homeName', 'awayName', 'competition', 'manualOverride'],
+    defaultColumns: ['kickoff', 'homeName', 'awayName', 'competition', 'status'],
+    description: 'Synced daily from fussball.de via MatchFeed cron — do not edit by hand.',
   },
   access: {
     read: anyone,
@@ -60,18 +61,7 @@ export const Matches: CollectionConfig = {
       name: 'source',
       type: 'select',
       defaultValue: 'fussballde',
-      options: [
-        { label: 'Fussball.de', value: 'fussballde' },
-        { label: 'Manual', value: 'manual' },
-      ],
-    },
-    {
-      name: 'manualOverride',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        description: 'When true, MatchFeed will not overwrite this match',
-      },
+      options: [{ label: 'Fussball.de', value: 'fussballde' }],
     },
     {
       name: 'sourceUrl',

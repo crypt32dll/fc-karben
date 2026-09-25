@@ -1,6 +1,5 @@
 import { pathForDoc } from '../club-paths'
 import { createLogger } from '../logger'
-import { type MatchDto, pickNextMatch } from '../match-feed'
 import { mapPageLayout } from '../page-builder'
 import { getPayloadClient } from '../payload'
 import { type RedirectRule, redirectRulesSchema } from '../redirects'
@@ -430,42 +429,4 @@ export async function findRedirectRules(): Promise<RedirectRule[]> {
     })
     return []
   }
-}
-
-export async function findUpcomingMatches(): Promise<MatchDto[]> {
-  const payload = await getPayloadClient()
-  try {
-    const result = await payload.find({
-      collection: 'matches',
-      where: {
-        status: { in: ['scheduled', 'live'] },
-      },
-      sort: 'kickoff',
-      limit: 20,
-      depth: 0,
-      overrideAccess: true,
-    })
-    return result.docs.map((doc) => ({
-      externalId: doc.externalId || String(doc.id),
-      kickoff: new Date(doc.kickoff),
-      homeName: doc.homeName,
-      awayName: doc.awayName,
-      competition: doc.competition || undefined,
-      venue: doc.venue || undefined,
-      homeScore: doc.homeScore ?? null,
-      awayScore: doc.awayScore ?? null,
-      status: (doc.status as MatchDto['status']) || 'scheduled',
-      sourceUrl: doc.sourceUrl || undefined,
-    }))
-  } catch (err) {
-    log.warn('findUpcomingMatches failed', {
-      error: err instanceof Error ? err.message : String(err),
-    })
-    return []
-  }
-}
-
-export async function findNextMatch(): Promise<MatchDto | null> {
-  const matches = await findUpcomingMatches()
-  return pickNextMatch(matches)
 }

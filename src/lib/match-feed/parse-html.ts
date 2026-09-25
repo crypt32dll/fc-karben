@@ -1,4 +1,4 @@
-import type { MatchDto } from './index'
+import type { MatchDto } from './dto'
 import { parseBerlinKickoff } from './kickoff'
 
 /**

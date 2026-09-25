@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   extractFussballDeTeamId,
-  mergeMatches,
   normalizeFussballDeMatch,
   parseBerlinKickoff,
   parseFussballDeMatchplanHtml,
@@ -21,28 +20,6 @@ describe('MatchFeed', () => {
     expect(match.externalId).toBe('abc')
     expect(match.homeName).toBe('FC Karben')
     expect(match.status).toBe('scheduled')
-  })
-
-  it('lets manual overrides win', () => {
-    const synced = [
-      normalizeFussballDeMatch({
-        id: '1',
-        kickoff: '2026-10-24T19:05:00.000Z',
-        home: 'FC Karben',
-        away: 'A',
-      }),
-    ]
-    const overrides = [
-      normalizeFussballDeMatch({
-        id: '1',
-        kickoff: '2026-10-24T20:00:00.000Z',
-        home: 'FC Karben',
-        away: 'A (Freundschaft)',
-      }),
-    ]
-    const merged = mergeMatches(synced, overrides)
-    expect(merged).toHaveLength(1)
-    expect(merged[0].awayName).toContain('Freundschaft')
   })
 
   it('picks next upcoming match', () => {
@@ -69,7 +46,6 @@ describe('MatchFeed', () => {
   it('parses Berlin kickoff from fussball.de labels', () => {
     const kickoff = parseBerlinKickoff('So, 27.09.26', '15:30')
     expect(kickoff).not.toBeNull()
-    // CEST (UTC+2) → 13:30Z
     expect(kickoff!.toISOString()).toBe('2026-09-27T13:30:00.000Z')
   })
 

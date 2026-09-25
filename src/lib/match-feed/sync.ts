@@ -1,16 +1,12 @@
 import type { Payload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
 import { revalidateCatalogPaths, revalidateCatalogTags } from '../cache/revalidate'
-import { CACHE_TAGS } from '../cache/tags'
+import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/tags'
 import { createLogger } from '../logger'
 import { getPayloadClient } from '../payload'
 import { fussballDeMatchFeedSource } from './fussball-de'
-import {
-  FIRST_TEAM_FUSSBALL_DE_ID,
-  type MatchDto,
-  mergeMatches,
-  pickNextMatch,
-} from './index'
+import { FIRST_TEAM_FUSSBALL_DE_ID, type MatchDto, pickNextMatch } from './dto'
 import { extractFussballDeTeamId } from './parse-html'
 
 const log = createLogger('MatchFeed')
@@ -20,7 +16,6 @@ export type SyncMatchFeedResult = {
   fetched: number
   created: number
   updated: number
-  skippedOverride: number
   nextExternalId: string | null
 }
 
@@ -29,7 +24,7 @@ type SyncTeam = {
   fussballDeId: string
 }
 
-/** Resolve the 1. Mannschaft (or any team with syncMatches) for MatchFeed. */
+/** Resolve Mannschaften with syncMatches for MatchFeed. */
 export async function findSyncTeams(payload: Payload): Promise<SyncTeam[]> {
   const result = await payload.find({
     collection: 'teams',
@@ -54,7 +49,7 @@ export async function findSyncTeams(payload: Payload): Promise<SyncTeam[]> {
   return teams
 }
 
-/** Upsert live fixtures into Payload; respect manualOverride; revalidate homepage. */
+/** Daily cron: fussball.de → Matches upsert; then revalidate homepage. */
 export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedResult[]> {
   const client = payload ?? (await getPayloadClient())
   const teams = await findSyncTeams(client)
@@ -69,7 +64,6 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
     const fetched = await fussballDeMatchFeedSource.fetchUpcoming(team.fussballDeId)
     let created = 0
     let updated = 0
-    let skippedOverride = 0
 
     for (const match of fetched) {
       const existing = await client.find({
@@ -80,10 +74,6 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
         overrideAccess: true,
       })
       const doc = existing.docs[0]
-      if (doc?.manualOverride) {
-        skippedOverride += 1
-        continue
-      }
 
       const data = {
         team: team.id,
@@ -98,7 +88,6 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
         externalId: match.externalId,
         source: 'fussballde' as const,
         sourceUrl: match.sourceUrl || null,
-        manualOverride: false,
       }
 
       if (doc) {
@@ -127,7 +116,6 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
       fetched: fetched.length,
       created,
       updated,
-      skippedOverride,
       nextExternalId: next?.externalId ?? null,
     })
     log.info('synced team matches', results[results.length - 1])
@@ -139,56 +127,38 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
   return results
 }
 
-/**
- * Next fixture for the scoreboard: live fussball.de + CMS overrides, DB fallback.
- */
-export async function resolveNextMatch(): Promise<MatchDto | null> {
-  const payload = await getPayloadClient()
-  const teams = await findSyncTeams(payload)
-  const team = teams[0]
-  const teamFussballId = team?.fussballDeId ?? FIRST_TEAM_FUSSBALL_DE_ID
+/** Upcoming fixtures from CMS (tag-cached). */
+export async function listUpcomingMatches(): Promise<MatchDto[]> {
+  return unstable_cache(() => loadUpcomingMatches(), ['upcoming-matches'], {
+    revalidate: CATALOG_REVALIDATE,
+    tags: [CACHE_TAGS.matches],
+  })()
+}
 
-  let synced: MatchDto[] = []
+/** Scoreboard: CMS list + wall-clock pick (no live fussball.de on pageview). */
+export async function getNextMatch(): Promise<MatchDto | null> {
+  const matches = await listUpcomingMatches()
+  return pickNextMatch(matches)
+}
+
+async function loadUpcomingMatches(): Promise<MatchDto[]> {
+  const payload = await getPayloadClient()
   try {
-    synced = await fussballDeMatchFeedSource.fetchUpcoming(teamFussballId)
+    const result = await payload.find({
+      collection: 'matches',
+      where: { status: { in: ['scheduled', 'live'] } },
+      sort: 'kickoff',
+      limit: 20,
+      depth: 0,
+      overrideAccess: true,
+    })
+    return result.docs.map(mapMatchDoc)
   } catch (err) {
-    log.warn('live feed failed, falling back to CMS', {
+    log.warn('loadUpcomingMatches failed', {
       error: err instanceof Error ? err.message : String(err),
     })
-    synced = await loadMatchesFromCms(payload)
+    return []
   }
-
-  const overrides = await loadOverrideMatches(payload)
-  return pickNextMatch(mergeMatches(synced, overrides))
-}
-
-async function loadMatchesFromCms(payload: Payload): Promise<MatchDto[]> {
-  const result = await payload.find({
-    collection: 'matches',
-    where: { status: { in: ['scheduled', 'live'] } },
-    sort: 'kickoff',
-    limit: 20,
-    depth: 0,
-    overrideAccess: true,
-  })
-  return result.docs.map(mapMatchDoc)
-}
-
-async function loadOverrideMatches(payload: Payload): Promise<MatchDto[]> {
-  const result = await payload.find({
-    collection: 'matches',
-    where: {
-      and: [
-        { manualOverride: { equals: true } },
-        { status: { in: ['scheduled', 'live'] } },
-      ],
-    },
-    sort: 'kickoff',
-    limit: 20,
-    depth: 0,
-    overrideAccess: true,
-  })
-  return result.docs.map(mapMatchDoc)
 }
 
 function mapMatchDoc(doc: {
