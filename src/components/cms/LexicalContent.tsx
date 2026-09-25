@@ -17,7 +17,7 @@ export function LexicalContent({ data, className }: Props) {
       data={data as never}
       className={
         className ||
-        'prose prose-neutral max-w-none text-ink leading-relaxed prose-headings:font-display prose-headings:text-navy prose-a:font-semibold prose-a:text-navy prose-a:underline prose-a:underline-offset-2 prose-a:decoration-navy/35 prose-a:transition-colors prose-a:hover:decoration-navy prose-table:w-full prose-th:bg-paper prose-th:text-navy'
+        'prose prose-neutral max-w-none text-ink leading-relaxed prose-headings:font-display prose-headings:text-navy prose-a:font-semibold prose-a:text-navy prose-a:underline prose-a:underline-offset-2 prose-a:decoration-navy/35 prose-a:transition-colors prose-a:hover:decoration-navy prose-hr:my-9 prose-hr:border-0 prose-hr:h-px prose-hr:bg-line prose-table:w-full prose-th:bg-paper prose-th:text-navy'
       }
     />
   )

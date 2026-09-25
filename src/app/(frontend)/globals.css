@@ -143,6 +143,16 @@
     filter: brightness(0.94);
   }
 
+  /* Default / Lexical horizontal rules */
+  hr,
+  .prose hr {
+    border: none;
+    height: 1px;
+    margin: 2.25rem 0;
+    background: var(--color-line);
+    color: transparent;
+  }
+
   /* Lexical / prose tables (Beitragsstruktur, etc.) */
   .lexical-table-container {
     overflow-x: auto;
