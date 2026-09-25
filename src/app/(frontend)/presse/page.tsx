@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
 import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { ClubLink } from '@/components/ui/ClubLink'
 import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
 import { clubPages, hrefForPage } from '@/lib/club-paths'
 
@@ -35,7 +35,7 @@ export default async function PressePage() {
       <Stagger className="mt-12 divide-y divide-line border-t border-line" as="ul">
         {posts.map((post) => (
           <StaggerItem key={post.id} as="li">
-            <Link
+            <ClubLink
               href={post.path}
               className="club-interactive group flex flex-col gap-1 py-5 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:px-2"
             >
@@ -51,7 +51,7 @@ export default async function PressePage() {
                   })}
                 </time>
               ) : null}
-            </Link>
+            </ClubLink>
             {post.excerpt ? (
               <p className="pb-5 text-sm text-ink-soft sm:px-2">{post.excerpt}</p>
             ) : null}

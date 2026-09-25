@@ -1,9 +1,9 @@
 'use client'
 
 import { Search } from 'lucide-react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { ClubLink } from '@/components/ui/ClubLink'
 import { clubAppRoutes } from '@/lib/club-paths'
 
 export function HeaderSearchLink() {
@@ -11,7 +11,7 @@ export function HeaderSearchLink() {
   const active = pathname === clubAppRoutes.search
 
   return (
-    <Link
+    <ClubLink
       href={clubAppRoutes.search}
       aria-label="Suche"
       aria-current={active ? 'page' : undefined}
@@ -20,6 +20,6 @@ export function HeaderSearchLink() {
       }`}
     >
       <Search className="size-5" aria-hidden="true" />
-    </Link>
+    </ClubLink>
   )
 }

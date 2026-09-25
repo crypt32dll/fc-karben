@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { Reveal } from '@/components/motion/Reveal'
+import { ClubLink } from '@/components/ui/ClubLink'
 import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
 import { hrefForPage } from '@/lib/club-paths'
 
@@ -36,12 +36,12 @@ export default async function PresseArtikelPage({ params }: Props) {
     <article className="mx-auto max-w-[800px] px-8 py-16">
       <Reveal immediate>
         <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
-          <Link
+          <ClubLink
             href={hrefForPage('presse')}
             className="inline-flex min-h-11 items-center underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
           >
             Presse
-          </Link>
+          </ClubLink>
           {post.categories?.[0] ? ` · ${post.categories[0].title}` : null}
         </p>
         <h1 className="text-5xl text-navy">{post.title}</h1>
@@ -65,12 +65,12 @@ export default async function PresseArtikelPage({ params }: Props) {
         <LexicalContent data={post.content} />
       </div>
       <p className="mt-12 border-t border-line pt-6 text-sm">
-        <Link
+        <ClubLink
           href={hrefForPage('presse')}
           className="inline-flex min-h-11 items-center font-semibold text-navy underline-offset-2 transition-colors hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
         >
           ← Alle Beiträge
-        </Link>
+        </ClubLink>
       </p>
     </article>
   )

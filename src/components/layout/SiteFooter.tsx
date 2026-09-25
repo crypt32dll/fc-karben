@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import {
   clubAppRoutes,
   clubTeams,
@@ -8,6 +6,8 @@ import {
   type ClubPageKey,
   type ClubTeamKey,
 } from '@/lib/club-paths'
+
+import { ClubLink } from '@/components/ui/ClubLink'
 
 const footerLinkClass =
   'block min-h-11 py-2.5 text-ink-soft transition-colors motion-reduce:transition-none hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy'
@@ -45,9 +45,9 @@ export function SiteFooter() {
               <h4 className="mb-1 font-semibold text-navy">Verein</h4>
               <nav className="flex flex-col" aria-label="Footer Verein">
                 {VEREIN_LINKS.map((item) => (
-                  <Link key={item.key} href={hrefForPage(item.key)} className={footerLinkClass}>
+                  <ClubLink key={item.key} href={hrefForPage(item.key)} className={footerLinkClass}>
                     {item.label}
-                  </Link>
+                  </ClubLink>
                 ))}
               </nav>
             </div>
@@ -55,9 +55,9 @@ export function SiteFooter() {
               <h4 className="mb-1 font-semibold text-navy">Mannschaften</h4>
               <nav className="flex flex-col" aria-label="Footer Mannschaften">
                 {TEAM_LINKS.map((key) => (
-                  <Link key={key} href={hrefForTeam(key)} className={footerLinkClass}>
+                  <ClubLink key={key} href={hrefForTeam(key)} className={footerLinkClass}>
                     {clubTeams[key].label}
-                  </Link>
+                  </ClubLink>
                 ))}
               </nav>
             </div>
@@ -68,13 +68,13 @@ export function SiteFooter() {
                   info@fc-karben.de
                 </a>
                 {KONTAKT_LINKS.map((item) => (
-                  <Link
+                  <ClubLink
                     key={item.key}
                     href={item.key === 'search' ? clubAppRoutes.search : hrefForPage(item.key)}
                     className={footerLinkClass}
                   >
                     {item.label}
-                  </Link>
+                  </ClubLink>
                 ))}
               </nav>
             </div>
@@ -83,19 +83,19 @@ export function SiteFooter() {
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-sm text-ink-soft">
           <span>© {new Date().getFullYear()} FC Karben e.V.</span>
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <Link
+            <ClubLink
               href={hrefForPage('impressum')}
               className="inline-flex min-h-11 items-center transition-colors hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy"
             >
               Impressum
-            </Link>
+            </ClubLink>
             <span aria-hidden="true">·</span>
-            <Link
+            <ClubLink
               href={hrefForPage('datenschutz')}
               className="inline-flex min-h-11 items-center transition-colors hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy"
             >
               Datenschutz
-            </Link>
+            </ClubLink>
           </span>
         </div>
       </div>

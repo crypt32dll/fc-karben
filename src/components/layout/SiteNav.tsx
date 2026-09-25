@@ -1,19 +1,16 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import {
-  clubAppRoutes,
-  hrefForPage,
-  isTeamPath,
-} from '@/lib/club-paths'
+import { ClubLink } from '@/components/ui/ClubLink'
+import { clubAppRoutes, hrefForPage, isTeamPath } from '@/lib/club-paths'
 
 const nav = [
   {
     href: clubAppRoutes.home,
     label: 'Home',
     match: (path: string) => path === clubAppRoutes.home,
+    prefetch: true,
   },
   {
     href: clubAppRoutes.teamsSection,
@@ -49,17 +46,19 @@ export function SiteNav() {
     <nav className="hidden items-center gap-1 md:flex" aria-label="Hauptnavigation">
       {nav.map((item) => {
         const active = item.match(pathname)
+        const prefetch = 'prefetch' in item ? item.prefetch : false
         return (
-          <Link
+          <ClubLink
             key={item.href}
             href={item.href}
+            prefetch={prefetch}
             aria-current={active ? 'page' : undefined}
             className={`inline-flex min-h-11 items-center px-2.5 text-sm font-semibold transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy ${
               active ? 'text-navy' : 'text-ink hover:text-navy'
             }`}
           >
             {item.label}
-          </Link>
+          </ClubLink>
         )
       })}
     </nav>

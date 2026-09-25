@@ -1,7 +1,6 @@
 import { ArrowRight, FileText, Newspaper, Search, X } from 'lucide-react'
-import Link from 'next/link'
-
 import { MotionPressable, Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { ClubLink } from '@/components/ui/ClubLink'
 import { searchContent, type SearchHit } from '@/lib/content-catalog'
 import { clubAppRoutes, hrefForPage, hrefForSearch } from '@/lib/club-paths'
 
@@ -33,12 +32,12 @@ function QueryExampleChips({ label }: { label: string }) {
       <ul className="mt-3 flex flex-wrap gap-2">
         {QUERY_EXAMPLES.map((term) => (
           <li key={term}>
-            <Link
+            <ClubLink
               href={hrefForSearch(term)}
               className="inline-flex min-h-11 items-center rounded-[2px] border border-line bg-white px-3 text-sm font-semibold text-navy transition-colors motion-reduce:transition-none hover:border-navy hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
             >
               {term}
-            </Link>
+            </ClubLink>
           </li>
         ))}
       </ul>
@@ -48,7 +47,7 @@ function QueryExampleChips({ label }: { label: string }) {
 
 function ResultRow({ hit }: { hit: SearchHit }) {
   return (
-    <Link
+    <ClubLink
       href={hit.path}
       className="group flex gap-4 py-5 transition-colors motion-reduce:transition-none hover:bg-white/70 sm:px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
     >
@@ -76,7 +75,7 @@ function ResultRow({ hit }: { hit: SearchHit }) {
           <ArrowRight className="size-3.5" />
         </span>
       </span>
-    </Link>
+    </ClubLink>
   )
 }
 
@@ -180,15 +179,15 @@ export async function SearchResults({ query }: { query: string }) {
               {AREA_SUGGESTIONS.map((item) => (
                 <StaggerItem key={item.href} as="li">
                   <MotionPressable>
-                    <Link
-                      href={item.href}
-                      className="group flex min-h-11 flex-col border border-line bg-white px-4 py-4 transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
-                    >
-                      <span className="font-semibold text-navy group-hover:underline">
-                        {item.label}
-                      </span>
-                      <span className="mt-1 text-sm text-ink-soft">{item.hint}</span>
-                    </Link>
+                      <ClubLink
+                        href={item.href}
+                        className="group flex min-h-11 flex-col border border-line bg-white px-4 py-4 transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                      >
+                        <span className="font-semibold text-navy group-hover:underline">
+                          {item.label}
+                        </span>
+                        <span className="mt-1 text-sm text-ink-soft">{item.hint}</span>
+                      </ClubLink>
                   </MotionPressable>
                 </StaggerItem>
               ))}
@@ -210,13 +209,13 @@ export async function SearchResults({ query }: { query: string }) {
                 {resultSummary}
               </p>
             </div>
-            <Link
+            <ClubLink
               href={clubAppRoutes.search}
               className="inline-flex min-h-11 items-center gap-2 rounded-[2px] border border-line bg-white px-3 text-sm font-semibold text-navy transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
             >
               <X className="size-4" aria-hidden="true" />
               Suche zurücksetzen
-            </Link>
+            </ClubLink>
           </Reveal>
         ) : null}
 
@@ -243,12 +242,12 @@ export async function SearchResults({ query }: { query: string }) {
             <ul className="mt-6 flex flex-wrap gap-3">
               {AREA_SUGGESTIONS.map((item) => (
                 <li key={item.href}>
-                  <Link
+                  <ClubLink
                     href={item.href}
                     className="inline-flex min-h-11 items-center rounded-[2px] border border-line bg-paper px-4 text-sm font-semibold text-navy transition-colors motion-reduce:transition-none hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
                   >
                     {item.label}
-                  </Link>
+                  </ClubLink>
                 </li>
               ))}
             </ul>

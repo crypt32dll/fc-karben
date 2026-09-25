@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
+import { ClubLink } from '@/components/ui/ClubLink'
 import { catalogSeoToMetadata, getSeiteBySlug } from '@/lib/content-catalog'
 import { clubPages, hrefForPage, type ClubPageKey } from '@/lib/club-paths'
 
@@ -41,9 +41,9 @@ export default async function VereinIndexPage() {
           <ul className="divide-y divide-line border border-line">
             {FALLBACK_LINKS.map((l) => (
               <li key={l.key}>
-                <Link href={hrefForPage(l.key)} className={linkClass}>
+                <ClubLink href={hrefForPage(l.key)} className={linkClass}>
                   {l.label}
-                </Link>
+                </ClubLink>
               </li>
             ))}
           </ul>
@@ -58,9 +58,9 @@ export default async function VereinIndexPage() {
       <ul className="mt-8 divide-y divide-line border border-line">
         {FALLBACK_LINKS.map((l) => (
           <li key={l.key}>
-            <Link href={hrefForPage(l.key)} className={linkClass}>
+            <ClubLink href={hrefForPage(l.key)} className={linkClass}>
               {l.label}
-            </Link>
+            </ClubLink>
           </li>
         ))}
       </ul>

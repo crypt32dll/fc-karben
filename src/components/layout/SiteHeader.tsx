@@ -1,9 +1,10 @@
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
 
 import logo from '../../../public/logo.png'
+
+import { ClubLink } from '@/components/ui/ClubLink'
 
 import { HeaderSearchLink } from './HeaderSearchLink'
 import { SiteNav } from './SiteNav'
@@ -12,8 +13,9 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white">
       <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-8 py-3.5">
-        <Link
+        <ClubLink
           href={clubAppRoutes.home}
+          prefetch
           className="flex min-w-0 items-center gap-3 rounded-[2px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
         >
           <Image
@@ -32,16 +34,17 @@ export function SiteHeader() {
               Fußball seit 2015
             </div>
           </div>
-        </Link>
+        </ClubLink>
         <SiteNav />
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <HeaderSearchLink />
-          <Link
+          <ClubLink
             href={hrefForPage('mitgliedWerden')}
+            prefetch
             className="inline-flex min-h-11 items-center rounded-[2px] bg-navy px-4 text-[13px] font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep sm:px-5"
           >
             Mitglied werden
-          </Link>
+          </ClubLink>
         </div>
       </div>
     </header>
