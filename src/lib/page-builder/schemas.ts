@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { mapCatalogBody } from '../content-catalog/body'
+
 const idField = z.preprocess((v) => {
   if (v == null || v === '') return undefined
   return String(v)
@@ -74,7 +76,7 @@ export const payloadLayoutBlockSchema = z.discriminatedUnion('blockType', [
       blockType: 'richText' as const,
       id: b.id,
       heading: b.heading,
-      body: b.body,
+      body: mapCatalogBody(b.body),
     })),
   z
     .object({

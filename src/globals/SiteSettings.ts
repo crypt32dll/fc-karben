@@ -2,7 +2,17 @@ import type { GlobalConfig } from 'payload'
 
 import { anyone, isAdmin, isAdminOrEditor } from '../access'
 import { pageBlocks } from '../blocks'
-import { CACHE_TAGS, createGlobalRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const siteSettingsCache: CachePolicy = {
+  tags: [CACHE_TAGS.siteSettings],
+  paths: ['/'],
+}
+
+export const homepageCache: CachePolicy = {
+  tags: [CACHE_TAGS.homepage],
+  paths: ['/'],
+}
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -10,7 +20,6 @@ export const SiteSettings: GlobalConfig = {
     read: anyone,
     update: isAdmin,
   },
-  hooks: createGlobalRevalidateHooks([CACHE_TAGS.siteSettings], ['/']),
   fields: [
     {
       name: 'clubName',
@@ -71,7 +80,6 @@ export const Homepage: GlobalConfig = {
     read: anyone,
     update: isAdminOrEditor,
   },
-  hooks: createGlobalRevalidateHooks([CACHE_TAGS.homepage], ['/']),
   fields: [
     {
       type: 'tabs',

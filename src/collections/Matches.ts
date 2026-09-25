@@ -1,7 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
-import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const matchesCache: CachePolicy = {
+  tags: [CACHE_TAGS.matches],
+  paths: ['/'],
+}
 
 export const Matches: CollectionConfig = {
   slug: 'matches',
@@ -15,7 +20,6 @@ export const Matches: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  hooks: createRevalidateHooks([CACHE_TAGS.matches], ['/']),
   fields: [
     {
       name: 'team',

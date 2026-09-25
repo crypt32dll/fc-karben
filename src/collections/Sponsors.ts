@@ -1,7 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
-import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const sponsorsCache: CachePolicy = {
+  tags: [CACHE_TAGS.sponsors],
+  paths: ['/', '/sponsoren'],
+}
 
 export const Sponsors: CollectionConfig = {
   slug: 'sponsors',
@@ -15,7 +20,6 @@ export const Sponsors: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  hooks: createRevalidateHooks([CACHE_TAGS.sponsors], ['/', '/sponsoren']),
   fields: [
     { name: 'name', type: 'text', required: true },
     {

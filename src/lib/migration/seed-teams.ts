@@ -1,9 +1,16 @@
-import type { CatalogTeam } from './types'
+/** Seed roster for MigrationPipeline load — not part of ContentCatalog. */
+export type SeedTeam = {
+  name: string
+  slug: string
+  shortLabel: string
+  league: string
+  fussballDeUrl: string
+  syncMatches?: boolean
+  path: string
+}
 
-/** Seed data for migrator only — ClubSite reads teams from Payload. */
-export const DEFAULT_TEAMS: CatalogTeam[] = [
+export const DEFAULT_TEAMS: SeedTeam[] = [
   {
-    id: '1',
     name: '1. Mannschaft',
     slug: '1-mannschaft',
     shortLabel: '01',
@@ -14,7 +21,6 @@ export const DEFAULT_TEAMS: CatalogTeam[] = [
     path: '/1-mannschaft',
   },
   {
-    id: '2',
     name: '2. Mannschaft',
     slug: '2-mannschaft',
     shortLabel: '02',
@@ -24,7 +30,6 @@ export const DEFAULT_TEAMS: CatalogTeam[] = [
     path: '/2-mannschaft',
   },
   {
-    id: '3',
     name: '3. Mannschaft',
     slug: '3-mannschaft',
     shortLabel: '03',
@@ -34,7 +39,6 @@ export const DEFAULT_TEAMS: CatalogTeam[] = [
     path: '/3-mannschaft',
   },
   {
-    id: '4',
     name: 'E-Jugend',
     slug: 'e-jugend',
     shortLabel: '04',
@@ -44,7 +48,6 @@ export const DEFAULT_TEAMS: CatalogTeam[] = [
     path: '/e-jugend',
   },
   {
-    id: '5',
     name: 'Alte Herren',
     slug: 'alte-herren',
     shortLabel: '05',

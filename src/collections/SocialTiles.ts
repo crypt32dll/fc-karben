@@ -1,7 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
-import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const socialTilesCache: CachePolicy = {
+  tags: [CACHE_TAGS.socialTiles],
+  paths: ['/'],
+}
 
 export const SocialTiles: CollectionConfig = {
   slug: 'social-tiles',
@@ -19,7 +24,6 @@ export const SocialTiles: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  hooks: createRevalidateHooks([CACHE_TAGS.socialTiles], ['/']),
   fields: [
     {
       name: 'image',

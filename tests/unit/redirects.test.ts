@@ -33,6 +33,21 @@ describe('RedirectMap', () => {
     })
   })
 
+  it('lets CMS rules override dated WP permalinks', () => {
+    expect(
+      resolveRedirect('/2026/05/18/special/', [
+        { from: '/2026/05/18/special', to: '/custom-landing', permanent: true },
+      ]),
+    ).toEqual({ to: '/custom-landing', permanent: true })
+  })
+
+  it('falls back to dated→presse when no CMS rule', () => {
+    expect(resolveRedirect('/2026/05/18/einladung/', [])).toEqual({
+      to: '/presse/einladung',
+      permanent: true,
+    })
+  })
+
   it('rejects open redirects', () => {
     expect(isSafeRedirectTarget('https://evil.example/phish')).toBe(false)
     expect(isSafeRedirectTarget('//evil.example')).toBe(false)

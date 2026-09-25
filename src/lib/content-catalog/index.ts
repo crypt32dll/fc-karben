@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 import { CACHE_TAGS, CATALOG_REVALIDATE_SECONDS } from '../cache/revalidate'
 import type { MatchDto } from '../match-feed'
 import type { RedirectRule } from '../redirects'
+import { resolveRedirect } from '../redirects'
 import { toNextMetadata } from '../seo'
 import type { SocialTileDto } from '../social-feed'
 import {
@@ -20,6 +21,7 @@ import {
   findSocialTiles,
   findSponsoren,
 } from './payload-adapter'
+import { decideRootSlug, type RootSlugResolution } from './resolve-root-slug'
 import { findSearchHits, type SearchHit } from './search'
 import type {
   CatalogHomepage,
@@ -31,9 +33,11 @@ import type {
   CatalogTeam,
 } from './types'
 
+export type { CatalogBody } from './body'
+export { mapCatalogBody } from './body'
 export { mapPostsForList, mapTeamsForGrid, postPath, teamPath } from './mappers'
+export { decideRootSlug, type RootSlugResolution } from './resolve-root-slug'
 export type { SearchHit } from './search'
-export { DEFAULT_TEAMS } from './seed-teams'
 export type {
   CatalogHomepage,
   CatalogNotice,
@@ -157,6 +161,21 @@ export async function listRedirectRules(): Promise<RedirectRule[]> {
     revalidate: CATALOG_REVALIDATE_SECONDS,
     tags: [CACHE_TAGS.redirects],
   })()
+}
+
+/** Resolve /:slug collision between Seite, Mannschaft, and Redirect. */
+export async function resolveRootSlug(slug: string): Promise<RootSlugResolution> {
+  const [page, team, rules] = await Promise.all([
+    getSeiteBySlug(slug),
+    getMannschaftBySlug(slug),
+    listRedirectRules(),
+  ])
+  return decideRootSlug({
+    slug,
+    page,
+    team,
+    redirect: resolveRedirect(`/${slug}`, rules),
+  })
 }
 
 export async function searchContent(query: string, limit = 24): Promise<SearchHit[]> {

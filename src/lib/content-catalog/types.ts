@@ -1,4 +1,7 @@
 import type { PageLayoutView } from '../page-builder'
+import type { CatalogBody } from './body'
+
+export type { CatalogBody } from './body'
 
 export type CatalogSeo = {
   metaTitle?: string | null
@@ -17,7 +20,7 @@ export type CatalogPost = {
   publishedAt?: string | null
   updatedAt?: string | null
   path: string
-  content?: unknown
+  content?: CatalogBody | null
   categories?: Array<{ title: string; slug: string }>
   seo?: CatalogSeo
 }
@@ -27,7 +30,7 @@ export type CatalogPage = {
   title: string
   slug: string
   path: string
-  content?: unknown
+  content?: CatalogBody | null
   layout?: PageLayoutView | null
   seo?: CatalogSeo
   updatedAt?: string | null
@@ -43,7 +46,7 @@ export type CatalogTeam = {
   fussballDeUrl?: string | null
   syncMatches?: boolean | null
   path: string
-  content?: unknown
+  content?: CatalogBody | null
   seo?: CatalogSeo
 }
 

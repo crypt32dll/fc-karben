@@ -5,6 +5,7 @@ import { mapPageLayout } from '../page-builder'
 import { getPayloadClient } from '../payload'
 import { type RedirectRule, redirectRulesSchema } from '../redirects'
 import type { SocialTileDto } from '../social-feed'
+import { mapCatalogBody } from './body'
 import { mapCategories, mapSeo, mapTeamsForGrid, postPath } from './mappers'
 import type {
   CatalogHomepage,
@@ -76,7 +77,7 @@ export async function findBeitragBySlug(slug: string): Promise<CatalogPost | nul
     publishedAt: doc.publishedAt,
     updatedAt: doc.updatedAt,
     path: postPath(doc.slug),
-    content: doc.content,
+    content: mapCatalogBody(doc.content),
     seo: docMeta(doc),
     categories: mapCategories(doc.categories),
   }
@@ -101,7 +102,7 @@ export async function findSeiteBySlug(slug: string): Promise<CatalogPage | null>
     title: doc.title,
     slug: doc.slug,
     path: doc.path || `/${doc.slug}`,
-    content: doc.content,
+    content: mapCatalogBody(doc.content),
     layout: mapPageLayout(doc.layout),
     seo: docMeta(doc),
     updatedAt: doc.updatedAt,
@@ -131,7 +132,7 @@ export async function findSeiteByPath(pathname: string): Promise<CatalogPage | n
     title: doc.title,
     slug: doc.slug,
     path: doc.path || path,
-    content: doc.content,
+    content: mapCatalogBody(doc.content),
     layout: mapPageLayout(doc.layout),
     seo: docMeta(doc),
     updatedAt: doc.updatedAt,
@@ -176,7 +177,7 @@ export async function findMannschaftBySlug(slug: string): Promise<CatalogTeam | 
     return mapped
       ? {
           ...mapped,
-          content: doc.content,
+          content: mapCatalogBody(doc.content),
           summary: doc.summary || mapped.summary,
           seo: docMeta(doc),
         }

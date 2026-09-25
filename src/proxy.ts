@@ -1,33 +1,21 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-import {
-  isSafeRedirectTarget,
-  type RedirectRule,
-  resolveRedirect,
-  wpDatedPostToPresse,
-} from '@/lib/redirects'
+import { CACHE_TAGS } from '@/lib/cache/tags'
+import { isSafeRedirectTarget, type RedirectRule, resolveRedirect } from '@/lib/redirects'
 
 /**
- * Edge redirects: built-in WP rules first, then cached CMS redirect map.
+ * Edge redirects: CMS rule map first (can override dated WP URLs), then built-ins.
  * Matcher excludes /_next, /api, /admin, and files with extensions.
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Fast built-in: dated WP permalinks (no network)
-  const presse = wpDatedPostToPresse(pathname)
-  if (presse) {
-    const url = request.nextUrl.clone()
-    url.pathname = presse
-    return NextResponse.redirect(url, 308)
-  }
-
   let rules: RedirectRule[] = []
   try {
     const origin = request.nextUrl.origin
     const res = await fetch(`${origin}/api/redirects`, {
-      next: { revalidate: 300 },
+      next: { tags: [CACHE_TAGS.redirects], revalidate: 60 },
       signal: AbortSignal.timeout(1500),
     })
     if (res.ok) {

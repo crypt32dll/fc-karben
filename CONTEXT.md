@@ -13,15 +13,16 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **Redirect** | 301 from a legacy WordPress URL to a canonical club route (`redirects`) |
 | **Match** | Upcoming/past fixture for the first team (`matches`), from MatchFeed or override |
 | **MatchFeed** | Module that syncs the 1st team schedule from Fussball.de |
-| **ContentCatalog** | Read API for the ClubSite (no Payload leaks into UI) |
+| **ContentCatalog** | Read seam for the ClubSite (no Payload leaks into UI); maps Lexical → **CatalogBody** |
+| **CatalogBody** | ClubSite-owned rich-text DTO validated at the ContentCatalog / Page Builder seam |
 | **SeoSurface** | Metadata, JSON-LD, sitemap, robots |
 | **SocialFeed** | Homepage social tiles; Phase 1 = manual CMS tiles |
-| **MigrationPipeline** | WXR extract → transform → load into Payload |
+| **MigrationPipeline** | WXR extract → transform → load into Payload (Mannschaft seed lives here) |
 | **ClubSite** | Public Next.js App Router frontend |
 | **Page Builder** | Payload `blocks` layout on `pages` (and homepage sections) so editors compose pages without code |
 | **LayoutView** | Zod-validated page-builder DTO (discriminated union on `blockType`) consumed by `RenderBlocks` |
 | **clubPaths** | Canonical path helpers (`postPath`, `teamPath`, `pathForDoc`) shared by SEO, redirects, search, catalog |
-| **SeoSurface** | Metadata, JSON-LD, sitemap, robots — fed by Payload SEO plugin `meta` via ContentCatalog |
+| **Redirect policy** | Built-ins + CMS rule map resolved in one module; proxy is a thin edge adapter |
 | **wpId** | Stable WordPress ID used for idempotent migration upserts |
 
 ## Roles

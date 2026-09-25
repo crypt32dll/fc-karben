@@ -1,19 +1,20 @@
-import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 
+import type { CatalogBody } from '@/lib/content-catalog'
+
 type Props = {
-  data: unknown
+  data: CatalogBody | null | undefined
   className?: string
 }
 
+/** ClubSite body renderer — accepts CatalogBody only (Payload Lexical stays behind the catalog seam). */
 export function LexicalContent({ data, className }: Props) {
-  if (!data || typeof data !== 'object') return null
-  const state = data as SerializedEditorState
-  if (!state.root) return null
+  if (!data?.root) return null
 
   return (
     <RichText
-      data={state}
+      // RichText expects Payload's SerializedEditorState; CatalogBody is the validated subset.
+      data={data as never}
       className={
         className ||
         'prose prose-neutral max-w-none text-ink prose-headings:font-display prose-headings:text-navy prose-a:text-navy'

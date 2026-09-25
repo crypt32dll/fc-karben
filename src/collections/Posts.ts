@@ -2,7 +2,16 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { wpIdField } from '../fields/seo'
-import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const postsCache: CachePolicy = {
+  tags: [CACHE_TAGS.posts],
+  paths: ['/', '/presse'],
+  pathsFromDoc: (doc) => {
+    const slug = (doc as { slug?: string }).slug
+    return slug ? [`/presse/${slug}`] : []
+  },
+}
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -19,7 +28,6 @@ export const Posts: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  hooks: createRevalidateHooks([CACHE_TAGS.posts], ['/', '/presse']),
   fields: [
     { name: 'title', type: 'text', required: true },
     {

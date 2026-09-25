@@ -7,7 +7,8 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { collections } from './collections'
-import { Homepage, SiteSettings } from './globals/SiteSettings'
+import { Homepage, homepageCache, SiteSettings, siteSettingsCache } from './globals/SiteSettings'
+import { withGlobalCache } from './lib/cache/register'
 import { buildPlugins } from './payload/plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -38,7 +39,10 @@ export default buildConfig({
     },
   },
   collections,
-  globals: [SiteSettings, Homepage],
+  globals: [
+    withGlobalCache(SiteSettings, siteSettingsCache),
+    withGlobalCache(Homepage, homepageCache),
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',
   sharp,
@@ -49,6 +53,11 @@ export default buildConfig({
     pool: {
       connectionString,
     },
+    // Set PAYLOAD_DATABASE_PUSH=false to skip interactive drizzle prompts (e.g. CI).
+    // Default: push in non-production so local/dev schema stays in sync.
+    push: process.env.PAYLOAD_DATABASE_PUSH
+      ? process.env.PAYLOAD_DATABASE_PUSH !== 'false'
+      : process.env.NODE_ENV !== 'production',
   }),
   plugins: [
     ...plugins,

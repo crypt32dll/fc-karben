@@ -3,13 +3,7 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { LexicalContent } from '@/components/cms/LexicalContent'
-import {
-  catalogSeoToMetadata,
-  getMannschaftBySlug,
-  getSeiteBySlug,
-  listRedirectRules,
-} from '@/lib/content-catalog'
-import { resolveRedirect } from '@/lib/redirects'
+import { catalogSeoToMetadata, resolveRootSlug } from '@/lib/content-catalog'
 
 export const revalidate = 300
 
@@ -17,23 +11,23 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const page = await getSeiteBySlug(slug)
-  if (page) {
+  const hit = await resolveRootSlug(slug)
+
+  if (hit.kind === 'seite') {
     return catalogSeoToMetadata({
-      title: page.title,
-      path: page.path,
-      seo: page.seo,
-      updatedAt: page.updatedAt,
+      title: hit.page.title,
+      path: hit.page.path,
+      seo: hit.page.seo,
+      updatedAt: hit.page.updatedAt,
     })
   }
 
-  const team = await getMannschaftBySlug(slug)
-  if (team) {
+  if (hit.kind === 'mannschaft') {
     return catalogSeoToMetadata({
-      title: team.name,
-      path: team.path,
-      excerpt: team.summary,
-      seo: team.seo,
+      title: hit.team.name,
+      path: hit.team.path,
+      excerpt: hit.team.summary,
+      seo: hit.team.seo,
     })
   }
 
@@ -42,11 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SlugPage({ params }: Props) {
   const { slug } = await params
+  const hit = await resolveRootSlug(slug)
 
-  const page = await getSeiteBySlug(slug)
-  const team = await getMannschaftBySlug(slug)
+  if (hit.kind === 'redirect') {
+    if (hit.permanent) permanentRedirect(hit.to)
+    redirect(hit.to)
+  }
 
-  if (team && !page?.content && !(Array.isArray(page?.layout) && page.layout.length)) {
+  if (hit.kind === 'mannschaft') {
+    const { team } = hit
     return (
       <article className="mx-auto max-w-[800px] px-8 py-16">
         <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
@@ -74,10 +72,8 @@ export default async function SlugPage({ params }: Props) {
     )
   }
 
-  if (page) {
-    if (page.path && page.path !== `/${slug}` && page.path.startsWith('/verein/')) {
-      permanentRedirect(page.path)
-    }
+  if (hit.kind === 'seite') {
+    const { page, team } = hit
     return (
       <>
         {team ? (
@@ -101,13 +97,6 @@ export default async function SlugPage({ params }: Props) {
         <CmsPageBody page={page} />
       </>
     )
-  }
-
-  const rules = await listRedirectRules()
-  const redir = resolveRedirect(`/${slug}`, rules)
-  if (redir) {
-    if (redir.permanent) permanentRedirect(redir.to)
-    redirect(redir.to)
   }
 
   notFound()

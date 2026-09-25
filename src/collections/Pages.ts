@@ -3,7 +3,19 @@ import type { CollectionConfig } from 'payload'
 import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { pageBlocks } from '../blocks'
 import { wpIdField } from '../fields/seo'
-import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
+import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+
+export const pagesCache: CachePolicy = {
+  tags: [CACHE_TAGS.pages],
+  paths: ['/'],
+  pathsFromDoc: (doc) => {
+    const d = doc as { path?: string; slug?: string }
+    const out: string[] = []
+    if (d.path?.startsWith('/')) out.push(d.path)
+    if (d.slug) out.push(`/${d.slug}`)
+    return out
+  },
+}
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -20,7 +32,6 @@ export const Pages: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  hooks: createRevalidateHooks([CACHE_TAGS.pages], ['/']),
   fields: [
     { name: 'title', type: 'text', required: true },
     {

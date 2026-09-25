@@ -81,7 +81,7 @@ export async function buildPlugins(r2Configured: boolean): Promise<Plugin[]> {
           update: isAdminOrEditor,
           delete: isAdmin,
         },
-        hooks: createRevalidateHooks([CACHE_TAGS.redirects]),
+        hooks: createRevalidateHooks({ tags: [CACHE_TAGS.redirects] }),
       },
     }),
   )

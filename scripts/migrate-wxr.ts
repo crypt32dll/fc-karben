@@ -18,11 +18,10 @@ import { pathToFileURL } from 'node:url'
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 import { JSDOM } from 'jsdom'
 import { getPayload, type Payload } from 'payload'
-
-import { DEFAULT_TEAMS } from '../src/lib/content-catalog/seed-teams'
 import { createLogger } from '../src/lib/logger'
 import { canonicalizePageSlug, prepareHtmlForLexical } from '../src/lib/migration/html-to-lexical'
 import { downloadFile, mapWithConcurrency } from '../src/lib/migration/media-loader'
+import { DEFAULT_TEAMS } from '../src/lib/migration/seed-teams'
 import {
   attachments,
   buildRedirectsFromPosts,

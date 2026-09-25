@@ -1,25 +1,11 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 
 import { createLogger } from '../logger'
+import type { CachePolicy, CacheTag } from './tags'
+
+export { CACHE_TAGS, CATALOG_REVALIDATE_SECONDS, type CachePolicy, type CacheTag } from './tags'
 
 const log = createLogger('Cache')
-
-export const CACHE_TAGS = {
-  posts: 'posts',
-  pages: 'pages',
-  teams: 'teams',
-  sponsors: 'sponsors',
-  socialTiles: 'social-tiles',
-  redirects: 'redirects',
-  homepage: 'homepage',
-  siteSettings: 'site-settings',
-  matches: 'matches',
-} as const
-
-export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
-
-/** Default ISR window for ClubSite catalog reads (seconds). */
-export const CATALOG_REVALIDATE_SECONDS = 300
 
 export function shouldSkipRevalidate(context: unknown): boolean {
   if (!context || typeof context !== 'object') return false
@@ -54,12 +40,18 @@ export function revalidateCatalogPaths(...paths: string[]) {
   }
 }
 
+function pathsForDoc(policy: CachePolicy, doc: unknown): string[] {
+  const staticPaths = policy.paths ?? ['/']
+  const dynamic = policy.pathsFromDoc?.(doc) ?? []
+  return [...new Set([...staticPaths, ...dynamic])]
+}
+
 /** Shared Payload collection hook — skip during migration bulk import. */
-export function createRevalidateHooks(tags: CacheTag[], paths: string[] = ['/']) {
-  const run = ({ context }: { context?: unknown }) => {
+export function createRevalidateHooks(policy: CachePolicy) {
+  const run = ({ doc, context }: { doc?: unknown; context?: unknown }) => {
     if (shouldSkipRevalidate(context)) return
-    revalidateCatalogTags(...tags)
-    revalidateCatalogPaths(...paths)
+    revalidateCatalogTags(...policy.tags)
+    revalidateCatalogPaths(...pathsForDoc(policy, doc))
   }
   return {
     afterChange: [run],
@@ -68,13 +60,13 @@ export function createRevalidateHooks(tags: CacheTag[], paths: string[] = ['/'])
 }
 
 /** Globals have no afterDelete — afterChange only. */
-export function createGlobalRevalidateHooks(tags: CacheTag[], paths: string[] = ['/']) {
+export function createGlobalRevalidateHooks(policy: CachePolicy) {
   return {
     afterChange: [
-      ({ context }: { context?: unknown }) => {
+      ({ doc, context }: { doc?: unknown; context?: unknown }) => {
         if (shouldSkipRevalidate(context)) return
-        revalidateCatalogTags(...tags)
-        revalidateCatalogPaths(...paths)
+        revalidateCatalogTags(...policy.tags)
+        revalidateCatalogPaths(...pathsForDoc(policy, doc))
       },
     ],
   }
