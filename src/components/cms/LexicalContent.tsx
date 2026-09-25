@@ -1,4 +1,4 @@
-import { RichText, type JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
+import { type JSXConvertersFunction, RichText } from '@payloadcms/richtext-lexical/react'
 
 import type { CatalogBody } from '@/lib/content-catalog'
 import {

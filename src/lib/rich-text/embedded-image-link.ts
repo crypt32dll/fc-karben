@@ -2,8 +2,7 @@ import { isAllowedMediaHost } from '../migration/media-loader'
 
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif)$/i
 const SIZE_SUFFIX = /-(\d+)x(\d+)(?=\.(png|jpe?g|gif|webp|avif)$)/i
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export type EmbeddedImage = {
   src: string
@@ -78,7 +77,10 @@ function textOf(node: unknown): string {
 }
 
 function altFromFilename(filename: string): string {
-  const stem = filename.replace(/\.[^.]+$/, '').replace(/-scaled$/i, '').replace(/-\d+x\d+$/i, '')
+  const stem = filename
+    .replace(/\.[^.]+$/, '')
+    .replace(/-scaled$/i, '')
+    .replace(/-\d+x\d+$/i, '')
   if (!stem || UUID.test(stem)) return 'Foto'
   return stem.replace(/[-_]+/g, ' ').trim() || 'Foto'
 }
