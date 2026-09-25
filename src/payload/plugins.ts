@@ -12,7 +12,7 @@ import { pathForDoc } from '../lib/club-paths'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
 
-export async function buildPlugins(r2Configured: boolean): Promise<Plugin[]> {
+export async function buildPlugins(): Promise<Plugin[]> {
   const plugins: Plugin[] = []
 
   plugins.push(
@@ -159,18 +159,16 @@ export async function buildPlugins(r2Configured: boolean): Promise<Plugin[]> {
     }),
   )
 
-  if (process.env.SENTRY_DSN) {
+  // Always register so `generate:importmap` includes AdminErrorBoundary (needed on Vercel with SENTRY_DSN).
+  {
     const Sentry = await import('@sentry/nextjs')
     plugins.push(
       sentryPlugin({
-        enabled: true,
+        enabled: Boolean(process.env.SENTRY_DSN),
         Sentry,
       }),
     )
   }
-
-  // r2Configured is applied by caller via s3Storage — kept for API symmetry
-  void r2Configured
 
   return plugins
 }

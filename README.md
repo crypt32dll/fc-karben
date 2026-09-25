@@ -6,7 +6,7 @@ Next.js 16 + Payload CMS 3 website for **FC Karben e.V.**
 
 - Next.js App Router + Payload Admin (`/admin`)
 - **Postgres** via Neon (`POSTGRES_URL`) — no Docker required
-- **Cloudflare R2** for media (S3-compatible). Locally without R2 env → Payload local disk under `media/`
+- **Vercel Blob** for media. Locally without `BLOB_READ_WRITE_TOKEN` → Payload local disk under `media/`
 - Biome, Vitest, Playwright, GitHub Actions CI
 - **Page Builder** blocks for editors
 
@@ -18,7 +18,7 @@ Next.js 16 + Payload CMS 3 website for **FC Karben e.V.**
 ```bash
 cp .env.example .env
 # set POSTGRES_URL + PAYLOAD_SECRET
-# optional later: R2_* for Cloudflare image storage
+# on Vercel: create a Blob store → BLOB_READ_WRITE_TOKEN
 pnpm install
 pnpm dev
 ```
@@ -32,20 +32,15 @@ pnpm generate:importmap
 pnpm generate:types
 ```
 
-## Media (Cloudflare R2)
+## Media (Vercel Blob)
 
-We do **not** use Vercel Blob. Production media goes to Cloudflare R2 via `@payloadcms/storage-s3`.
+Production media uses `@payloadcms/storage-vercel-blob` with `clientUploads: true`.
 
-Set in `.env` / Vercel:
+1. In the Vercel project: **Storage → Create → Blob**
+2. Ensure `BLOB_READ_WRITE_TOKEN` is set (often linked automatically)
+3. Redeploy; run `pnpm generate:importmap` after plugin changes
 
-- `R2_BUCKET`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
-- `R2_ENDPOINT` (e.g. `https://<accountid>.r2.cloudflarestorage.com`)
-- `R2_REGION=auto`
-- optional custom domain: `NEXT_PUBLIC_MEDIA_URL=https://media.fc-karben.de`
-
-Then run `pnpm generate:importmap` so the admin upload handler matches R2.
+Locally, omit the token to keep uploads on disk under `media/`.
 
 ## Scripts
 

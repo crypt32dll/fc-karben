@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'fc-karben.de' },
-      { protocol: 'https', hostname: '**.r2.cloudflarestorage.com' },
-      { protocol: 'https', hostname: 'media.fc-karben.de' },
+      { protocol: 'https', hostname: 'www.fc-karben.de' },
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
     ],
     localPatterns: [
       { pathname: '/api/media/file/**' },

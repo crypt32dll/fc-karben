@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { s3Storage } from '@payloadcms/storage-s3'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -19,14 +19,15 @@ if (!connectionString) {
   throw new Error('Missing POSTGRES_URL (or DATABASE_URL) — set it in .env')
 }
 
-const r2Configured = Boolean(
-  process.env.R2_BUCKET &&
-    process.env.R2_ACCESS_KEY_ID &&
-    process.env.R2_SECRET_ACCESS_KEY &&
-    process.env.R2_ENDPOINT,
-)
+const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 
-const plugins = await buildPlugins(r2Configured)
+if (process.env.VERCEL && !blobConfigured) {
+  throw new Error(
+    'Vercel deploy requires BLOB_READ_WRITE_TOKEN (create a Blob store in the Vercel project)',
+  )
+}
+
+const plugins = await buildPlugins()
 
 export default buildConfig({
   admin: {
@@ -61,22 +62,17 @@ export default buildConfig({
   }),
   plugins: [
     ...plugins,
-    ...(r2Configured
+    ...(blobConfigured
       ? [
-          s3Storage({
+          vercelBlobStorage({
             collections: {
               media: true,
+              exports: true,
+              imports: true,
             },
-            bucket: process.env.R2_BUCKET as string,
-            config: {
-              credentials: {
-                accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
-                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
-              },
-              region: process.env.R2_REGION || 'auto',
-              endpoint: process.env.R2_ENDPOINT,
-              forcePathStyle: true,
-            },
+            token: process.env.BLOB_READ_WRITE_TOKEN as string,
+            // Bypass ~4.5MB Vercel function body limit for admin uploads
+            clientUploads: true,
           }),
         ]
       : []),

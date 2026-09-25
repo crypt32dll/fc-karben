@@ -9,7 +9,7 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **Mannschaft** | Club team with roster/contact and optional Fussball.de link (`teams`) |
 | **Spielbericht** | Beitrag categorized as a match report (via `categories`) |
 | **Kategorie** | Taxonomy from WordPress (`categories`) |
-| **Medien** | Uploaded file in Cloudflare R2 (`media`), keyed by `wpId` when migrated |
+| **Medien** | Uploaded file in Vercel Blob (`media`), keyed by `wpId` when migrated |
 | **Redirect** | 301 from a legacy WordPress URL to a canonical club route (`redirects`) |
 | **Match** | Upcoming/past fixture for the first team (`matches`), from MatchFeed or override |
 | **MatchFeed** | Module that syncs the 1st team schedule from Fussball.de |
