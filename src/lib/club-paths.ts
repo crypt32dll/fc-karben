@@ -95,3 +95,15 @@ export function clubStaticPagePaths(): string[] {
 export function isTeamPath(pathname: string): boolean {
   return Object.values(clubTeams).some((t) => pathname === teamPath(t.slug))
 }
+
+/**
+ * Paths that are already canonical ClubSite routes — proxy can skip CMS redirect lookup.
+ * (Redirects only matter for legacy/unknown inbound URLs.)
+ */
+export function isKnownClubSitePath(pathname: string): boolean {
+  const p = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+  if (p === '/' || p === clubAppRoutes.search) return true
+  if (p === '/presse' || p.startsWith('/presse/')) return true
+  if (isTeamPath(p)) return true
+  return Object.values(clubPages).some((page) => pagePath(page.slug, page.path) === p)
+}

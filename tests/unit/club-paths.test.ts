@@ -31,4 +31,14 @@ describe('club-paths CMS registry', () => {
     expect(isTeamPath('/2-mannschaft')).toBe(true)
     expect(isTeamPath('/presse')).toBe(false)
   })
+
+  it('skips redirect lookup for known ClubSite paths', async () => {
+    const { isKnownClubSitePath } = await import('../../src/lib/club-paths')
+    expect(isKnownClubSitePath('/')).toBe(true)
+    expect(isKnownClubSitePath('/presse')).toBe(true)
+    expect(isKnownClubSitePath('/presse/foo')).toBe(true)
+    expect(isKnownClubSitePath('/verein/vorstand')).toBe(true)
+    expect(isKnownClubSitePath('/suche')).toBe(true)
+    expect(isKnownClubSitePath('/2024/01/01/old-post')).toBe(false)
+  })
 })
