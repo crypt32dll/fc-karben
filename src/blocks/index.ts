@@ -1,9 +1,21 @@
 import type { Block } from 'payload'
 
+function blockThumb(slug: string, alt: string) {
+  return {
+    images: {
+      thumbnail: {
+        url: `/block-thumbnails/block-${slug}.png`,
+        alt,
+      },
+    },
+  } satisfies NonNullable<Block['admin']>
+}
+
 export const HeroBlock: Block = {
   slug: 'hero',
   interfaceName: 'HeroBlock',
   labels: { singular: 'Hero', plural: 'Hero' },
+  admin: blockThumb('hero', 'Hero: großer Navy-Header mit Headline und Buttons'),
   fields: [
     { name: 'eyebrow', type: 'text' },
     { name: 'title', type: 'text', required: true },
@@ -31,6 +43,7 @@ export const RichTextBlock: Block = {
   slug: 'richText',
   interfaceName: 'RichTextBlock',
   labels: { singular: 'Text', plural: 'Text' },
+  admin: blockThumb('richtext', 'Text: Überschrift und Fließtext'),
   fields: [
     { name: 'heading', type: 'text' },
     { name: 'body', type: 'richText', required: true },
@@ -41,6 +54,7 @@ export const CtaBlock: Block = {
   slug: 'cta',
   interfaceName: 'CtaBlock',
   labels: { singular: 'Call to Action', plural: 'CTAs' },
+  admin: blockThumb('cta', 'Call to Action: Banner mit Button'),
   fields: [
     { name: 'heading', type: 'text', required: true },
     { name: 'text', type: 'textarea' },
@@ -63,6 +77,7 @@ export const ImageBlock: Block = {
   slug: 'image',
   interfaceName: 'ImageBlock',
   labels: { singular: 'Bild', plural: 'Bilder' },
+  admin: blockThumb('image', 'Bild: großes Medienbild mit Caption'),
   fields: [
     {
       name: 'image',
@@ -78,6 +93,7 @@ export const TeamGridBlock: Block = {
   slug: 'teamGrid',
   interfaceName: 'TeamGridBlock',
   labels: { singular: 'Mannschaften-Grid', plural: 'Mannschaften-Grids' },
+  admin: blockThumb('team-grid', 'Mannschaften-Grid: Kartenraster der Teams'),
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Unsere Teams' },
     { name: 'heading', type: 'text', defaultValue: 'Mannschaften' },
@@ -97,6 +113,7 @@ export const PostListBlock: Block = {
   slug: 'postList',
   interfaceName: 'PostListBlock',
   labels: { singular: 'Beitrags-Liste', plural: 'Beitrags-Listen' },
+  admin: blockThumb('post-list', 'Beitrags-Liste: Presseartikel in Reihen'),
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Aktuelles' },
     { name: 'heading', type: 'text', defaultValue: 'Presse' },
@@ -120,6 +137,7 @@ export const ScoreboardBlock: Block = {
   slug: 'scoreboard',
   interfaceName: 'ScoreboardBlock',
   labels: { singular: 'Nächstes Spiel', plural: 'Scoreboards' },
+  admin: blockThumb('scoreboard', 'Nächstes Spiel: Match-Ankündigung mit VS'),
   fields: [
     {
       name: 'label',
@@ -138,6 +156,7 @@ export const SocialGridBlock: Block = {
   slug: 'socialGrid',
   interfaceName: 'SocialGridBlock',
   labels: { singular: 'Social Grid', plural: 'Social Grids' },
+  admin: blockThumb('social-grid', 'Social Grid: Instagram-Kacheln'),
   fields: [
     { name: 'eyebrow', type: 'text', defaultValue: 'Live von Instagram' },
     { name: 'heading', type: 'text', defaultValue: 'Auf Social Media' },
@@ -155,6 +174,7 @@ export const SponsorsBlock: Block = {
   slug: 'sponsors',
   interfaceName: 'SponsorsBlock',
   labels: { singular: 'Sponsoren', plural: 'Sponsoren' },
+  admin: blockThumb('sponsors', 'Sponsoren: Logo-Leiste'),
   fields: [{ name: 'eyebrow', type: 'text', defaultValue: 'Unsere Sponsoren' }],
 }
 
@@ -162,6 +182,7 @@ export const DownloadsBlock: Block = {
   slug: 'downloads',
   interfaceName: 'DownloadsBlock',
   labels: { singular: 'Downloads', plural: 'Downloads' },
+  admin: blockThumb('downloads', 'Downloads: Dateiliste mit Download-Buttons'),
   fields: [
     { name: 'heading', type: 'text', defaultValue: 'Formulare' },
     {
@@ -184,6 +205,7 @@ export const BoardBlock: Block = {
   slug: 'board',
   interfaceName: 'BoardBlock',
   labels: { singular: 'Vorstand / Personen', plural: 'Vorstand' },
+  admin: blockThumb('board', 'Vorstand: Personenkarten mit Rolle'),
   fields: [
     { name: 'heading', type: 'text', defaultValue: 'Vorstand' },
     {
@@ -202,6 +224,7 @@ export const SpacerBlock: Block = {
   slug: 'spacer',
   interfaceName: 'SpacerBlock',
   labels: { singular: 'Abstand', plural: 'Abstände' },
+  admin: blockThumb('spacer', 'Abstand: vertikaler Leerraum zwischen Blöcken'),
   fields: [
     {
       name: 'size',
