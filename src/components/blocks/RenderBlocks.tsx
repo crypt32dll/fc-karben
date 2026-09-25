@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { DEFAULT_TEAMS } from '@/lib/content-catalog'
+import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
 import { type MatchDto, pickNextMatch } from '@/lib/match-feed'
 import { type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
 
@@ -9,10 +9,12 @@ type BlockBase = {
   blockType: string
 }
 
-type RenderContext = {
+export type RenderContext = {
   nextMatch?: MatchDto | null
   socialTiles?: SocialTileDto[]
   notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
+  teams?: CatalogTeam[]
+  sponsors?: CatalogSponsor[]
 }
 
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -44,7 +46,9 @@ export function RenderBlocks({
           case 'cta':
             return <CtaFromBlock key={key} block={block as never} />
           case 'teamGrid':
-            return <TeamGridFromBlock key={key} block={block as never} />
+            return (
+              <TeamGridFromBlock key={key} block={block as never} teams={context.teams || []} />
+            )
           case 'scoreboard':
             return (
               <ScoreboardFromBlock
@@ -63,7 +67,13 @@ export function RenderBlocks({
               />
             )
           case 'sponsors':
-            return <SponsorsFromBlock key={key} block={block as never} />
+            return (
+              <SponsorsFromBlock
+                key={key}
+                block={block as never}
+                sponsors={context.sponsors || []}
+              />
+            )
           case 'board':
             return <BoardFromBlock key={key} block={block as never} />
           case 'downloads':
@@ -135,7 +145,6 @@ function RichTextFromBlock({ block }: { block: { heading?: string; body?: unknow
     <Wrap>
       {block.heading ? <h2 className="mb-6 text-[38px] text-navy">{block.heading}</h2> : null}
       <div className="prose prose-neutral max-w-3xl text-ink">
-        {/* Lexical JSON rendered simply as placeholder until full converter wired */}
         <p className="text-ink-soft text-sm">Inhalt aus dem Page Builder.</p>
       </div>
     </Wrap>
@@ -177,8 +186,14 @@ function CtaFromBlock({
   )
 }
 
-function TeamGridFromBlock({ block }: { block: { eyebrow?: string; heading?: string } }) {
-  const teams = DEFAULT_TEAMS
+function TeamGridFromBlock({
+  block,
+  teams,
+}: {
+  block: { eyebrow?: string; heading?: string }
+  teams: CatalogTeam[]
+}) {
+  if (!teams.length) return null
   return (
     <Wrap>
       <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
@@ -314,21 +329,37 @@ function SocialGridFromBlock({
   )
 }
 
-function SponsorsFromBlock({ block }: { block: { eyebrow?: string } }) {
+function SponsorsFromBlock({
+  block,
+  sponsors,
+}: {
+  block: { eyebrow?: string }
+  sponsors: CatalogSponsor[]
+}) {
   return (
     <Wrap className="border-y border-line">
       <p className="mb-6 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
         {block.eyebrow || 'Unsere Sponsoren'}
       </p>
       <div className="flex flex-wrap gap-3">
-        {['Sponsor 1', 'Sponsor 2', 'Sponsor 3', 'Sponsor 4', 'Sponsor 5'].map((name) => (
-          <div
-            key={name}
-            className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
+        {sponsors.length ? (
+          sponsors.map((s) => (
+            <a
+              key={s.id}
+              href={s.url || '/sponsoren'}
+              className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
+            >
+              {s.name}
+            </a>
+          ))
+        ) : (
+          <a
+            href="/sponsoren"
+            className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy"
           >
-            {name}
-          </div>
-        ))}
+            Alle Sponsoren →
+          </a>
+        )}
       </div>
     </Wrap>
   )

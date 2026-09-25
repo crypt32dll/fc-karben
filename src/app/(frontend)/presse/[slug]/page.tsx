@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
 
+export const revalidate = 300
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

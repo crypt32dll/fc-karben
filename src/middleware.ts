@@ -1,20 +1,50 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-import { wpDatedPostToPresse } from '@/lib/redirects'
+import {
+  isSafeRedirectTarget,
+  type RedirectRule,
+  resolveRedirect,
+  wpDatedPostToPresse,
+} from '@/lib/redirects'
 
 /**
- * Lightweight edge redirects for WP dated permalinks.
- * Full Redirect collection lookup happens in page loaders (Node runtime).
+ * Edge redirects: built-in WP rules first, then cached CMS redirect map.
+ * Matcher excludes /_next, /api, /admin, and files with extensions.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Fast built-in: dated WP permalinks (no network)
   const presse = wpDatedPostToPresse(pathname)
   if (presse) {
     const url = request.nextUrl.clone()
     url.pathname = presse
     return NextResponse.redirect(url, 308)
   }
+
+  let rules: RedirectRule[] = []
+  try {
+    const origin = request.nextUrl.origin
+    const res = await fetch(`${origin}/api/redirects`, {
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(1500),
+    })
+    if (res.ok) {
+      const data = (await res.json()) as { rules?: RedirectRule[] }
+      rules = data.rules || []
+    }
+  } catch {
+    // Fall through to built-ins only
+  }
+
+  const hit = resolveRedirect(pathname, rules)
+  if (hit && isSafeRedirectTarget(hit.to, request.nextUrl.origin)) {
+    const url = request.nextUrl.clone()
+    url.pathname = hit.to
+    return NextResponse.redirect(url, hit.permanent ? 308 : 307)
+  }
+
   return NextResponse.next()
 }
 

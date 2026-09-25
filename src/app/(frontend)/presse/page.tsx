@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import {
-  catalogSeoToMetadata,
-  getSeiteBySlug,
-  listBeitrage,
-} from '@/lib/content-catalog'
+import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
+
+export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getSeiteBySlug('presse')
@@ -28,9 +26,7 @@ export default async function PressePage() {
         News &amp; Spielberichte
       </p>
       <h1 className="text-5xl text-navy">Presse</h1>
-      <p className="mt-4 max-w-2xl text-ink-soft">
-        {totalDocs} Beiträge aus dem Vereinsarchiv.
-      </p>
+      <p className="mt-4 max-w-2xl text-ink-soft">{totalDocs} Beiträge aus dem Vereinsarchiv.</p>
 
       <ul className="mt-12 divide-y divide-line border-t border-line">
         {posts.map((post) => (
@@ -43,10 +39,7 @@ export default async function PressePage() {
                 {post.title}
               </span>
               {post.publishedAt ? (
-                <time
-                  dateTime={post.publishedAt}
-                  className="shrink-0 text-sm text-ink-soft"
-                >
+                <time dateTime={post.publishedAt} className="shrink-0 text-sm text-ink-soft">
                   {new Date(post.publishedAt).toLocaleDateString('de-DE', {
                     day: '2-digit',
                     month: 'long',

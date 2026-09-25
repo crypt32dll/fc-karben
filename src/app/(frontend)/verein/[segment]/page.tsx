@@ -4,12 +4,13 @@ import { notFound } from 'next/navigation'
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { catalogSeoToMetadata, getSeiteByPath, getSeiteBySlug } from '@/lib/content-catalog'
 
+export const revalidate = 300
+
 type Props = { params: Promise<{ segment: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { segment } = await params
-  const page =
-    (await getSeiteByPath(`/verein/${segment}`)) || (await getSeiteBySlug(segment))
+  const page = (await getSeiteByPath(`/verein/${segment}`)) || (await getSeiteBySlug(segment))
   if (!page) return { title: 'Verein' }
   return catalogSeoToMetadata({
     title: page.title,
@@ -21,8 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VereinSubpage({ params }: Props) {
   const { segment } = await params
-  const page =
-    (await getSeiteByPath(`/verein/${segment}`)) || (await getSeiteBySlug(segment))
+  const page = (await getSeiteByPath(`/verein/${segment}`)) || (await getSeiteBySlug(segment))
   if (!page) notFound()
   return (
     <>

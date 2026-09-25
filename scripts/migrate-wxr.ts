@@ -10,16 +10,19 @@
  *   pnpm migrate:wxr -- --file content/wxr/export.xml --apply --limit 10
  *   pnpm migrate:wxr -- --file content/wxr/export.xml --apply --skip-media
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { loadEnvFile } from 'node:process'
 import { pathToFileURL } from 'node:url'
 
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 import { JSDOM } from 'jsdom'
 import { getPayload, type Payload } from 'payload'
 
-import { DEFAULT_TEAMS } from '../src/lib/content-catalog'
+import { DEFAULT_TEAMS } from '../src/lib/content-catalog/seed-teams'
 import { createLogger } from '../src/lib/logger'
+import { canonicalizePageSlug, prepareHtmlForLexical } from '../src/lib/migration/html-to-lexical'
+import { downloadFile, mapWithConcurrency } from '../src/lib/migration/media-loader'
 import {
   attachments,
   buildRedirectsFromPosts,
@@ -28,9 +31,13 @@ import {
   publishedPages,
   publishedPosts,
   referencedAttachmentUrls,
-  type WxrItem,
 } from '../src/lib/migration/wxr'
 import { normalizePath } from '../src/lib/redirects'
+
+// tsx does not load .env (unlike `next` / Payload CLI) — needed for POSTGRES_URL etc.
+if (existsSync('.env')) {
+  loadEnvFile('.env')
+}
 
 const log = createLogger('migrate:wxr')
 
@@ -45,32 +52,6 @@ function stripHtml(html: string): string {
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-}
-
-/** Lexical upload nodes need Payload media IDs — rewrite imgs to links for migration */
-function prepareHtmlForLexical(html: string): string {
-  return (html || '')
-    .replace(/\[\/?[^\]]+\]/g, '')
-    .replace(
-      /<img([^>]*?)src=["']([^"']+)["']([^>]*)>/gi,
-      (_m, _pre, src: string) => `<p><a href="${src}">${src.split('/').pop() || src}</a></p>`,
-    )
-    .replace(/<\/?figure[^>]*>/gi, '')
-    .trim()
-}
-
-function mimeFromUrl(url: string): string {
-  const lower = url.toLowerCase().split('?')[0]
-  if (lower.endsWith('.png')) return 'image/png'
-  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg'
-  if (lower.endsWith('.gif')) return 'image/gif'
-  if (lower.endsWith('.webp')) return 'image/webp'
-  if (lower.endsWith('.pdf')) return 'application/pdf'
-  if (lower.endsWith('.doc')) return 'application/msword'
-  if (lower.endsWith('.docx')) {
-    return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  }
-  return 'application/octet-stream'
 }
 
 async function findByWpId(payload: Payload, collection: string, wpId: number) {
@@ -116,49 +97,19 @@ async function upsertByWpId(
   })
 }
 
-function stripUploadNodes(node: unknown): unknown {
-  if (!node || typeof node !== 'object') return node
-  const n = node as Record<string, unknown>
-  if (n.type === 'upload') {
-    return {
-      type: 'paragraph',
-      format: '',
-      indent: 0,
-      version: 1,
-      children: [
-        {
-          type: 'text',
-          text: '[Bild]',
-          format: 0,
-          detail: 0,
-          mode: 'normal',
-          style: '',
-          version: 1,
-        },
-      ],
-      direction: 'ltr',
-      textFormat: 0,
-    }
-  }
-  if (Array.isArray(n.children)) {
-    return { ...n, children: n.children.map(stripUploadNodes) }
-  }
-  if (n.root && typeof n.root === 'object') {
-    return { ...n, root: stripUploadNodes(n.root) }
-  }
-  return n
-}
-
-async function htmlToLexical(payload: Payload, html: string) {
-  const cleaned = prepareHtmlForLexical(html) || '<p></p>'
+async function htmlToLexical(
+  payload: Payload,
+  html: string,
+  mediaUrlBySource?: Map<string, string>,
+) {
+  const cleaned = prepareHtmlForLexical(html, mediaUrlBySource)
   const editorConfig = await editorConfigFactory.default({ config: payload.config })
   try {
-    const lexical = convertHTMLToLexical({
+    return convertHTMLToLexical({
       editorConfig,
       html: cleaned,
       JSDOM,
     })
-    return stripUploadNodes(lexical)
   } catch (err) {
     log.warn('HTML→Lexical failed, using plain paragraph', {
       error: err instanceof Error ? err.message : String(err),
@@ -169,38 +120,6 @@ async function htmlToLexical(payload: Payload, html: string) {
       html: `<p>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`,
       JSDOM,
     })
-  }
-}
-
-async function downloadFile(url: string): Promise<{
-  data: Buffer
-  mimetype: string
-  name: string
-  size: number
-} | null> {
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'fc-karben-migrator/1.0' },
-      signal: AbortSignal.timeout(60_000),
-    })
-    if (!res.ok) {
-      log.warn('Media download failed', { url, status: res.status })
-      return null
-    }
-    const buf = Buffer.from(await res.arrayBuffer())
-    const name = decodeURIComponent(url.split('/').pop() || `file-${Date.now()}`)
-    return {
-      data: buf,
-      mimetype: res.headers.get('content-type') || mimeFromUrl(url),
-      name,
-      size: buf.length,
-    }
-  } catch (err) {
-    log.warn('Media download error', {
-      url,
-      error: err instanceof Error ? err.message : String(err),
-    })
-    return null
   }
 }
 
@@ -233,20 +152,46 @@ async function seedTeams(payload: Payload) {
         id: existing.docs[0].id,
         data,
         overrideAccess: true,
+        context: { disableRevalidate: true },
       })
     } else {
       await payload.create({
         collection: 'teams',
         data,
         overrideAccess: true,
+        context: { disableRevalidate: true },
       })
     }
   }
   log.info('Teams seeded', { count: DEFAULT_TEAMS.length })
 }
 
+async function upsertRedirect(payload: Payload, from: string, to: string) {
+  const existing = await payload.find({
+    collection: 'redirects',
+    where: { from: { equals: from } },
+    limit: 1,
+    overrideAccess: true,
+  })
+  if (existing.docs[0]) {
+    await payload.update({
+      collection: 'redirects',
+      id: existing.docs[0].id,
+      data: { to, permanent: true },
+      overrideAccess: true,
+      context: { disableRevalidate: true },
+    })
+  } else {
+    await payload.create({
+      collection: 'redirects',
+      data: { from, to, permanent: true },
+      overrideAccess: true,
+      context: { disableRevalidate: true },
+    })
+  }
+}
+
 async function applyMigration() {
-  // Ensure env is loaded (next/payload scripts usually load .env via dotenv in payload)
   process.env.PAYLOAD_SECRET = process.env.PAYLOAD_SECRET || 'dev-secret-change-me'
 
   const configModule = await import(pathToFileURL(path.resolve('src/payload.config.ts')).href)
@@ -287,7 +232,6 @@ async function applyMigration() {
     categoryIdBySlug.set(cat.slug, doc.id)
     categoryIdBySlug.set(cat.name, doc.id)
   }
-  // parent pass
   for (const cat of parsed.categories) {
     if (!cat.parentSlug) continue
     const parentId = categoryIdBySlug.get(cat.parentSlug)
@@ -298,6 +242,7 @@ async function applyMigration() {
         id: self.id,
         data: { parent: parentId },
         overrideAccess: true,
+        context: { disableRevalidate: true },
       })
     }
   }
@@ -305,21 +250,24 @@ async function applyMigration() {
 
   // 2) Media (referenced only)
   const mediaIdByWpId = new Map<number, number | string>()
-  const mediaIdByUrl = new Map<string, number | string>()
+  const mediaUrlBySource = new Map<string, string>()
   if (!skipMedia) {
-    let i = 0
-    for (const att of mediaItems) {
-      i += 1
-      if (!att.attachmentUrl) continue
-      if (limit > 0 && i > limit * 3) break
+    const toImport = limit > 0 ? mediaItems.slice(0, limit * 3) : mediaItems
+    let imported = 0
+    await mapWithConcurrency(toImport, 4, async (att, i) => {
+      if (!att.attachmentUrl) return
       const existing = await findByWpId(payload, 'media', att.id)
       if (existing) {
         mediaIdByWpId.set(att.id, existing.id)
-        mediaIdByUrl.set(att.attachmentUrl, existing.id)
-        continue
+        const url =
+          typeof existing.url === 'string'
+            ? existing.url
+            : `/api/media/file/${(existing as { filename?: string }).filename || ''}`
+        mediaUrlBySource.set(att.attachmentUrl, url)
+        return
       }
       const downloaded = await downloadFile(att.attachmentUrl)
-      if (!downloaded) continue
+      if (!downloaded) return
       try {
         const doc = await payload.create({
           collection: 'media',
@@ -330,34 +278,46 @@ async function applyMigration() {
           },
           file: downloaded,
           overrideAccess: true,
+          context: { disableRevalidate: true },
         })
         mediaIdByWpId.set(att.id, doc.id)
-        mediaIdByUrl.set(att.attachmentUrl, doc.id)
+        const url =
+          typeof doc.url === 'string'
+            ? doc.url
+            : `/api/media/file/${doc.filename || downloaded.name}`
+        mediaUrlBySource.set(att.attachmentUrl, url)
+        imported += 1
       } catch (err) {
         log.warn('Media create failed', {
           wpId: att.id,
           error: err instanceof Error ? err.message : String(err),
         })
       }
-      if (i % 25 === 0) log.info('Media progress', { i, total: mediaItems.length })
-    }
-    log.info('Media done', { imported: mediaIdByWpId.size })
+      if ((i + 1) % 25 === 0) {
+        log.info('Media progress', { i: i + 1, total: toImport.length })
+      }
+    })
+    log.info('Media done', { imported: mediaIdByWpId.size, newlyCreated: imported })
   }
 
   // 3) Pages
   for (const page of pages) {
     if (!page.slug || page.slug === 'home' || page.slug === 'contact') continue
-    let pathname = `/${page.slug}`
+    const { slug, pathHint } = canonicalizePageSlug(page.slug)
+    let pathname = pathHint || `/${slug}`
     try {
-      pathname = normalizePath(new URL(page.link).pathname)
+      if (!pathHint) {
+        pathname = normalizePath(new URL(page.link).pathname)
+        if (page.slug === 'g-jugend') pathname = '/alte-herren'
+      }
     } catch {
       // keep slug path
     }
     try {
-      const content = await htmlToLexical(payload, page.content)
+      const content = await htmlToLexical(payload, page.content, mediaUrlBySource)
       await upsertByWpId(payload, 'pages', page.id, {
-        title: page.title || page.slug,
-        slug: page.slug,
+        title: page.title || slug,
+        slug,
         path: pathname,
         content,
         seo: {
@@ -368,7 +328,7 @@ async function applyMigration() {
       })
     } catch (err) {
       log.warn('Page import failed', {
-        slug: page.slug,
+        slug,
         error: err instanceof Error ? err.message : String(err),
       })
     }
@@ -379,7 +339,7 @@ async function applyMigration() {
   for (const post of posts) {
     if (!post.slug) continue
     try {
-      const content = await htmlToLexical(payload, post.content)
+      const content = await htmlToLexical(payload, post.content, mediaUrlBySource)
       const categoryIds = post.categories
         .map((c) => categoryIdBySlug.get(c))
         .filter(Boolean) as Array<number | string>
@@ -389,6 +349,9 @@ async function applyMigration() {
         (a) => a.parentId === post.id && a.attachmentUrl && mediaIdByWpId.has(a.id),
       )
       if (childMedia) featuredImage = mediaIdByWpId.get(childMedia.id)
+      if (!featuredImage && post.thumbnailId && mediaIdByWpId.has(post.thumbnailId)) {
+        featuredImage = mediaIdByWpId.get(post.thumbnailId)
+      }
 
       const publishedAt = post.publishedAt
         ? new Date(post.publishedAt.replace(' ', 'T') + '+02:00').toISOString()
@@ -405,9 +368,7 @@ async function applyMigration() {
         seo: {
           metaTitle: post.seo.metaTitle,
           metaDescription:
-            post.seo.metaDescription ||
-            stripHtml(post.excerpt).slice(0, 160) ||
-            undefined,
+            post.seo.metaDescription || stripHtml(post.excerpt).slice(0, 160) || undefined,
         },
         _status: 'published',
       })
@@ -423,28 +384,10 @@ async function applyMigration() {
   // 5) Redirects
   const redirects = buildRedirectsFromPosts(publishedPosts(parsed.items))
   for (const redir of redirects) {
-    const existing = await payload.find({
-      collection: 'redirects',
-      where: { from: { equals: redir.from } },
-      limit: 1,
-      overrideAccess: true,
-    })
-    if (existing.docs[0]) {
-      await payload.update({
-        collection: 'redirects',
-        id: existing.docs[0].id,
-        data: { to: redir.to, permanent: true },
-        overrideAccess: true,
-      })
-    } else {
-      await payload.create({
-        collection: 'redirects',
-        data: { from: redir.from, to: redir.to, permanent: true },
-        overrideAccess: true,
-      })
-    }
+    await upsertRedirect(payload, redir.from, redir.to)
   }
-  log.info('Redirects done', { count: redirects.length })
+  await upsertRedirect(payload, '/g-jugend', '/alte-herren')
+  log.info('Redirects done', { count: redirects.length + 1 })
 
   // 6) Teams
   await seedTeams(payload)

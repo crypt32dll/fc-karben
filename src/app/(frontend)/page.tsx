@@ -1,41 +1,64 @@
 import Link from 'next/link'
 
-import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
+import { RenderBlocks } from '@/components/blocks/RenderBlocks'
+import {
+  getHomepage,
+  getRenderContextData,
+  listBeitrage,
+  listMannschaften,
+} from '@/lib/content-catalog'
+
+export const revalidate = 300
 
 export default async function HomePage() {
-  const [teams, { posts }] = await Promise.all([
+  const [homepage, context, teams, { posts }] = await Promise.all([
+    getHomepage(),
+    getRenderContextData(),
     listMannschaften(),
     listBeitrage({ limit: 4 }),
   ])
+
+  if (Array.isArray(homepage?.layout) && homepage.layout.length > 0) {
+    return <RenderBlocks blocks={homepage.layout as never} context={context} />
+  }
+
+  const displayTeams = teams.length ? teams : context.teams
 
   return (
     <>
       <section className="relative overflow-hidden bg-navy text-white">
         <div className="relative z-10 mx-auto max-w-[1120px] px-8 pb-16 pt-24">
           <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#b9bade]">
-            Gruppenliga · Saison 2025/26
+            {homepage?.heroEyebrow || 'Gruppenliga · Saison 2025/26'}
           </p>
           <h1 className="max-w-[640px] text-[clamp(42px,7vw,76px)] text-white">
-            Mit Leidenschaft
-            <br />
-            für <span className="text-transparent [-webkit-text-stroke:1px_white]">Karben.</span>
+            {homepage?.heroTitle ? (
+              homepage.heroTitle
+            ) : (
+              <>
+                Mit Leidenschaft
+                <br />
+                für{' '}
+                <span className="text-transparent [-webkit-text-stroke:1px_white]">Karben.</span>
+              </>
+            )}
           </h1>
           <p className="mt-5 max-w-[480px] text-[17px] leading-relaxed text-[#cfd0e8]">
-            Der FC Karben e.V. ist die fußballerische Heimat der Stadt Karben — vom Bambini-Training
-            bis zur ersten Mannschaft. Gegründet 2015, getragen von echter Vereinsliebe.
+            {homepage?.heroLead ||
+              'Der FC Karben e.V. ist die fußballerische Heimat der Stadt Karben — vom Bambini-Training bis zur ersten Mannschaft. Gegründet 2015, getragen von echter Vereinsliebe.'}
           </p>
           <div className="mt-8 flex flex-wrap gap-3.5">
             <Link
-              href="/verein/mitglied-werden"
+              href={homepage?.heroPrimaryCta?.href || '/verein/mitglied-werden'}
               className="inline-flex rounded-[2px] bg-white px-6 py-3.5 text-sm font-semibold text-navy hover:bg-[#e4e4f4]"
             >
-              Jetzt Mitglied werden
+              {homepage?.heroPrimaryCta?.label || 'Jetzt Mitglied werden'}
             </Link>
             <Link
-              href="/#mannschaften"
+              href={homepage?.heroSecondaryCta?.href || '/#mannschaften'}
               className="inline-flex rounded-[2px] border border-white/40 px-6 py-3.5 text-sm font-semibold text-white hover:border-white"
             >
-              Mannschaften ansehen
+              {homepage?.heroSecondaryCta?.label || 'Mannschaften ansehen'}
             </Link>
           </div>
         </div>
@@ -62,7 +85,7 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-5">
-            {teams.map((team) => (
+            {displayTeams.map((team) => (
               <Link
                 key={team.id}
                 href={team.path}
@@ -155,8 +178,8 @@ export default async function HomePage() {
             </p>
             <h2 className="text-[38px] text-navy">Der Verein</h2>
             <p className="mt-4 max-w-md text-[17px] leading-relaxed text-ink-soft">
-              Der FC Karben e.V. wurde im Mai 2015 gegründet und ist seitdem als fußballerische
-              Heimat in der Stadt Karben gewachsen.
+              {homepage?.vereinIntro ||
+                'Der FC Karben e.V. wurde im Mai 2015 gegründet und ist seitdem als fußballerische Heimat in der Stadt Karben gewachsen.'}
             </p>
             <Link
               href="/verein/vereinssatzung"
@@ -170,7 +193,7 @@ export default async function HomePage() {
                 <div className="text-sm text-ink-soft">Gegründet</div>
               </div>
               <div>
-                <div className="font-display text-4xl text-navy">{teams.length || 5}</div>
+                <div className="font-display text-4xl text-navy">{displayTeams.length || 5}</div>
                 <div className="text-sm text-ink-soft">Mannschaften</div>
               </div>
             </div>
@@ -191,7 +214,10 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
-            <Link href="/verein/vorstand" className="mt-4 inline-block text-sm font-semibold text-navy">
+            <Link
+              href="/verein/vorstand"
+              className="mt-4 inline-block text-sm font-semibold text-navy"
+            >
               Mehr zum Vorstand →
             </Link>
           </div>
@@ -204,12 +230,24 @@ export default async function HomePage() {
             Unsere Sponsoren
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/sponsoren"
-              className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy"
-            >
-              Alle Sponsoren →
-            </Link>
+            {context.sponsors.length ? (
+              context.sponsors.slice(0, 6).map((s) => (
+                <a
+                  key={s.id}
+                  href={s.url || '/sponsoren'}
+                  className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
+                >
+                  {s.name}
+                </a>
+              ))
+            ) : (
+              <Link
+                href="/sponsoren"
+                className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy"
+              >
+                Alle Sponsoren →
+              </Link>
+            )}
           </div>
         </div>
       </section>

@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import logo from '../../../public/logo.png'
+
 const nav = [
   { href: '/', label: 'Home' },
   { href: '/#mannschaften', label: 'Mannschaften' },
@@ -16,7 +18,7 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-[1120px] items-center justify-between px-8 py-3.5">
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src="/logo.png"
+            src={logo}
             alt="FC Karben"
             width={44}
             height={55}

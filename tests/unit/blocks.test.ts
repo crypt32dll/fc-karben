@@ -12,4 +12,15 @@ describe('Page Builder blocks', () => {
     expect(slugs).toContain('downloads')
     expect(slugs.length).toBeGreaterThanOrEqual(8)
   })
+
+  it('does not hardcode DEFAULT_TEAMS inside RenderBlocks module', async () => {
+    const src = await import('node:fs').then((fs) =>
+      fs.readFileSync(
+        new URL('../../src/components/blocks/RenderBlocks.tsx', import.meta.url),
+        'utf8',
+      ),
+    )
+    expect(src).not.toContain('DEFAULT_TEAMS')
+    expect(src).toContain('context.teams')
+  })
 })

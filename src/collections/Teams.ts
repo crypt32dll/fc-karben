@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '../access'
 import { seoFields } from '../fields/seo'
+import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Teams: CollectionConfig = {
   slug: 'teams',
@@ -15,6 +16,7 @@ export const Teams: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
+  hooks: createRevalidateHooks([CACHE_TAGS.teams], ['/']),
   fields: [
     { name: 'name', type: 'text', required: true },
     {

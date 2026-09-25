@@ -14,3 +14,17 @@ export const isAdminOrEditor: Access = ({ req: { user } }) => {
 }
 
 export const isAdminField: FieldAccess = ({ req: { user } }) => (user as RoleUser)?.role === 'admin'
+
+/**
+ * Public API: only published docs. Staff (admin/editor) see drafts too.
+ * Used for Posts + Pages with versions.drafts.
+ */
+export const publishedOrStaff: Access = ({ req: { user } }) => {
+  const role = (user as RoleUser)?.role
+  if (role === 'admin' || role === 'editor') return true
+  return {
+    _status: {
+      equals: 'published',
+    },
+  }
+}

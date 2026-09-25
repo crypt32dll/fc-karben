@@ -1,6 +1,5 @@
-import { getPayload, type Payload } from 'payload'
-
 import config from '@payload-config'
+import { getPayload, type Payload } from 'payload'
 
 let cached: Payload | null = null
 

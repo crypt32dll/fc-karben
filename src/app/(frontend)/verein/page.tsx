@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
 import { catalogSeoToMetadata, getSeiteBySlug } from '@/lib/content-catalog'
 
+export const revalidate = 300
+
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getSeiteBySlug('verein')
   if (!page) return { title: 'Verein' }
@@ -35,7 +37,10 @@ export default async function VereinIndexPage() {
           <ul className="divide-y divide-line border border-line">
             {FALLBACK_LINKS.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="block px-4 py-3 font-semibold text-navy hover:bg-paper">
+                <Link
+                  href={l.href}
+                  className="block px-4 py-3 font-semibold text-navy hover:bg-paper"
+                >
                   {l.label}
                 </Link>
               </li>

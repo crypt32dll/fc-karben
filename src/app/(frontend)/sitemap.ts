@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 
 import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
 
+export const revalidate = 300
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
   const staticPaths = [
@@ -23,10 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const now = new Date()
-  const [teams, { posts }] = await Promise.all([
-    listMannschaften(),
-    listBeitrage({ limit: 500 }),
-  ])
+  const [teams, { posts }] = await Promise.all([listMannschaften(), listBeitrage({ limit: 500 })])
 
   return [
     ...staticPaths.map((path) => ({

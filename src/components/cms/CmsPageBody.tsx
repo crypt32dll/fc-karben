@@ -1,16 +1,17 @@
-import { LexicalContent } from '@/components/cms/LexicalContent'
 import { RenderBlocks } from '@/components/blocks/RenderBlocks'
-import type { CatalogPage } from '@/lib/content-catalog'
+import { LexicalContent } from '@/components/cms/LexicalContent'
+import { type CatalogPage, getRenderContextData } from '@/lib/content-catalog'
 
-export function CmsPageBody({ page }: { page: CatalogPage }) {
+export async function CmsPageBody({ page }: { page: CatalogPage }) {
   const hasBlocks = Array.isArray(page.layout) && page.layout.length > 0
+  const context = hasBlocks ? await getRenderContextData() : null
 
   return (
     <article className="mx-auto max-w-[800px] px-8 py-16">
       <h1 className="text-5xl text-navy">{page.title}</h1>
-      {hasBlocks ? (
-        <div className="mt-10">
-          <RenderBlocks blocks={page.layout as never} />
+      {hasBlocks && context ? (
+        <div className="mt-10 -mx-8 max-w-none md:mx-0">
+          <RenderBlocks blocks={page.layout as never} context={context} />
         </div>
       ) : (
         <div className="mt-8">

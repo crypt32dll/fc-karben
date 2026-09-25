@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 export type SeoInput = {
   title?: string | null
   description?: string | null
@@ -10,6 +12,8 @@ export type SeoInput = {
   publishedAt?: string | null
   modifiedAt?: string | null
   type?: 'website' | 'article'
+  /** Original headline for JSON-LD (may differ from meta title) */
+  headline?: string | null
 }
 
 export type AbsoluteUrlOptions = {
@@ -94,4 +98,55 @@ export function robotsFromFlags(noIndex?: boolean, noFollow?: boolean) {
     index: !noIndex,
     follow: !noFollow,
   }
+}
+
+/** Canonical Next.js Metadata factory — exclusive SeoSurface seam for ClubSite. */
+export function toNextMetadata(
+  input: SeoInput,
+  opts?: AbsoluteUrlOptions & { siteName?: string },
+): Metadata {
+  const metadataBase =
+    opts?.metadataBase || process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+  const siteName = opts?.siteName || input.siteName || 'FC Karben'
+  const canonical = buildCanonical(input, { metadataBase })
+  const robots = robotsFromFlags(input.noIndex, input.noFollow)
+  const titleText = input.title || siteName
+
+  const meta: Metadata = {
+    title: buildTitle(titleText, siteName),
+    description: input.description || undefined,
+    alternates: { canonical },
+    robots,
+    openGraph: {
+      title: titleText,
+      description: input.description || undefined,
+      url: canonical,
+      locale: 'de_DE',
+      type: input.type === 'article' ? 'article' : 'website',
+      images: input.ogImageUrl ? [{ url: input.ogImageUrl }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titleText,
+      description: input.description || undefined,
+      images: input.ogImageUrl ? [input.ogImageUrl] : undefined,
+    },
+  }
+
+  if (input.type === 'article') {
+    meta.other = {
+      'script:ld+json': JSON.stringify(
+        buildArticleJsonLd({
+          headline: input.headline || titleText,
+          url: canonical,
+          datePublished: input.publishedAt,
+          dateModified: input.modifiedAt,
+          image: input.ogImageUrl,
+          publisherName: siteName,
+        }),
+      ),
+    }
+  }
+
+  return meta
 }

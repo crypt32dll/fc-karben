@@ -1,8 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone, isAdminOrEditor } from '../access'
+import { isAdminOrEditor, publishedOrStaff } from '../access'
 import { pageBlocks } from '../blocks'
 import { seoFields, wpIdField } from '../fields/seo'
+import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -14,11 +15,12 @@ export const Pages: CollectionConfig = {
     drafts: true,
   },
   access: {
-    read: anyone,
+    read: publishedOrStaff,
     create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
+  hooks: createRevalidateHooks([CACHE_TAGS.pages], ['/']),
   fields: [
     { name: 'title', type: 'text', required: true },
     {

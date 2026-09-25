@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { anyone, isAdmin, isAdminOrEditor } from '../access'
+import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 
 export const Redirects: CollectionConfig = {
   slug: 'redirects',
@@ -14,6 +15,7 @@ export const Redirects: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdmin,
   },
+  hooks: createRevalidateHooks([CACHE_TAGS.redirects]),
   fields: [
     {
       name: 'from',

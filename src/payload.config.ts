@@ -1,4 +1,4 @@
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
@@ -12,7 +12,10 @@ import { Homepage, SiteSettings } from './globals/SiteSettings'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('Missing POSTGRES_URL (or DATABASE_URL) — set it in .env')
+}
 
 const r2Configured = Boolean(
   process.env.R2_BUCKET &&
@@ -39,7 +42,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: vercelPostgresAdapter({
+  db: postgresAdapter({
     pool: {
       connectionString,
     },

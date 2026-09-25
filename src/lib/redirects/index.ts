@@ -8,7 +8,6 @@ export function normalizePath(path: string): string {
   if (!path) return '/'
   let p = path.trim()
   if (!p.startsWith('/')) p = `/${p}`
-  // strip origin if accidentally included
   try {
     if (p.startsWith('http')) {
       p = new URL(p).pathname
@@ -28,20 +27,43 @@ export function wpDatedPostToPresse(pathname: string): string | null {
   return `/presse/${match[4]}`
 }
 
+/** Reject open redirects — only relative paths or same-origin absolute URLs. */
+export function isSafeRedirectTarget(
+  to: string,
+  siteOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de',
+): boolean {
+  if (!to || to.startsWith('//')) return false
+  if (to.startsWith('/')) return !to.startsWith('//')
+  try {
+    const target = new URL(to)
+    const site = new URL(siteOrigin)
+    return target.origin === site.origin
+  } catch {
+    return false
+  }
+}
+
 export function resolveRedirect(
   pathname: string,
   rules: RedirectRule[],
 ): { to: string; permanent: boolean } | null {
   const from = normalizePath(pathname)
   const hit = rules.find((r) => normalizePath(r.from) === from)
-  if (!hit) {
-    // built-in G-Jugend retirement
-    if (from === '/g-jugend' || from.startsWith('/category/g-jugend')) {
-      return { to: '/presse', permanent: true }
-    }
-    const presse = wpDatedPostToPresse(from)
-    if (presse) return { to: presse, permanent: true }
-    return null
+  if (hit) {
+    const to = normalizePath(hit.to)
+    if (!isSafeRedirectTarget(to)) return null
+    return { to, permanent: hit.permanent !== false }
   }
-  return { to: normalizePath(hit.to), permanent: hit.permanent !== false }
+
+  // Alte Herren lived under /g-jugend in WordPress
+  if (from === '/g-jugend') {
+    return { to: '/alte-herren', permanent: true }
+  }
+  if (from.startsWith('/category/g-jugend')) {
+    return { to: '/presse', permanent: true }
+  }
+
+  const presse = wpDatedPostToPresse(from)
+  if (presse) return { to: presse, permanent: true }
+  return null
 }

@@ -7,8 +7,11 @@ import {
   catalogSeoToMetadata,
   getMannschaftBySlug,
   getSeiteBySlug,
-  resolveRedirect,
+  listRedirectRules,
 } from '@/lib/content-catalog'
+import { resolveRedirect } from '@/lib/redirects'
+
+export const revalidate = 300
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -25,7 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const team = await getMannschaftBySlug(slug)
-  if (team) return { title: team.name }
+  if (team) {
+    return catalogSeoToMetadata({
+      title: team.name,
+      path: team.path,
+      excerpt: team.summary,
+      seo: team.seo,
+    })
+  }
 
   return { title: slug }
 }
@@ -33,7 +43,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function SlugPage({ params }: Props) {
   const { slug } = await params
 
-  // Prefer migrated Seite (incl. SEO/body) when present — covers team pages too
   const page = await getSeiteBySlug(slug)
   const team = await getMannschaftBySlug(slug)
 
@@ -94,7 +103,8 @@ export default async function SlugPage({ params }: Props) {
     )
   }
 
-  const redir = await resolveRedirect(`/${slug}`)
+  const rules = await listRedirectRules()
+  const redir = resolveRedirect(`/${slug}`, rules)
   if (redir) {
     if (redir.permanent) permanentRedirect(redir.to)
     redirect(redir.to)

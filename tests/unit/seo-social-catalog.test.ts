@@ -7,6 +7,7 @@ import {
   buildOrganizationJsonLd,
   buildTitle,
   robotsFromFlags,
+  toNextMetadata,
 } from '../../src/lib/seo/index'
 import { selectSocialTiles } from '../../src/lib/social-feed/index'
 
@@ -41,6 +42,15 @@ describe('SeoSurface', () => {
 
   it('robots flags', () => {
     expect(robotsFromFlags(true, false)).toEqual({ index: false, follow: true })
+  })
+
+  it('toNextMetadata is the exclusive metadata factory', () => {
+    const meta = toNextMetadata(
+      { title: 'Presse', path: '/presse', description: 'News' },
+      { metadataBase: 'https://fc-karben.de' },
+    )
+    expect(meta.title).toBe('Presse | FC Karben')
+    expect(meta.alternates?.canonical).toBe('https://fc-karben.de/presse')
   })
 })
 

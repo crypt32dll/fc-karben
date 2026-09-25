@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizePath, resolveRedirect, wpDatedPostToPresse } from '../../src/lib/redirects/index'
+import {
+  isSafeRedirectTarget,
+  normalizePath,
+  resolveRedirect,
+  wpDatedPostToPresse,
+} from '../../src/lib/redirects/index'
 
 describe('RedirectMap', () => {
   it('maps WP dated URLs to presse', () => {
@@ -13,8 +18,12 @@ describe('RedirectMap', () => {
     expect(normalizePath('verein/vorstand/')).toBe('/verein/vorstand')
   })
 
-  it('retires g-jugend to presse', () => {
-    expect(resolveRedirect('/g-jugend', [])).toEqual({ to: '/presse', permanent: true })
+  it('maps g-jugend page to alte-herren', () => {
+    expect(resolveRedirect('/g-jugend', [])).toEqual({ to: '/alte-herren', permanent: true })
+  })
+
+  it('retires g-jugend category to presse', () => {
+    expect(resolveRedirect('/category/g-jugend', [])).toEqual({ to: '/presse', permanent: true })
   })
 
   it('uses explicit rules first', () => {
@@ -22,5 +31,11 @@ describe('RedirectMap', () => {
       to: '/new',
       permanent: true,
     })
+  })
+
+  it('rejects open redirects', () => {
+    expect(isSafeRedirectTarget('https://evil.example/phish')).toBe(false)
+    expect(isSafeRedirectTarget('//evil.example')).toBe(false)
+    expect(isSafeRedirectTarget('/presse/ok')).toBe(true)
   })
 })
