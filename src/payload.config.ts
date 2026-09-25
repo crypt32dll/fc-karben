@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
@@ -22,6 +23,7 @@ if (!rawConnectionString) {
 const connectionString = normalizePostgresUrl(rawConnectionString)
 
 const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+const resendConfigured = Boolean(process.env.RESEND_API_KEY)
 
 if (process.env.VERCEL && !blobConfigured) {
   throw new Error(
@@ -47,6 +49,17 @@ export default buildConfig({
     withGlobalCache(Homepage, homepageCache),
   ],
   editor: lexicalEditor(),
+  // Resend is preferred on Vercel (lightweight). Without RESEND_API_KEY, Payload logs to console.
+  // https://payloadcms.com/docs/email/overview
+  ...(resendConfigured
+    ? {
+        email: resendAdapter({
+          defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'noreply@fc-karben.de',
+          defaultFromName: process.env.EMAIL_FROM_NAME || 'FC Karben',
+          apiKey: process.env.RESEND_API_KEY as string,
+        }),
+      }
+    : {}),
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-change-me',
   sharp,
   typescript: {
