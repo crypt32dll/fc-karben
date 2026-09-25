@@ -69,14 +69,14 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    categories: Record<string, unknown>;
-    posts: Record<string, unknown>;
-    pages: Record<string, unknown>;
-    teams: Record<string, unknown>;
-    matches: Record<string, unknown>;
-    sponsors: Record<string, unknown>;
-    redirects: Record<string, unknown>;
-    'social-tiles': Record<string, unknown>;
+    categories: Category;
+    posts: Post;
+    pages: Page;
+    teams: Team;
+    matches: Match;
+    sponsors: Sponsor;
+    redirects: Redirect;
+    'social-tiles': SocialTile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,28 +86,31 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    categories: Record<string, unknown>;
-    posts: Record<string, unknown>;
-    pages: Record<string, unknown>;
-    teams: Record<string, unknown>;
-    matches: Record<string, unknown>;
-    sponsors: Record<string, unknown>;
-    redirects: Record<string, unknown>;
-    'social-tiles': Record<string, unknown>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    teams: TeamsSelect<false> | TeamsSelect<true>;
+    matches: MatchesSelect<false> | MatchesSelect<true>;
+    sponsors: SponsorsSelect<false> | SponsorsSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'social-tiles': SocialTilesSelect<false> | SocialTilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
-  globals: {
-    'site-settings': Record<string, unknown>;
-    homepage: Record<string, unknown>;
-  };
   db: {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+    homepage: Homepage;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -143,7 +146,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
-  role?: 'admin' | 'editor' | null;
+  /**
+   * Admin = full access; Editor = content only (Media team)
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -169,7 +175,15 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  alt?: string | null;
+  /**
+   * WordPress ID for idempotent migration
+   */
+  wpId?: number | null;
+  /**
+   * Original WordPress attachment URL
+   */
+  wpSourceUrl?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -181,6 +195,384 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  parent?: (number | null) | Category;
+  /**
+   * WordPress ID for idempotent migration
+   */
+  wpId?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  publishedAt?: string | null;
+  excerpt?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  featuredImage?: (number | null) | Media;
+  categories?: (number | Category)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    canonicalOverride?: string | null;
+  };
+  /**
+   * WordPress ID for idempotent migration
+   */
+  wpId?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Canonical path e.g. /verein/vorstand (optional)
+   */
+  path?: string | null;
+  layout?:
+    | (
+        | {
+            eyebrow?: string | null;
+            title: string;
+            lead?: string | null;
+            primaryCta?: {
+              label?: string | null;
+              href?: string | null;
+            };
+            secondaryCta?: {
+              label?: string | null;
+              href?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading?: string | null;
+            body: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            heading: string;
+            text?: string | null;
+            buttonLabel: string;
+            buttonHref: string;
+            variant?: ('navy' | 'pitch' | 'outline') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            image: number | Media;
+            caption?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            /**
+             * Leer = alle aktiven Mannschaften
+             */
+            teams?: (number | Team)[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'teamGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            limit?: number | null;
+            /**
+             * Optional filtern
+             */
+            category?: (number | null) | Category;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'postList';
+          }
+        | {
+            label?: string | null;
+            fallbackText?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'scoreboard';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            maxTiles?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'socialGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'sponsors';
+          }
+        | {
+            heading?: string | null;
+            files?:
+              | {
+                  label: string;
+                  file: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'downloads';
+          }
+        | {
+            heading?: string | null;
+            members?:
+              | {
+                  role: string;
+                  name: string;
+                  detail?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'board';
+          }
+        | {
+            size?: ('sm' | 'md' | 'lg') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+      )[]
+    | null;
+  /**
+   * Fallback wenn kein Layout mit Blöcken gesetzt ist
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  featuredImage?: (number | null) | Media;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    canonicalOverride?: string | null;
+  };
+  /**
+   * WordPress ID for idempotent migration
+   */
+  wpId?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teams".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  slug: string;
+  /**
+   * e.g. 01 for grid display
+   */
+  shortLabel?: string | null;
+  league?: string | null;
+  summary?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  photo?: (number | null) | Media;
+  contacts?:
+    | {
+        role: string;
+        name: string;
+        phone?: string | null;
+        email?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  trainingTimes?: string | null;
+  /**
+   * Fussball.de team-id
+   */
+  fussballDeId?: string | null;
+  fussballDeUrl?: string | null;
+  /**
+   * Only 1. Mannschaft should sync MatchFeed
+   */
+  syncMatches?: boolean | null;
+  active?: boolean | null;
+  sortOrder?: number | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    canonicalOverride?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "matches".
+ */
+export interface Match {
+  id: number;
+  team: number | Team;
+  kickoff: string;
+  homeName: string;
+  awayName: string;
+  competition?: string | null;
+  venue?: string | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  status?: ('scheduled' | 'live' | 'finished' | 'cancelled') | null;
+  externalId?: string | null;
+  source?: ('fussballde' | 'manual') | null;
+  /**
+   * When true, MatchFeed will not overwrite this match
+   */
+  manualOverride?: boolean | null;
+  sourceUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sponsors".
+ */
+export interface Sponsor {
+  id: number;
+  name: string;
+  logo?: (number | null) | Media;
+  url?: string | null;
+  sortOrder?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Legacy path, e.g. /2026/05/18/slug/
+   */
+  from: string;
+  /**
+   * Canonical path, e.g. /presse/slug
+   */
+  to: string;
+  permanent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-tiles".
+ */
+export interface SocialTile {
+  id: number;
+  image: number | Media;
+  caption?: string | null;
+  /**
+   * Link to Instagram post or profile
+   */
+  url?: string | null;
+  sortOrder?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -213,6 +605,38 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'teams';
+        value: number | Team;
+      } | null)
+    | ({
+        relationTo: 'matches';
+        value: number | Match;
+      } | null)
+    | ({
+        relationTo: 'sponsors';
+        value: number | Sponsor;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'social-tiles';
+        value: number | SocialTile;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -261,6 +685,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -284,6 +710,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  wpId?: T;
+  wpSourceUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -295,6 +723,300 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  parent?: T;
+  wpId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedAt?: T;
+  excerpt?: T;
+  content?: T;
+  featuredImage?: T;
+  categories?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noIndex?: T;
+        noFollow?: T;
+        canonicalOverride?: T;
+      };
+  wpId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  path?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              lead?: T;
+              primaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              heading?: T;
+              text?: T;
+              buttonLabel?: T;
+              buttonHref?: T;
+              variant?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+        teamGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              teams?: T;
+              id?: T;
+              blockName?: T;
+            };
+        postList?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              limit?: T;
+              category?: T;
+              id?: T;
+              blockName?: T;
+            };
+        scoreboard?:
+          | T
+          | {
+              label?: T;
+              fallbackText?: T;
+              id?: T;
+              blockName?: T;
+            };
+        socialGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              maxTiles?: T;
+              id?: T;
+              blockName?: T;
+            };
+        sponsors?:
+          | T
+          | {
+              eyebrow?: T;
+              id?: T;
+              blockName?: T;
+            };
+        downloads?:
+          | T
+          | {
+              heading?: T;
+              files?:
+                | T
+                | {
+                    label?: T;
+                    file?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        board?:
+          | T
+          | {
+              heading?: T;
+              members?:
+                | T
+                | {
+                    role?: T;
+                    name?: T;
+                    detail?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              size?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  content?: T;
+  featuredImage?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noIndex?: T;
+        noFollow?: T;
+        canonicalOverride?: T;
+      };
+  wpId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teams_select".
+ */
+export interface TeamsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  shortLabel?: T;
+  league?: T;
+  summary?: T;
+  content?: T;
+  photo?: T;
+  contacts?:
+    | T
+    | {
+        role?: T;
+        name?: T;
+        phone?: T;
+        email?: T;
+        id?: T;
+      };
+  trainingTimes?: T;
+  fussballDeId?: T;
+  fussballDeUrl?: T;
+  syncMatches?: T;
+  active?: T;
+  sortOrder?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noIndex?: T;
+        noFollow?: T;
+        canonicalOverride?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "matches_select".
+ */
+export interface MatchesSelect<T extends boolean = true> {
+  team?: T;
+  kickoff?: T;
+  homeName?: T;
+  awayName?: T;
+  competition?: T;
+  venue?: T;
+  homeScore?: T;
+  awayScore?: T;
+  status?: T;
+  externalId?: T;
+  source?: T;
+  manualOverride?: T;
+  sourceUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sponsors_select".
+ */
+export interface SponsorsSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  url?: T;
+  sortOrder?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  permanent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-tiles_select".
+ */
+export interface SocialTilesSelect<T extends boolean = true> {
+  image?: T;
+  caption?: T;
+  url?: T;
+  sortOrder?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -335,6 +1057,381 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  clubName?: string | null;
+  tagline?: string | null;
+  foundingYear?: number | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  venue?: string | null;
+  social?: {
+    instagram?: string | null;
+    facebook?: string | null;
+    tiktok?: string | null;
+  };
+  defaultSeo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  /**
+   * Google Search Console HTML tag content value
+   */
+  gscVerification?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: number;
+  heroEyebrow?: string | null;
+  heroTitle?: string | null;
+  heroLead?: string | null;
+  heroPrimaryCta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  heroSecondaryCta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  featuredPosts?: (number | Post)[] | null;
+  vereinIntro?: string | null;
+  layout?:
+    | (
+        | {
+            eyebrow?: string | null;
+            title: string;
+            lead?: string | null;
+            primaryCta?: {
+              label?: string | null;
+              href?: string | null;
+            };
+            secondaryCta?: {
+              label?: string | null;
+              href?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading?: string | null;
+            body: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            heading: string;
+            text?: string | null;
+            buttonLabel: string;
+            buttonHref: string;
+            variant?: ('navy' | 'pitch' | 'outline') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            image: number | Media;
+            caption?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            /**
+             * Leer = alle aktiven Mannschaften
+             */
+            teams?: (number | Team)[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'teamGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            limit?: number | null;
+            /**
+             * Optional filtern
+             */
+            category?: (number | null) | Category;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'postList';
+          }
+        | {
+            label?: string | null;
+            fallbackText?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'scoreboard';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            maxTiles?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'socialGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'sponsors';
+          }
+        | {
+            heading?: string | null;
+            files?:
+              | {
+                  label: string;
+                  file: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'downloads';
+          }
+        | {
+            heading?: string | null;
+            members?:
+              | {
+                  role: string;
+                  name: string;
+                  detail?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'board';
+          }
+        | {
+            size?: ('sm' | 'md' | 'lg') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+      )[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  clubName?: T;
+  tagline?: T;
+  foundingYear?: T;
+  email?: T;
+  phone?: T;
+  address?: T;
+  venue?: T;
+  social?:
+    | T
+    | {
+        instagram?: T;
+        facebook?: T;
+        tiktok?: T;
+      };
+  defaultSeo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  gscVerification?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  heroEyebrow?: T;
+  heroTitle?: T;
+  heroLead?: T;
+  heroPrimaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  heroSecondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  featuredPosts?: T;
+  vereinIntro?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              lead?: T;
+              primaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              heading?: T;
+              text?: T;
+              buttonLabel?: T;
+              buttonHref?: T;
+              variant?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+        teamGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              teams?: T;
+              id?: T;
+              blockName?: T;
+            };
+        postList?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              limit?: T;
+              category?: T;
+              id?: T;
+              blockName?: T;
+            };
+        scoreboard?:
+          | T
+          | {
+              label?: T;
+              fallbackText?: T;
+              id?: T;
+              blockName?: T;
+            };
+        socialGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              maxTiles?: T;
+              id?: T;
+              blockName?: T;
+            };
+        sponsors?:
+          | T
+          | {
+              eyebrow?: T;
+              id?: T;
+              blockName?: T;
+            };
+        downloads?:
+          | T
+          | {
+              heading?: T;
+              files?:
+                | T
+                | {
+                    label?: T;
+                    file?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        board?:
+          | T
+          | {
+              heading?: T;
+              members?:
+                | T
+                | {
+                    role?: T;
+                    name?: T;
+                    detail?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              size?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
