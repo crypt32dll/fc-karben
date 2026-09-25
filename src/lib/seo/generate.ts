@@ -1,7 +1,10 @@
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { convertLexicalToPlaintext } from '@payloadcms/richtext-lexical/plaintext'
 
-const SEO_DESCRIPTION_MAX = 160
+/** Matches @payloadcms/plugin-seo defaults.description.maxLength */
+export const SEO_DESCRIPTION_MAX = 150
+/** Matches @payloadcms/plugin-seo defaults.title.maxLength */
+export const SEO_TITLE_MAX = 60
 const SITE_NAME = 'FC Karben'
 
 /**
@@ -36,6 +39,14 @@ export function getPublicSiteURL(): string {
   return 'http://localhost:3000'
 }
 
+/**
+ * Soft-launch / staging gate. Indexing stays off until explicitly enabled
+ * via ALLOW_SEARCH_INDEXING=true (e.g. on Vercel at cutover).
+ */
+export function allowSearchIndexing(): boolean {
+  return process.env.ALLOW_SEARCH_INDEXING === 'true'
+}
+
 /** Lexical rich text → plain string for meta description. */
 export function lexicalToPlainText(content: unknown): string {
   if (!content || typeof content !== 'object') return ''
@@ -49,12 +60,24 @@ export function lexicalToPlainText(content: unknown): string {
   }
 }
 
-export function truncateSeoDescription(text: string, max = SEO_DESCRIPTION_MAX): string {
+function truncateAtWord(text: string, max: number): string {
   const cleaned = text.replace(/\s+/g, ' ').trim()
   if (cleaned.length <= max) return cleaned
-  const sliced = cleaned.slice(0, max - 1)
+  const budget = Math.max(1, max - 1) // room for …
+  let sliced = cleaned.slice(0, budget)
   const lastSpace = sliced.lastIndexOf(' ')
-  return `${(lastSpace > 80 ? sliced.slice(0, lastSpace) : sliced).trimEnd()}…`
+  const minKeep = Math.floor(max * 0.5)
+  if (lastSpace > minKeep) sliced = sliced.slice(0, lastSpace)
+  const result = `${sliced.trimEnd()}…`
+  return result.length <= max ? result : `${cleaned.slice(0, max - 1).trimEnd()}…`
+}
+
+export function truncateSeoDescription(text: string, max = SEO_DESCRIPTION_MAX): string {
+  return truncateAtWord(text, max)
+}
+
+export function truncateSeoTitle(text: string, max = SEO_TITLE_MAX): string {
+  return truncateAtWord(text, max)
 }
 
 type SeoDoc = {
@@ -70,14 +93,16 @@ type SeoDoc = {
 /** Shared with @payloadcms/plugin-seo generateTitle. */
 export function generateSeoTitle(doc: SeoDoc): string {
   const headline = doc.title || doc.name || SITE_NAME
-  if (headline === SITE_NAME || headline.includes('|')) return headline
-  return `${headline} | ${SITE_NAME}`
+  if (headline === SITE_NAME) return truncateSeoTitle(SITE_NAME)
+  if (headline.includes('|')) return truncateSeoTitle(headline)
+  return truncateSeoTitle(`${headline} | ${SITE_NAME}`)
 }
 
 /**
  * Shared with @payloadcms/plugin-seo generateDescription.
  * Prefers excerpt/summary, then Lexical body, then a title-based fallback
  * so Auto-generate never returns an empty string for pages.
+ * Always ≤ SEO_DESCRIPTION_MAX (150) to match the CMS length indicator.
  */
 export function generateSeoDescription(doc: SeoDoc): string {
   const fromExcerpt = (doc.excerpt || doc.summary || '').trim()

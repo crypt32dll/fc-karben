@@ -48,9 +48,16 @@ describe('SEO generate helpers', () => {
     expect(generateSeoDescription({ title: 'Nur Titel' }).length).toBeGreaterThan(10)
   })
 
-  it('truncates long descriptions', () => {
+  it('truncates long descriptions to plugin max (150)', () => {
     const long = 'Wort '.repeat(80)
-    expect(truncateSeoDescription(long).length).toBeLessThanOrEqual(160)
+    const out = truncateSeoDescription(long)
+    expect(out.length).toBeLessThanOrEqual(150)
+    expect(out.endsWith('…')).toBe(true)
+  })
+
+  it('never exceeds 150 even for excerpt longer than the limit', () => {
+    const excerpt = 'x'.repeat(200)
+    expect(generateSeoDescription({ title: 'T', excerpt }).length).toBeLessThanOrEqual(150)
   })
 
   it('uses Vercel production host over NEXT_PUBLIC_SITE_URL', () => {

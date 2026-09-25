@@ -1,11 +1,14 @@
 #!/usr/bin/env tsx
 /**
- * Auto-generate SEO meta.title + meta.description for pages (and optionally posts/teams).
+ * Auto-generate / fix SEO meta.title + meta.description for pages (and optionally posts/teams).
  *
  *   pnpm migrate:seo -- --apply
- *   pnpm migrate:seo -- --apply --force          # overwrite existing meta
+ *   pnpm migrate:seo -- --apply --force                 # regenerate all meta
  *   pnpm migrate:seo -- --apply --collections pages,posts
- *   pnpm migrate:seo --                              # dry-run
+ *   pnpm migrate:seo --                                 # dry-run
+ *
+ * Without --force: fills empty meta AND truncates descriptions/titles that exceed
+ * plugin limits (150 / 60 chars).
  */
 import { existsSync } from 'node:fs'
 import path from 'node:path'
@@ -15,7 +18,14 @@ import { pathToFileURL } from 'node:url'
 import { getPayload, type Payload } from 'payload'
 
 import { createLogger } from '../src/lib/logger'
-import { generateSeoDescription, generateSeoTitle } from '../src/lib/seo/generate'
+import {
+  generateSeoDescription,
+  generateSeoTitle,
+  SEO_DESCRIPTION_MAX,
+  SEO_TITLE_MAX,
+  truncateSeoDescription,
+  truncateSeoTitle,
+} from '../src/lib/seo/generate'
 
 if (existsSync('.env')) {
   loadEnvFile('.env')
@@ -41,6 +51,7 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
   let page = 1
   let updated = 0
   let skipped = 0
+  let truncated = 0
   let total = 0
 
   for (;;) {
@@ -61,11 +72,11 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
       const excerpt = (doc as { excerpt?: string | null }).excerpt
       const summary = (doc as { summary?: string | null }).summary
 
-      const nextTitle = generateSeoTitle({
+      const generatedTitle = generateSeoTitle({
         title: collection === 'teams' ? undefined : headline,
         name: collection === 'teams' ? headline : undefined,
       })
-      const nextDescription = generateSeoDescription({
+      const generatedDescription = generateSeoDescription({
         title: collection === 'teams' ? undefined : headline,
         name: collection === 'teams' ? headline : undefined,
         excerpt,
@@ -74,20 +85,40 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
       })
 
       const meta = (doc as { meta?: { title?: string | null; description?: string | null } }).meta
-      const hasTitle = Boolean(meta?.title?.trim())
-      const hasDescription = Boolean(meta?.description?.trim())
+      const currentTitle = meta?.title?.trim() || ''
+      const currentDescription = meta?.description?.trim() || ''
+      const hasTitle = Boolean(currentTitle)
+      const hasDescription = Boolean(currentDescription)
+      const titleTooLong = currentTitle.length > SEO_TITLE_MAX
+      const descriptionTooLong = currentDescription.length > SEO_DESCRIPTION_MAX
 
-      if (!force && hasTitle && hasDescription) {
+      if (!force && hasTitle && hasDescription && !titleTooLong && !descriptionTooLong) {
         skipped += 1
-        log.debug('Skip (meta present)', { collection, id: doc.id, title: headline })
         continue
       }
+
+      const nextTitle = force || !hasTitle ? generatedTitle : truncateSeoTitle(currentTitle)
+      const nextDescription =
+        force || !hasDescription
+          ? generatedDescription
+          : truncateSeoDescription(currentDescription)
+
+      if (
+        nextTitle === currentTitle &&
+        nextDescription === currentDescription &&
+        !force
+      ) {
+        skipped += 1
+        continue
+      }
+
+      if ((titleTooLong || descriptionTooLong) && !force) truncated += 1
 
       const data = {
         meta: {
           ...(meta || {}),
-          title: force || !hasTitle ? nextTitle : meta?.title,
-          description: force || !hasDescription ? nextDescription : meta?.description,
+          title: nextTitle,
+          description: nextDescription,
         },
       }
 
@@ -96,7 +127,10 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
         id: doc.id,
         title: headline,
         metaTitle: data.meta.title,
+        metaTitleLen: data.meta.title.length,
+        metaDescriptionLen: data.meta.description.length,
         metaDescription: String(data.meta.description).slice(0, 80),
+        fixedLength: titleTooLong || descriptionTooLong,
       })
 
       if (apply) {
@@ -115,7 +149,7 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
     page += 1
   }
 
-  return { collection, total, updated, skipped }
+  return { collection, total, updated, skipped, truncated }
 }
 
 async function main() {
@@ -124,7 +158,13 @@ async function main() {
   const configModule = await import(pathToFileURL(path.resolve('src/payload.config.ts')).href)
   const payload = await getPayload({ config: configModule.default })
 
-  log.info('SEO generate start', { apply, force, collections })
+  log.info('SEO generate start', {
+    apply,
+    force,
+    collections,
+    descriptionMax: SEO_DESCRIPTION_MAX,
+    titleMax: SEO_TITLE_MAX,
+  })
 
   const results = []
   for (const collection of collections) {
@@ -133,7 +173,9 @@ async function main() {
 
   log.info('SEO generate done', { apply, results })
   if (!apply) {
-    log.info('Dry-run only. Pass --apply to write. Use --force to overwrite existing meta.')
+    log.info(
+      'Dry-run only. Pass --apply to write. Use --force to regenerate. Over-length meta is truncated automatically.',
+    )
   }
   process.exit(0)
 }

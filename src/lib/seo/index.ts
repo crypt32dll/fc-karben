@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
-import { getPublicSiteURL } from './generate'
+import { getPublicSiteURL, allowSearchIndexing } from './generate'
+
 
 export type SeoInput = {
   title?: string | null
@@ -96,9 +97,10 @@ export function buildArticleJsonLd(opts: {
 }
 
 export function robotsFromFlags(noIndex?: boolean, noFollow?: boolean) {
+  const blockAll = !allowSearchIndexing()
   return {
-    index: !noIndex,
-    follow: !noFollow,
+    index: blockAll ? false : !noIndex,
+    follow: blockAll ? false : !noFollow,
   }
 }
 

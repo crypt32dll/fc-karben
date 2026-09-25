@@ -1,12 +1,11 @@
 import type { MetadataRoute } from 'next'
 
-import { getPublicSiteURL } from '@/lib/seo/generate'
+import { allowSearchIndexing, getPublicSiteURL } from '@/lib/seo/generate'
 
 export default function robots(): MetadataRoute.Robots {
-  const isProd = process.env.VERCEL_ENV === 'production'
   const site = getPublicSiteURL()
 
-  if (!isProd) {
+  if (!allowSearchIndexing()) {
     return {
       rules: { userAgent: '*', disallow: '/' },
     }

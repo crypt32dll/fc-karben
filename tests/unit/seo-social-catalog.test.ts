@@ -40,8 +40,14 @@ describe('SeoSurface', () => {
     expect(json.author).toEqual({ '@type': 'Organization', name: 'FC Karben' })
   })
 
-  it('robots flags', () => {
+  it('robots flags respect staging gate', () => {
+    const prev = process.env.ALLOW_SEARCH_INDEXING
+    process.env.ALLOW_SEARCH_INDEXING = 'true'
     expect(robotsFromFlags(true, false)).toEqual({ index: false, follow: true })
+    expect(robotsFromFlags(false, false)).toEqual({ index: true, follow: true })
+    delete process.env.ALLOW_SEARCH_INDEXING
+    expect(robotsFromFlags(false, false)).toEqual({ index: false, follow: false })
+    process.env.ALLOW_SEARCH_INDEXING = prev
   })
 
   it('toNextMetadata is the exclusive metadata factory', () => {

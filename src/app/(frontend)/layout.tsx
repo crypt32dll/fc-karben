@@ -9,6 +9,7 @@ import { RefreshRouteOnSave } from '@/components/preview/RefreshRouteOnSave'
 import { getSiteSettings } from '@/lib/content-catalog'
 import { getPublicSiteURL } from '@/lib/preview/urls'
 import { toNextMetadata } from '@/lib/seo'
+import { allowSearchIndexing } from '@/lib/seo/generate'
 
 import './globals.css'
 
@@ -34,7 +35,6 @@ const inter = Inter({
 })
 
 const siteUrl = getPublicSiteURL()
-const isProd = process.env.VERCEL_ENV === 'production'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
         settings?.tagline ||
         'FC Karben e.V. — Fußball in Karben seit 2015. Mannschaften, News und Verein am Günter-Reutzel-Sportfeld.',
       path: '/',
-      noIndex: !isProd,
+      noIndex: !allowSearchIndexing(),
       ogImageUrl: settings?.defaultSeo?.ogImageUrl,
     },
     { metadataBase: siteUrl },
