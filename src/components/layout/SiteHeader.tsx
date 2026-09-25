@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 const nav = [
@@ -14,9 +15,14 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-line bg-white">
       <div className="mx-auto flex max-w-[1120px] items-center justify-between px-8 py-3.5">
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">
-            FC
-          </div>
+          <Image
+            src="/logo.png"
+            alt="FC Karben"
+            width={44}
+            height={55}
+            className="h-11 w-auto"
+            priority
+          />
           <div>
             <div className="font-display text-[19px] font-bold uppercase tracking-wide text-navy">
               FC Karben
