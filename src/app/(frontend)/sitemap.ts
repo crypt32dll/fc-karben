@@ -1,0 +1,39 @@
+import type { MetadataRoute } from 'next'
+
+import { DEFAULT_TEAMS } from '@/lib/content-catalog'
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
+  const staticPaths = [
+    '',
+    '/presse',
+    '/verein',
+    '/verein/vorstand',
+    '/verein/mitglied-werden',
+    '/verein/beitragsstruktur',
+    '/verein/vereinssatzung',
+    '/verein/platzbelegung',
+    '/sponsoren',
+    '/formulare',
+    '/anfahrt',
+    '/impressum',
+    '/datenschutz',
+  ]
+
+  const now = new Date()
+
+  return [
+    ...staticPaths.map((path) => ({
+      url: `${site}${path}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: path === '' ? 1 : 0.7,
+    })),
+    ...DEFAULT_TEAMS.map((team) => ({
+      url: `${site}${team.path}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    })),
+  ]
+}

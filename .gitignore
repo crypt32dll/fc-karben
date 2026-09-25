@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Next / Payload
+.next
+dist
+build
+src/app/(payload)/admin/importMap.js
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Media / reports
+media
+public/media
+content/wxr/last-report.json
+playwright-report
+test-results
+coverage
+
+# OS / IDE
+.DS_Store
+*.log
+.vercel
+.cursor
+tsconfig.tsbuildinfo

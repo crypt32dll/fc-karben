@@ -1,0 +1,427 @@
+import type { ReactNode } from 'react'
+
+import { DEFAULT_TEAMS } from '@/lib/content-catalog'
+import { type MatchDto, pickNextMatch } from '@/lib/match-feed'
+import { type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
+
+type BlockBase = {
+  id?: string | null
+  blockType: string
+}
+
+type RenderContext = {
+  nextMatch?: MatchDto | null
+  socialTiles?: SocialTileDto[]
+  notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
+}
+
+function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <section className={`py-16 md:py-22 ${className}`}>
+      <div className="mx-auto max-w-[1120px] px-8">{children}</div>
+    </section>
+  )
+}
+
+export function RenderBlocks({
+  blocks,
+  context = {},
+}: {
+  blocks: BlockBase[] | null | undefined
+  context?: RenderContext
+}) {
+  if (!blocks?.length) return null
+
+  return (
+    <>
+      {blocks.map((block, index) => {
+        const key = block.id || `${block.blockType}-${index}`
+        switch (block.blockType) {
+          case 'hero':
+            return <HeroFromBlock key={key} block={block as never} />
+          case 'richText':
+            return <RichTextFromBlock key={key} block={block as never} />
+          case 'cta':
+            return <CtaFromBlock key={key} block={block as never} />
+          case 'teamGrid':
+            return <TeamGridFromBlock key={key} block={block as never} />
+          case 'scoreboard':
+            return (
+              <ScoreboardFromBlock
+                key={key}
+                block={block as never}
+                match={context.nextMatch ?? pickNextMatch([])}
+              />
+            )
+          case 'socialGrid':
+            return (
+              <SocialGridFromBlock
+                key={key}
+                block={block as never}
+                tiles={selectSocialTiles(context.socialTiles || [], 6)}
+                notices={context.notices || []}
+              />
+            )
+          case 'sponsors':
+            return <SponsorsFromBlock key={key} block={block as never} />
+          case 'board':
+            return <BoardFromBlock key={key} block={block as never} />
+          case 'downloads':
+            return <DownloadsFromBlock key={key} block={block as never} />
+          case 'spacer':
+            return <SpacerFromBlock key={key} block={block as never} />
+          case 'postList':
+            return <PostListFromBlock key={key} block={block as never} notices={context.notices} />
+          case 'image':
+            return <ImageFromBlock key={key} block={block as never} />
+          default:
+            return null
+        }
+      })}
+    </>
+  )
+}
+
+function HeroFromBlock({
+  block,
+}: {
+  block: {
+    eyebrow?: string
+    title?: string
+    lead?: string
+    primaryCta?: { label?: string; href?: string }
+    secondaryCta?: { label?: string; href?: string }
+  }
+}) {
+  return (
+    <section className="relative overflow-hidden bg-navy text-white">
+      <div className="relative z-10 mx-auto max-w-[1120px] px-8 pb-16 pt-24">
+        {block.eyebrow ? (
+          <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#b9bade]">
+            {block.eyebrow}
+          </p>
+        ) : null}
+        <h1 className="max-w-[640px] text-[clamp(42px,7vw,76px)] text-white">{block.title}</h1>
+        {block.lead ? (
+          <p className="mt-5 max-w-[480px] text-[17px] leading-relaxed text-[#cfd0e8]">
+            {block.lead}
+          </p>
+        ) : null}
+        <div className="mt-8 flex flex-wrap gap-3.5">
+          {block.primaryCta?.href && block.primaryCta.label ? (
+            <a
+              href={block.primaryCta.href}
+              className="inline-flex items-center rounded-[2px] bg-white px-6 py-3.5 text-sm font-semibold text-navy"
+            >
+              {block.primaryCta.label}
+            </a>
+          ) : null}
+          {block.secondaryCta?.href && block.secondaryCta.label ? (
+            <a
+              href={block.secondaryCta.href}
+              className="inline-flex items-center rounded-[2px] border border-white/40 px-6 py-3.5 text-sm font-semibold text-white"
+            >
+              {block.secondaryCta.label}
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function RichTextFromBlock({ block }: { block: { heading?: string; body?: unknown } }) {
+  return (
+    <Wrap>
+      {block.heading ? <h2 className="mb-6 text-[38px] text-navy">{block.heading}</h2> : null}
+      <div className="prose prose-neutral max-w-3xl text-ink">
+        {/* Lexical JSON rendered simply as placeholder until full converter wired */}
+        <p className="text-ink-soft text-sm">Inhalt aus dem Page Builder.</p>
+      </div>
+    </Wrap>
+  )
+}
+
+function CtaFromBlock({
+  block,
+}: {
+  block: {
+    heading?: string
+    text?: string
+    buttonLabel?: string
+    buttonHref?: string
+    variant?: string
+  }
+}) {
+  const bg =
+    block.variant === 'pitch'
+      ? 'bg-pitch text-white'
+      : block.variant === 'outline'
+        ? 'border border-line bg-white text-navy'
+        : 'bg-navy text-white'
+  return (
+    <Wrap>
+      <div className={`rounded-[2px] p-10 ${bg}`}>
+        <h2 className="text-3xl">{block.heading}</h2>
+        {block.text ? <p className="mt-3 max-w-xl opacity-90">{block.text}</p> : null}
+        {block.buttonHref && block.buttonLabel ? (
+          <a
+            href={block.buttonHref}
+            className="mt-6 inline-flex rounded-[2px] bg-white px-5 py-3 text-sm font-semibold text-navy"
+          >
+            {block.buttonLabel}
+          </a>
+        ) : null}
+      </div>
+    </Wrap>
+  )
+}
+
+function TeamGridFromBlock({ block }: { block: { eyebrow?: string; heading?: string } }) {
+  const teams = DEFAULT_TEAMS
+  return (
+    <Wrap>
+      <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          {block.eyebrow ? (
+            <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+              {block.eyebrow}
+            </p>
+          ) : null}
+          <h2 className="text-[38px] text-navy">{block.heading || 'Mannschaften'}</h2>
+        </div>
+        <a
+          href="/#mannschaften"
+          className="border-b border-navy pb-0.5 text-sm font-semibold text-navy"
+        >
+          Alle Mannschaften →
+        </a>
+      </div>
+      <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+        {teams.slice(0, 4).map((team) => (
+          <a
+            key={team.id}
+            href={team.path}
+            className="bg-white p-7 transition-colors hover:bg-paper"
+          >
+            <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
+            <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
+            <p className="text-[13px] text-ink-soft">{team.league}</p>
+          </a>
+        ))}
+      </div>
+    </Wrap>
+  )
+}
+
+function ScoreboardFromBlock({
+  block,
+  match,
+}: {
+  block: { label?: string; fallbackText?: string }
+  match: MatchDto | null
+}) {
+  return (
+    <div className="border-t border-white/12 bg-navy-deep text-white">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 px-8 py-5">
+        <span className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-[#8f90c0]">
+          {block.label || 'Nächstes Spiel'}
+        </span>
+        {match ? (
+          <div className="flex flex-wrap items-center gap-5 font-semibold">
+            <span>{match.homeName}</span>
+            <span className="font-display text-xl text-[#8f90c0]">VS</span>
+            <span>{match.awayName}</span>
+            <span className="text-[13px] font-normal text-[#b9bade]">
+              {match.kickoff.toLocaleString('de-DE', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+              {match.venue ? ` · ${match.venue}` : ''}
+            </span>
+          </div>
+        ) : (
+          <span className="text-[13px] text-[#b9bade]">
+            {block.fallbackText || 'Spielplan folgt'}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SocialGridFromBlock({
+  block,
+  tiles,
+  notices,
+}: {
+  block: { eyebrow?: string; heading?: string }
+  tiles: SocialTileDto[]
+  notices: Array<{ title: string; publishedAt?: string | null; path: string }>
+}) {
+  return (
+    <Wrap className="bg-paper">
+      <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+            {block.eyebrow || 'Live von Instagram'}
+          </p>
+          <h2 className="text-[38px] text-navy">{block.heading || 'Auf Social Media'}</h2>
+        </div>
+        <a
+          href="https://www.instagram.com/fckarben/"
+          className="border-b border-navy pb-0.5 text-sm font-semibold text-navy"
+        >
+          Mehr auf Instagram →
+        </a>
+      </div>
+      <div className="mb-10 grid grid-cols-3 gap-0.5 md:grid-cols-6">
+        {(tiles.length ? tiles : Array.from({ length: 6 }).map((_, i) => ({ id: `ph-${i}` }))).map(
+          (tile) => (
+            <div
+              key={tile.id}
+              className="aspect-square bg-navy odd:bg-navy-mid even:bg-navy-deep"
+            />
+          ),
+        )}
+      </div>
+      {notices.length ? (
+        <div>
+          <p className="mb-4 text-sm font-semibold text-ink-soft">Offizielle Mitteilungen</p>
+          <ul className="divide-y divide-line border border-line bg-white">
+            {notices.slice(0, 3).map((n) => (
+              <li key={n.path}>
+                <a href={n.path} className="flex gap-4 px-4 py-3 hover:bg-paper">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-pitch">
+                    {n.publishedAt
+                      ? new Date(n.publishedAt).toLocaleDateString('de-DE', {
+                          day: '2-digit',
+                          month: 'short',
+                        })
+                      : '—'}
+                  </span>
+                  <span className="font-semibold text-ink">{n.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </Wrap>
+  )
+}
+
+function SponsorsFromBlock({ block }: { block: { eyebrow?: string } }) {
+  return (
+    <Wrap className="border-y border-line">
+      <p className="mb-6 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+        {block.eyebrow || 'Unsere Sponsoren'}
+      </p>
+      <div className="flex flex-wrap gap-3">
+        {['Sponsor 1', 'Sponsor 2', 'Sponsor 3', 'Sponsor 4', 'Sponsor 5'].map((name) => (
+          <div
+            key={name}
+            className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
+          >
+            {name}
+          </div>
+        ))}
+      </div>
+    </Wrap>
+  )
+}
+
+function BoardFromBlock({
+  block,
+}: {
+  block: { heading?: string; members?: Array<{ role: string; name: string; detail?: string }> }
+}) {
+  return (
+    <Wrap>
+      <h2 className="mb-8 text-[38px] text-navy">{block.heading || 'Vorstand'}</h2>
+      <div className="divide-y divide-line border border-line">
+        {(block.members || []).map((m) => (
+          <div
+            key={`${m.role}-${m.name}`}
+            className="flex flex-wrap justify-between gap-2 px-4 py-3"
+          >
+            <span className="text-sm text-ink-soft">{m.role}</span>
+            <span className="font-semibold text-ink">{m.name}</span>
+          </div>
+        ))}
+      </div>
+    </Wrap>
+  )
+}
+
+function DownloadsFromBlock({
+  block,
+}: {
+  block: { heading?: string; files?: Array<{ label: string }> }
+}) {
+  return (
+    <Wrap>
+      <h2 className="mb-6 text-[38px] text-navy">{block.heading || 'Formulare'}</h2>
+      <ul className="space-y-2">
+        {(block.files || []).map((f) => (
+          <li key={f.label} className="border border-line px-4 py-3 font-semibold text-navy">
+            {f.label}
+          </li>
+        ))}
+      </ul>
+    </Wrap>
+  )
+}
+
+function SpacerFromBlock({ block }: { block: { size?: string } }) {
+  const h = block.size === 'sm' ? 'h-8' : block.size === 'lg' ? 'h-24' : 'h-16'
+  return <div className={h} aria-hidden />
+}
+
+function PostListFromBlock({
+  block,
+  notices,
+}: {
+  block: { eyebrow?: string; heading?: string }
+  notices?: Array<{ title: string; publishedAt?: string | null; path: string }>
+}) {
+  return (
+    <Wrap>
+      <div className="mb-8">
+        {block.eyebrow ? (
+          <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+            {block.eyebrow}
+          </p>
+        ) : null}
+        <h2 className="text-[38px] text-navy">{block.heading || 'Presse'}</h2>
+      </div>
+      <div className="grid gap-7 md:grid-cols-3">
+        {(notices || []).slice(0, 6).map((n) => (
+          <a key={n.path} href={n.path} className="border border-line">
+            <div className="h-[170px] bg-navy" />
+            <div className="p-5">
+              <span className="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-pitch">
+                {n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('de-DE') : ''}
+              </span>
+              <h3 className="font-body text-[16.5px] font-semibold normal-case tracking-normal text-ink">
+                {n.title}
+              </h3>
+            </div>
+          </a>
+        ))}
+      </div>
+    </Wrap>
+  )
+}
+
+function ImageFromBlock({ block }: { block: { caption?: string } }) {
+  return (
+    <Wrap>
+      <div className="aspect-[16/9] bg-navy-mid" />
+      {block.caption ? <p className="mt-2 text-sm text-ink-soft">{block.caption}</p> : null}
+    </Wrap>
+  )
+}
