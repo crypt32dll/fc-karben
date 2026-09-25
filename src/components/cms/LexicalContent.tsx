@@ -1,5 +1,5 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
 type Props = {
   data: unknown
