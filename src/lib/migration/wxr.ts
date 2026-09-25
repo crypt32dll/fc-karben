@@ -5,6 +5,11 @@ import { normalizePath, wpDatedPostToPresse } from '../redirects'
 
 const log = createLogger('MigrationPipeline')
 
+export type WxrSeo = {
+  metaTitle?: string
+  metaDescription?: string
+}
+
 export type WxrItem = {
   id: number
   title: string
@@ -18,6 +23,9 @@ export type WxrItem = {
   categories: string[]
   attachmentUrl?: string
   parentId?: number
+  thumbnailId?: number
+  meta: Record<string, string>
+  seo: WxrSeo
 }
 
 export type WxrCategory = {
@@ -44,7 +52,31 @@ function cdata(value: unknown): string {
   if (typeof value === 'object' && value !== null && '#text' in value) {
     return String((value as { '#text': unknown })['#text'] ?? '')
   }
+  if (typeof value === 'object' && value !== null && '__cdata' in value) {
+    return String((value as { __cdata: unknown }).__cdata ?? '')
+  }
   return String(value)
+}
+
+/** Drop AIOSEO/Yoast placeholders that aren't real copy */
+export function cleanSeoValue(value: string | undefined | null): string | undefined {
+  if (!value) return undefined
+  const trimmed = value.trim()
+  if (!trimmed || trimmed === 'a:0:{}') return undefined
+  if (/%%[\w.-]+%%/.test(trimmed)) return undefined
+  if (/#(post_|site_|separator)/i.test(trimmed)) return undefined
+  return trimmed
+}
+
+export function extractSeoFromMeta(meta: Record<string, string>): WxrSeo {
+  const metaTitle = cleanSeoValue(meta._aioseo_title || meta._yoast_wpseo_title)
+  const metaDescription = cleanSeoValue(
+    meta._aioseo_description || meta._yoast_wpseo_metadesc || meta._aioseo_og_description,
+  )
+  return {
+    ...(metaTitle ? { metaTitle } : {}),
+    ...(metaDescription ? { metaDescription } : {}),
+  }
 }
 
 export function parseWxr(xml: string): ParsedWxr {
@@ -71,9 +103,21 @@ export function parseWxr(xml: string): ParsedWxr {
     const cats = asArray(item.category)
       .map((c) => {
         if (typeof c === 'string') return c
+        const nicename = c?.['@_nicename'] || c?.['@_slug']
+        if (nicename) return String(nicename)
         return cdata(c?.__cdata ?? c?.['#text'] ?? c)
       })
       .filter(Boolean)
+
+    const meta: Record<string, string> = {}
+    for (const entry of asArray(item['wp:postmeta'])) {
+      const key = cdata(entry?.['wp:meta_key']?.__cdata ?? entry?.['wp:meta_key'])
+      const value = cdata(entry?.['wp:meta_value']?.__cdata ?? entry?.['wp:meta_value'])
+      if (key) meta[key] = value
+    }
+
+    const thumbRaw = meta._thumbnail_id
+    const thumbnailId = thumbRaw && /^\d+$/.test(thumbRaw) ? Number(thumbRaw) : undefined
 
     return {
       id: Number(item['wp:post_id']),
@@ -89,6 +133,9 @@ export function parseWxr(xml: string): ParsedWxr {
       attachmentUrl:
         cdata(item['wp:attachment_url']?.__cdata ?? item['wp:attachment_url']) || undefined,
       parentId: item['wp:post_parent'] ? Number(item['wp:post_parent']) : undefined,
+      thumbnailId,
+      meta,
+      seo: extractSeoFromMeta(meta),
     }
   })
 

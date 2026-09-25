@@ -1,8 +1,13 @@
 import Link from 'next/link'
 
-import { DEFAULT_TEAMS } from '@/lib/content-catalog'
+import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [teams, { posts }] = await Promise.all([
+    listMannschaften(),
+    listBeitrage({ limit: 4 }),
+  ])
+
   return (
     <>
       <section className="relative overflow-hidden bg-navy text-white">
@@ -57,7 +62,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-5">
-            {DEFAULT_TEAMS.map((team) => (
+            {teams.map((team) => (
               <Link
                 key={team.id}
                 href={team.path}
@@ -72,7 +77,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="aktuelles" className="bg-paper py-20">
+      <section id="presse" className="bg-paper py-20">
+        <div className="mx-auto max-w-[1120px] px-8">
+          <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+                Aktuelles
+              </p>
+              <h2 className="text-[38px] text-navy">Presse</h2>
+            </div>
+            <Link
+              href="/presse"
+              className="border-b border-navy pb-0.5 text-sm font-semibold text-navy"
+            >
+              Alle Beiträge →
+            </Link>
+          </div>
+          <ul className="divide-y divide-line border border-line bg-white">
+            {posts.map((post) => (
+              <li key={post.id}>
+                <Link
+                  href={post.path}
+                  className="flex flex-col gap-1 px-5 py-4 hover:bg-paper sm:flex-row sm:items-baseline sm:justify-between"
+                >
+                  <span className="font-semibold text-navy">{post.title}</span>
+                  {post.publishedAt ? (
+                    <time dateTime={post.publishedAt} className="text-sm text-ink-soft">
+                      {new Date(post.publishedAt).toLocaleDateString('de-DE')}
+                    </time>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+            {posts.length === 0 ? (
+              <li className="px-5 py-6 text-sm text-ink-soft">Beiträge folgen.</li>
+            ) : null}
+          </ul>
+        </div>
+      </section>
+
+      <section id="aktuelles" className="py-20">
         <div className="mx-auto max-w-[1120px] px-8">
           <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -126,7 +170,7 @@ export default function HomePage() {
                 <div className="text-sm text-ink-soft">Gegründet</div>
               </div>
               <div>
-                <div className="font-display text-4xl text-navy">5</div>
+                <div className="font-display text-4xl text-navy">{teams.length || 5}</div>
                 <div className="text-sm text-ink-soft">Mannschaften</div>
               </div>
             </div>
@@ -147,6 +191,9 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
+            <Link href="/verein/vorstand" className="mt-4 inline-block text-sm font-semibold text-navy">
+              Mehr zum Vorstand →
+            </Link>
           </div>
         </div>
       </section>
@@ -157,14 +204,12 @@ export default function HomePage() {
             Unsere Sponsoren
           </p>
           <div className="flex flex-wrap gap-3">
-            {['Sponsor 1', 'Sponsor 2', 'Sponsor 3', 'Sponsor 4', 'Sponsor 5'].map((name) => (
-              <div
-                key={name}
-                className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
-              >
-                {name}
-              </div>
-            ))}
+            <Link
+              href="/sponsoren"
+              className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy"
+            >
+              Alle Sponsoren →
+            </Link>
           </div>
         </div>
       </section>

@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next'
 
-import { DEFAULT_TEAMS } from '@/lib/content-catalog'
+import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://fc-karben.de'
   const staticPaths = [
     '',
@@ -13,14 +13,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/verein/beitragsstruktur',
     '/verein/vereinssatzung',
     '/verein/platzbelegung',
+    '/verein/gremien',
     '/sponsoren',
     '/formulare',
     '/anfahrt',
     '/impressum',
     '/datenschutz',
+    '/spielberichte',
   ]
 
   const now = new Date()
+  const [teams, { posts }] = await Promise.all([
+    listMannschaften(),
+    listBeitrage({ limit: 500 }),
+  ])
 
   return [
     ...staticPaths.map((path) => ({
@@ -29,11 +35,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: path === '' ? 1 : 0.7,
     })),
-    ...DEFAULT_TEAMS.map((team) => ({
+    ...teams.map((team) => ({
       url: `${site}${team.path}`,
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
+    })),
+    ...posts.map((post) => ({
+      url: `${site}${post.path}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
   ]
 }

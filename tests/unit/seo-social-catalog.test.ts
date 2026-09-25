@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mapPostsForList } from '../../src/lib/content-catalog/index'
+import { cleanSeoValue, extractSeoFromMeta } from '../../src/lib/migration/wxr'
 import {
   absoluteUrl,
   buildArticleJsonLd,
@@ -61,5 +62,27 @@ describe('ContentCatalog', () => {
   it('maps posts to presse paths', () => {
     const posts = mapPostsForList([{ id: 1, title: 'A', slug: 'a' }])
     expect(posts[0].path).toBe('/presse/a')
+  })
+})
+
+describe('MigrationPipeline SEO', () => {
+  it('keeps real AIOSEO descriptions', () => {
+    expect(
+      cleanSeoValue('1. Mannschaft FC Karben, Tabelle, Termine, Kontakt, Spielberichte'),
+    ).toBeTruthy()
+  })
+
+  it('drops placeholder SEO templates', () => {
+    expect(cleanSeoValue('%%title%% %%sep%% %%sitename%%')).toBeUndefined()
+    expect(cleanSeoValue('#post_title Vereinsheim #separator_sa #site_title')).toBeUndefined()
+    expect(cleanSeoValue('#post_content')).toBeUndefined()
+  })
+
+  it('extracts AIOSEO over empty yoast', () => {
+    const seo = extractSeoFromMeta({
+      _aioseo_description: 'Der FC Karben stellt die Weichen neu',
+      _yoast_wpseo_metadesc: '%%title%%',
+    })
+    expect(seo.metaDescription).toContain('FC Karben')
   })
 })

@@ -13,7 +13,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.r2.cloudflarestorage.com' },
       { protocol: 'https', hostname: 'media.fc-karben.de' },
     ],
-    localPatterns: [{ pathname: '/api/media/file/**' }],
+    localPatterns: [
+      { pathname: '/api/media/file/**' },
+      { pathname: '/logo.png' },
+      { pathname: '/favicon.ico' },
+    ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
