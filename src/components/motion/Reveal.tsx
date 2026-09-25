@@ -13,28 +13,16 @@ type RevealProps = {
   immediate?: boolean
 }
 
-/** Soft fade/slide-in — skipped when the user prefers reduced motion. */
+/** Soft fade/slide-in — skipped when the user prefers reduced motion.
+ *  `immediate` = first-paint / LCP content: no opacity:0 (avoids delayed LCP). */
 export function Reveal({ children, className, delay = 0, immediate = false }: RevealProps) {
   const reduce = useReducedMotion()
 
-  if (reduce) {
+  if (reduce || immediate) {
     return <div className={className}>{children}</div>
   }
 
   const transition = { duration: 0.45, delay, ease: easeOut }
-
-  if (immediate) {
-    return (
-      <motion.div
-        className={className}
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={transition}
-      >
-        {children}
-      </motion.div>
-    )
-  }
 
   return (
     <motion.div

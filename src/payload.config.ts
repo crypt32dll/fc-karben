@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { EXPERIMENTAL_TableFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -55,7 +55,9 @@ export default buildConfig({
     withGlobalCache(SiteSettings, siteSettingsCache),
     withGlobalCache(Homepage, homepageCache),
   ],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, EXPERIMENTAL_TableFeature()],
+  }),
   // Resend is preferred on Vercel (lightweight). Without RESEND_API_KEY, Payload logs to console.
   // https://payloadcms.com/docs/email/overview
   ...(resendConfigured

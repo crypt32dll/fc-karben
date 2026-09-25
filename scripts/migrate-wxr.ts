@@ -20,6 +20,7 @@ import { JSDOM } from 'jsdom'
 import { getPayload, type Payload } from 'payload'
 import { createLogger } from '../src/lib/logger'
 import { canonicalizePageSlug, prepareHtmlForLexical } from '../src/lib/migration/html-to-lexical'
+import { lexicalTable, parseSimpleHtmlTable } from '../src/lib/migration/lexical-table'
 import { downloadFile, mapWithConcurrency } from '../src/lib/migration/media-loader'
 import { DEFAULT_TEAMS } from '../src/lib/migration/seed-teams'
 import {
@@ -102,13 +103,18 @@ async function htmlToLexical(
   mediaUrlBySource?: Map<string, string>,
 ) {
   const cleaned = prepareHtmlForLexical(html, mediaUrlBySource)
+  const { html: withoutTables, tables } = extractHtmlTables(cleaned)
   const editorConfig = await editorConfigFactory.default({ config: payload.config })
   try {
-    return convertHTMLToLexical({
+    const doc = convertHTMLToLexical({
       editorConfig,
-      html: cleaned,
+      html: withoutTables,
       JSDOM,
-    })
+    }) as { root?: { children?: unknown[] } }
+    if (tables.length && doc.root?.children) {
+      injectLexicalTables(doc.root.children, tables)
+    }
+    return doc
   } catch (err) {
     log.warn('HTML→Lexical failed, using plain paragraph', {
       error: err instanceof Error ? err.message : String(err),
@@ -119,6 +125,38 @@ async function htmlToLexical(
       html: `<p>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`,
       JSDOM,
     })
+  }
+}
+
+/** Pull WP tables out before Lexical HTML convert (default converter flattens them). */
+function extractHtmlTables(html: string): { html: string; tables: string[][][] } {
+  const tables: string[][][] = []
+  const htmlOut = html.replace(/<table[\s\S]*?<\/table>/gi, (match) => {
+    const rows = parseSimpleHtmlTable(match)
+    if (!rows?.length) return match
+    const index = tables.length
+    tables.push(rows)
+    return `<p data-fc-table-placeholder="${index}">__FC_TABLE_${index}__</p>`
+  })
+  return { html: htmlOut, tables }
+}
+
+function injectLexicalTables(children: unknown[], tables: string[][][]) {
+  for (let i = 0; i < children.length; i++) {
+    const node = children[i] as {
+      type?: string
+      children?: Array<{ type?: string; text?: string }>
+    }
+    if (node?.type !== 'paragraph' || !Array.isArray(node.children)) continue
+    const text = node.children
+      .filter((c) => c.type === 'text')
+      .map((c) => c.text || '')
+      .join('')
+    const m = text.match(/^__FC_TABLE_(\d+)__$/)
+    if (!m) continue
+    const rows = tables[Number(m[1])]
+    if (!rows) continue
+    children[i] = lexicalTable(rows, true)
   }
 }
 

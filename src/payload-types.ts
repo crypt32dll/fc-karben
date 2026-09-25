@@ -625,6 +625,8 @@ export interface SpacerBlock {
   blockType: 'spacer';
 }
 /**
+ * Synced daily from fussball.de via MatchFeed cron — do not edit by hand.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "matches".
  */
@@ -640,11 +642,7 @@ export interface Match {
   awayScore?: number | null;
   status?: ('scheduled' | 'live' | 'finished' | 'cancelled') | null;
   externalId?: string | null;
-  source?: ('fussballde' | 'manual') | null;
-  /**
-   * When true, MatchFeed will not overwrite this match
-   */
-  manualOverride?: boolean | null;
+  source?: 'fussballde' | null;
   sourceUrl?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1429,7 +1427,6 @@ export interface MatchesSelect<T extends boolean = true> {
   status?: T;
   externalId?: T;
   source?: T;
-  manualOverride?: T;
   sourceUrl?: T;
   updatedAt?: T;
   createdAt?: T;

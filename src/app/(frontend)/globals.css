@@ -142,6 +142,42 @@
   [role="button"]:active:not([aria-disabled="true"]) {
     filter: brightness(0.94);
   }
+
+  /* Lexical / prose tables (Beitragsstruktur, etc.) */
+  .lexical-table-container {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .lexical-table,
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .lexical-table-cell,
+  .prose th,
+  .prose td {
+    border: 1px solid var(--color-line);
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .lexical-table-cell-header-1,
+  .lexical-table-cell-header-2,
+  .lexical-table-cell-header-3,
+  .prose th {
+    background: var(--color-paper);
+    font-weight: 600;
+    color: var(--color-navy);
+  }
+
+  .lexical-table tbody tr:nth-child(even) .lexical-table-cell:not([class*='header']),
+  .prose tbody tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--color-paper) 55%, white);
+  }
 }
 
 /* Shared surface for list rows / cards that navigate */
