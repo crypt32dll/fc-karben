@@ -1,29 +1,14 @@
 import type { MetadataRoute } from 'next'
 
 import { listBeitrage, listMannschaften } from '@/lib/content-catalog'
+import { clubAppRoutes, clubStaticPagePaths } from '@/lib/club-paths'
 import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = getPublicSiteURL()
-  const staticPaths = [
-    '',
-    '/presse',
-    '/verein',
-    '/verein/vorstand',
-    '/verein/mitglied-werden',
-    '/verein/beitragsstruktur',
-    '/verein/vereinssatzung',
-    '/verein/platzbelegung',
-    '/verein/gremien',
-    '/sponsoren',
-    '/formulare',
-    '/anfahrt',
-    '/impressum',
-    '/datenschutz',
-    '/spielberichte',
-  ]
+  const staticPaths = [clubAppRoutes.home === '/' ? '' : clubAppRoutes.home, ...clubStaticPagePaths()]
 
   const now = new Date()
   const [teams, { posts }] = await Promise.all([listMannschaften(), listBeitrage({ limit: 500 })])

@@ -3,6 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { anyone, isAdmin, isAdminOrEditor } from '../access'
 import { pageBlocks } from '../blocks'
 import { CACHE_TAGS, type CachePolicy } from '../lib/cache/tags'
+import { clubAppRoutes, hrefForPage } from '../lib/club-paths'
 import { previewURLForHomepage } from '../lib/preview/urls'
 
 export const siteSettingsCache: CachePolicy = {
@@ -122,7 +123,7 @@ export const Homepage: GlobalConfig = {
               type: 'group',
               fields: [
                 { name: 'label', type: 'text', defaultValue: 'Jetzt Mitglied werden' },
-                { name: 'href', type: 'text', defaultValue: '/verein/mitglied-werden' },
+                { name: 'href', type: 'text', defaultValue: hrefForPage('mitgliedWerden') },
               ],
             },
             {
@@ -130,7 +131,7 @@ export const Homepage: GlobalConfig = {
               type: 'group',
               fields: [
                 { name: 'label', type: 'text', defaultValue: 'Mannschaften ansehen' },
-                { name: 'href', type: 'text', defaultValue: '/#mannschaften' },
+                { name: 'href', type: 'text', defaultValue: clubAppRoutes.teamsSection },
               ],
             },
             {

@@ -36,3 +36,14 @@ Source: `fc-karben-demo.html` + ui-ux-pro-max sports/club direction.
 ## Anti-slop
 
 No glassmorphism, no purple SaaS gradients, no floating badges on hero, no bylines on articles.
+
+## Interaction (sitewide)
+
+- `cursor: pointer` on all actionable controls (`a[href]`, `button`, …)
+- Hover styles only when `(hover: hover) and (pointer: fine)` — touch uses `:active` press feedback
+- Visible `focus-visible` rings (2px navy / pitch on dark surfaces)
+- Min touch target ~44px (`min-h-11`) on primary controls and footer links
+- `prefers-reduced-motion`: disable smooth scroll and shorten transitions
+- Skip link → `#main-content`; sticky header compensated via `scroll-padding-top`
+- Utility `.club-interactive` for list rows / navigational surfaces
+

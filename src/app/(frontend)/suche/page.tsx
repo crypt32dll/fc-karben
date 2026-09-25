@@ -1,11 +1,14 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
-import { SiteSearch } from '@/components/search/SiteSearch'
+import { SearchResultsSkeleton } from '@/components/search/SearchResultsSkeleton'
+import { SearchHero, SearchResults } from '@/components/search/SiteSearch'
 import { catalogSeoToMetadata } from '@/lib/content-catalog'
+import { clubAppRoutes } from '@/lib/club-paths'
 
 export const metadata: Metadata = catalogSeoToMetadata({
   title: 'Suche',
-  path: '/suche',
+  path: clubAppRoutes.search,
   excerpt: 'Beiträge und Seiten auf fc-karben.de durchsuchen.',
 })
 
@@ -15,5 +18,14 @@ type Props = {
 
 export default async function SuchePage({ searchParams }: Props) {
   const { q } = await searchParams
-  return <SiteSearch initialQuery={q || ''} />
+  const query = q || ''
+
+  return (
+    <>
+      <SearchHero initialQuery={query} />
+      <Suspense fallback={<SearchResultsSkeleton query={query} />}>
+        <SearchResults query={query} />
+      </Suspense>
+    </>
+  )
 }

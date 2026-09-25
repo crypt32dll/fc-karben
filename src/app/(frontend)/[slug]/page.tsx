@@ -61,7 +61,7 @@ export default async function SlugPage({ params }: Props) {
         {team.fussballDeUrl ? (
           <a
             href={team.fussballDeUrl}
-            className="mt-8 inline-flex rounded-[2px] bg-navy px-5 py-3 text-sm font-semibold text-white"
+            className="mt-8 inline-flex min-h-11 items-center rounded-[2px] bg-navy px-5 py-3 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep"
             rel="noopener noreferrer"
             target="_blank"
           >
@@ -85,7 +85,7 @@ export default async function SlugPage({ params }: Props) {
             {team.fussballDeUrl ? (
               <a
                 href={team.fussballDeUrl}
-                className="mt-4 inline-flex rounded-[2px] bg-navy px-4 py-2 text-sm font-semibold text-white"
+                className="mt-4 inline-flex min-h-11 items-center rounded-[2px] bg-navy px-4 py-2 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep"
                 rel="noopener noreferrer"
                 target="_blank"
               >

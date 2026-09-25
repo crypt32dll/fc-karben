@@ -3,7 +3,9 @@ import type { ReactNode } from 'react'
 
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
+import { MotionPressable, Reveal } from '@/components/motion/Reveal'
 import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
+import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
 import type { MatchDto } from '@/lib/match-feed'
 import type {
   BoardBlockView,
@@ -39,7 +41,7 @@ export type RenderContext = {
 function Wrap({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <section className={`py-16 md:py-22 ${className}`}>
-      <div className="mx-auto max-w-[1120px] px-8">{children}</div>
+      <Reveal className="mx-auto max-w-[1120px] px-8">{children}</Reveal>
     </section>
   )
 }
@@ -100,7 +102,7 @@ export function RenderBlocks({
 function HeroFromBlock({ block }: { block: HeroBlockView }) {
   return (
     <section className="relative overflow-hidden bg-navy text-white">
-      <div className="relative z-10 mx-auto max-w-[1120px] px-8 pb-16 pt-24">
+      <Reveal immediate className="relative z-10 mx-auto max-w-[1120px] px-8 pb-16 pt-24">
         {block.eyebrow ? (
           <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#b9bade]">
             {block.eyebrow}
@@ -114,23 +116,27 @@ function HeroFromBlock({ block }: { block: HeroBlockView }) {
         ) : null}
         <div className="mt-8 flex flex-wrap gap-3.5">
           {block.primaryCta?.href && block.primaryCta.label ? (
-            <a
-              href={block.primaryCta.href}
-              className="inline-flex items-center rounded-[2px] bg-white px-6 py-3.5 text-sm font-semibold text-navy"
-            >
-              {block.primaryCta.label}
-            </a>
+            <MotionPressable>
+              <a
+                href={block.primaryCta.href}
+                className="inline-flex min-h-11 items-center rounded-[2px] bg-white px-6 py-3.5 text-sm font-semibold text-navy transition-colors motion-reduce:transition-none hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-paper"
+              >
+                {block.primaryCta.label}
+              </a>
+            </MotionPressable>
           ) : null}
           {block.secondaryCta?.href && block.secondaryCta.label ? (
-            <a
-              href={block.secondaryCta.href}
-              className="inline-flex items-center rounded-[2px] border border-white/40 px-6 py-3.5 text-sm font-semibold text-white"
-            >
-              {block.secondaryCta.label}
-            </a>
+            <MotionPressable>
+              <a
+                href={block.secondaryCta.href}
+                className="inline-flex min-h-11 items-center rounded-[2px] border border-white/40 px-6 py-3.5 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-white/15"
+              >
+                {block.secondaryCta.label}
+              </a>
+            </MotionPressable>
           ) : null}
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }
@@ -158,7 +164,7 @@ function CtaFromBlock({ block }: { block: CtaBlockView }) {
         {block.text ? <p className="mt-3 max-w-xl opacity-90">{block.text}</p> : null}
         <a
           href={block.buttonHref}
-          className="mt-6 inline-flex rounded-[2px] bg-white px-5 py-3 text-sm font-semibold text-navy"
+          className="mt-6 inline-flex min-h-11 items-center rounded-[2px] bg-white px-5 py-3 text-sm font-semibold text-navy transition-colors motion-reduce:transition-none hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-paper"
         >
           {block.buttonLabel}
         </a>
@@ -184,23 +190,24 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
           <h2 className="text-[38px] text-navy">{block.heading || 'Mannschaften'}</h2>
         </div>
         <a
-          href="/#mannschaften"
-          className="border-b border-navy pb-0.5 text-sm font-semibold text-navy"
+          href={clubAppRoutes.teamsSection}
+          className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
         >
           Alle Mannschaften →
         </a>
       </div>
       <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
         {filtered.slice(0, 4).map((team) => (
-          <a
-            key={team.id}
-            href={team.path}
-            className="bg-white p-7 transition-colors hover:bg-paper"
-          >
+          <MotionPressable key={team.id}>
+            <a
+              href={team.path}
+              className="club-interactive block bg-white p-7 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
+            >
             <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
             <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
             <p className="text-[13px] text-ink-soft">{team.league}</p>
-          </a>
+            </a>
+          </MotionPressable>
         ))}
       </div>
     </Wrap>
@@ -266,7 +273,7 @@ function SocialGridFromBlock({
         </div>
         <a
           href="https://www.instagram.com/fckarben/"
-          className="border-b border-navy pb-0.5 text-sm font-semibold text-navy"
+          className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
         >
           Mehr auf Instagram →
         </a>
@@ -286,7 +293,7 @@ function SocialGridFromBlock({
             <a
               key={tile.id}
               href={tile.url || 'https://www.instagram.com/fckarben/'}
-              className="relative aspect-square overflow-hidden bg-navy"
+              className="relative aspect-square overflow-hidden bg-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
             >
               <Image
                 src={tile.imageUrl}
@@ -311,7 +318,10 @@ function SocialGridFromBlock({
           <ul className="divide-y divide-line border border-line bg-white">
             {notices.slice(0, 3).map((n) => (
               <li key={n.path}>
-                <a href={n.path} className="flex gap-4 px-4 py-3 hover:bg-paper">
+                <a
+                  href={n.path}
+                  className="club-interactive flex min-h-11 gap-4 px-4 py-3 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                >
                   <span className="text-xs font-semibold uppercase tracking-wide text-pitch">
                     {n.publishedAt
                       ? new Date(n.publishedAt).toLocaleDateString('de-DE', {
@@ -348,16 +358,16 @@ function SponsorsFromBlock({
           sponsors.map((s) => (
             <a
               key={s.id}
-              href={s.url || '/sponsoren'}
-              className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft"
+              href={s.url || hrefForPage('sponsoren')}
+              className="club-interactive flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft hover:border-navy hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
             >
               {s.name}
             </a>
           ))
         ) : (
           <a
-            href="/sponsoren"
-            className="flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy"
+            href={hrefForPage('sponsoren')}
+            className="club-interactive flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
           >
             Alle Sponsoren →
           </a>
@@ -396,7 +406,7 @@ function DownloadsFromBlock({ block }: { block: DownloadsBlockView }) {
             {f.url ? (
               <a
                 href={f.url}
-                className="block border border-line px-4 py-3 font-semibold text-navy hover:bg-paper"
+                className="club-interactive block min-h-11 border border-line px-4 py-3 font-semibold text-navy hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
                 download
               >
                 {f.label}
@@ -444,7 +454,11 @@ function PostListFromBlock({
       </div>
       <div className="grid gap-7 md:grid-cols-3">
         {(notices || []).slice(0, limit).map((n) => (
-          <a key={n.path} href={n.path} className="border border-line">
+          <a
+            key={n.path}
+            href={n.path}
+            className="club-interactive group border border-line hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
+          >
             <FeaturedMedia
               src={n.featuredImageUrl}
               alt={n.featuredImageAlt || n.title}

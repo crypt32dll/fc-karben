@@ -21,7 +21,7 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **ClubSite** | Public Next.js App Router frontend |
 | **Page Builder** | Payload `blocks` layout on `pages` (and homepage sections) so editors compose pages without code |
 | **LayoutView** | Zod-validated page-builder DTO (discriminated union on `blockType`) consumed by `RenderBlocks` |
-| **clubPaths** | Canonical path helpers (`postPath`, `teamPath`, `pathForDoc`) shared by SEO, redirects, search, catalog |
+| **clubPaths** | Canonical path helpers + CMS slug registry (`hrefForPage`, `hrefForTeam`, `clubPages`) shared by SEO, redirects, search, catalog, nav |
 | **Redirect policy** | Built-ins + CMS rule map resolved in one module; proxy is a thin edge adapter |
 | **wpId** | Stable WordPress ID used for idempotent migration upserts |
 

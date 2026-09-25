@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { Archivo_Black, Barlow_Condensed, Inter } from 'next/font/google'
-import { draftMode } from 'next/headers'
+import { Suspense } from 'react'
 
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
-import { DraftModeBanner } from '@/components/preview/DraftModeBanner'
-import { RefreshRouteOnSave } from '@/components/preview/RefreshRouteOnSave'
+import { DraftModeGate } from '@/components/preview/DraftModeGate'
 import { getSiteSettings } from '@/lib/content-catalog'
 import { getPublicSiteURL } from '@/lib/preview/urls'
 import { toNextMetadata } from '@/lib/seo'
@@ -63,22 +62,23 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled: isDraftPreview } = await draftMode()
-
+export default function FrontendLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
       <body
         className={`${barlow.variable} ${archivo.variable} ${inter.variable} font-body antialiased`}
       >
-        {isDraftPreview ? (
-          <>
-            <DraftModeBanner />
-            <RefreshRouteOnSave serverURL={getPublicSiteURL()} />
-          </>
-        ) : null}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-[2px] focus:bg-navy focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-pitch"
+        >
+          Zum Inhalt springen
+        </a>
+        <Suspense fallback={null}>
+          <DraftModeGate />
+        </Suspense>
         <SiteHeader />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <SiteFooter />
       </body>
     </html>

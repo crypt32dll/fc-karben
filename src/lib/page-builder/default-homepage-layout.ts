@@ -1,3 +1,5 @@
+import { clubAppRoutes, hrefForPage } from '../club-paths'
+
 import type { PageLayoutView } from './schemas'
 
 type HomepageHeroSource = {
@@ -25,11 +27,11 @@ export function defaultHomepageLayout(homepage?: HomepageHeroSource | null): Pag
         'Der FC Karben e.V. ist die fußballerische Heimat der Stadt Karben — vom Bambini-Training bis zur ersten Mannschaft. Gegründet 2015, getragen von echter Vereinsliebe.',
       primaryCta: {
         label: homepage?.heroPrimaryCta?.label || 'Jetzt Mitglied werden',
-        href: homepage?.heroPrimaryCta?.href || '/verein/mitglied-werden',
+        href: homepage?.heroPrimaryCta?.href || hrefForPage('mitgliedWerden'),
       },
       secondaryCta: {
         label: homepage?.heroSecondaryCta?.label || 'Mannschaften ansehen',
-        href: homepage?.heroSecondaryCta?.href || '/#mannschaften',
+        href: homepage?.heroSecondaryCta?.href || clubAppRoutes.teamsSection,
       },
     },
     {
@@ -66,7 +68,7 @@ export function defaultHomepageLayout(homepage?: HomepageHeroSource | null): Pag
         homepage?.vereinIntro ||
         'Der FC Karben e.V. wurde im Mai 2015 gegründet und ist seitdem als fußballerische Heimat in der Stadt Karben gewachsen.',
       buttonLabel: 'Vereinssatzung ansehen',
-      buttonHref: '/verein/vereinssatzung',
+      buttonHref: hrefForPage('vereinssatzung'),
       variant: 'navy',
     },
     {
