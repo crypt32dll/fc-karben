@@ -9,6 +9,7 @@ import type { Plugin } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access'
 import { CACHE_TAGS, createRevalidateHooks } from '../lib/cache/revalidate'
 import { pathForDoc } from '../lib/club-paths'
+import { searchablePlainText } from '../lib/search/searchable-text'
 import { generateSeoDescription, generateSeoTitle, getPublicSiteURL } from '../lib/seo/generate'
 
 export async function buildPlugins(): Promise<Plugin[]> {
@@ -89,22 +90,39 @@ export async function buildPlugins(): Promise<Plugin[]> {
         posts: 10,
         pages: 20,
       },
-      beforeSync: ({ searchDoc, originalDoc }) => ({
-        ...searchDoc,
-        title: (originalDoc as { title?: string }).title || searchDoc.title,
-        excerpt:
-          (originalDoc as { excerpt?: string; summary?: string }).excerpt ||
-          (originalDoc as { summary?: string }).summary ||
-          undefined,
-        slug: (originalDoc as { slug?: string }).slug,
-        path: (originalDoc as { path?: string }).path,
-      }),
+      beforeSync: ({ searchDoc, originalDoc }) => {
+        const doc = originalDoc as {
+          title?: string
+          excerpt?: string
+          summary?: string
+          slug?: string
+          path?: string
+          content?: unknown
+          layout?: unknown
+        }
+        return {
+          ...searchDoc,
+          title: doc.title || searchDoc.title,
+          excerpt: doc.excerpt || doc.summary || undefined,
+          slug: doc.slug,
+          path: doc.path,
+          body: searchablePlainText(doc) || undefined,
+        }
+      },
       searchOverrides: {
         fields: ({ defaultFields }) => [
           ...defaultFields,
           { name: 'excerpt', type: 'textarea' },
           { name: 'slug', type: 'text' },
           { name: 'path', type: 'text' },
+          {
+            name: 'body',
+            type: 'textarea',
+            admin: {
+              readOnly: true,
+              description: 'Indexierter Volltext (Lexical + Blöcke) für die Site-Suche',
+            },
+          },
         ],
       },
     }),

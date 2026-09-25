@@ -9,7 +9,7 @@ export function SiteFooter() {
             <div className="font-display text-2xl font-bold uppercase text-navy">
               FC Karben e.V.
             </div>
-            <p className="mt-2 max-w-xs text-sm text-ink-soft">
+            <p className="mt-2 max-w-s text-sm text-ink-soft">
               Günter-Reutzel-Sportfeld · Karl-Liebknecht-Str. 48 · 61184 Karben
             </p>
           </div>

@@ -17,7 +17,12 @@ export async function findSearchHits(query: string, limit = 24): Promise<SearchH
     const result = await payload.find({
       collection: 'search',
       where: {
-        or: [{ title: { contains: q } }, { excerpt: { contains: q } }, { slug: { contains: q } }],
+        or: [
+          { title: { contains: q } },
+          { excerpt: { contains: q } },
+          { slug: { contains: q } },
+          { body: { contains: q } },
+        ],
       },
       sort: '-priority',
       limit,

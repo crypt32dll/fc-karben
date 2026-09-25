@@ -726,6 +726,10 @@ export interface Search {
   excerpt?: string | null;
   slug?: string | null;
   path?: string | null;
+  /**
+   * Indexierter Volltext (Lexical + Blöcke) für die Site-Suche
+   */
+  body?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1484,6 +1488,7 @@ export interface SearchSelect<T extends boolean = true> {
   excerpt?: T;
   slug?: T;
   path?: T;
+  body?: T;
   updatedAt?: T;
   createdAt?: T;
 }
