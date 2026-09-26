@@ -43,6 +43,8 @@ type StaggerProps = {
   delayChildren?: number
   stagger?: number
   as?: 'div' | 'ul'
+  /** Animate when scrolled into view (homepage sections). Default: on mount. */
+  inView?: boolean
 }
 
 /** Parent for staggered list children (`StaggerItem`). */
@@ -52,6 +54,7 @@ export function Stagger({
   delayChildren = 0.04,
   stagger = 0.055,
   as = 'div',
+  inView = false,
 }: StaggerProps) {
   const reduce = useReducedMotion()
   const MotionTag = as === 'ul' ? motion.ul : motion.div
@@ -61,16 +64,23 @@ export function Stagger({
     return <Static className={className}>{children}</Static>
   }
 
+  const show = {
+    transition: { staggerChildren: stagger, delayChildren },
+  }
+
   return (
     <MotionTag
       className={className}
       initial="hidden"
-      animate="show"
+      {...(inView
+        ? {
+            whileInView: 'show',
+            viewport: { once: true, amount: 0.2, margin: '0px 0px -6% 0px' },
+          }
+        : { animate: 'show' })}
       variants={{
         hidden: {},
-        show: {
-          transition: { staggerChildren: stagger, delayChildren },
-        },
+        show,
       }}
     >
       {children}
@@ -116,9 +126,12 @@ export function StaggerItem({
 export function MotionPressable({
   children,
   className,
+  intensity = 'subtle',
 }: {
   children: ReactNode
   className?: string
+  /** `lift` = gallery tiles (slight scale + rise). */
+  intensity?: 'subtle' | 'lift'
 }) {
   const reduce = useReducedMotion()
 
@@ -129,9 +142,11 @@ export function MotionPressable({
   return (
     <motion.div
       className={className}
-      whileHover={{ y: -2 }}
+      whileHover={
+        intensity === 'lift' ? { y: -4, scale: 1.03 } : { y: -2 }
+      }
       whileTap={{ scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 26 }}
     >
       {children}
     </motion.div>

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
-import { MotionPressable, Reveal } from '@/components/motion/Reveal'
+import { MotionPressable, Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
 import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
 import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
 import type { MatchDto } from '@/lib/match-feed'
@@ -264,88 +264,111 @@ function SocialGridFromBlock({
   tiles: SocialTileDto[]
   notices: Array<{ title: string; publishedAt?: string | null; path: string }>
 }) {
+  const displayTiles = tiles.length
+    ? tiles
+    : Array.from(
+        { length: block.maxTiles ?? 6 },
+        (_, i): SocialTileDto => ({
+          id: `ph-${i}`,
+          imageUrl: null,
+          url: null,
+          caption: null,
+          sortOrder: i,
+        }),
+      )
+
   return (
     <Wrap className="bg-paper">
-      <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+      <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+        <div className="max-w-xl">
+          <p className="mb-3 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
             {block.eyebrow || 'Live von Instagram'}
           </p>
-          <h2 className="text-[38px] text-navy">{block.heading || 'Auf Social Media'}</h2>
+          <h2 className="text-[clamp(36px,5vw,52px)] text-navy">
+            {block.heading || 'Auf Social Media'}
+          </h2>
+          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
+            Aktuelle Eindrücke vom Günter-Reutzel-Sportfeld — Spiele, Training und Vereinsleben.
+          </p>
         </div>
-        <a
-          href={instagramProfileUrl()}
-          className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Mehr auf Instagram →
-        </a>
+        <MotionPressable>
+          <a
+            href={instagramProfileUrl()}
+            className="inline-flex min-h-11 items-center rounded-[2px] bg-navy px-5 py-3 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-navy-mid focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-navy-deep"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Mehr auf Instagram →
+          </a>
+        </MotionPressable>
       </div>
-      {/* Instagram feed posts are 4:5 (e.g. 480×600); gaps keep the row full-bleed width. */}
-      <div className="mb-10 grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
-        {(tiles.length
-          ? tiles
-          : Array.from(
-              { length: block.maxTiles ?? 6 },
-              (_, i): SocialTileDto => ({
-                id: `ph-${i}`,
-                imageUrl: null,
-                url: null,
-                caption: null,
-                sortOrder: i,
-              }),
-            )
-        ).map((tile) =>
-          tile.imageUrl ? (
-            <a
-              key={tile.id}
-              href={tile.url || instagramProfileUrl()}
-              className="relative aspect-[4/5] overflow-hidden bg-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <Image
-                src={tile.imageUrl}
-                alt={tile.caption || ''}
-                fill
-                className="object-contain"
-                loading="lazy"
-                sizes="(max-width: 768px) 33vw, 16vw"
-                unoptimized={tile.source === 'feedframer'}
-              />
-            </a>
-          ) : (
-            <div
-              key={tile.id}
-              className="aspect-[4/5] bg-navy odd:bg-navy-mid even:bg-navy-deep"
-            />
-          ),
-        )}
-      </div>
-      {notices.length ? (
-        <div>
-          <p className="mb-4 text-sm font-semibold text-ink-soft">Offizielle Mitteilungen</p>
-          <ul className="divide-y divide-line border border-line bg-white">
-            {notices.slice(0, 3).map((n) => (
-              <li key={n.path}>
+
+      {/* Instagram feed posts are 4:5; light surface so club-blue graphics pop (portfolio-grid). */}
+      <Stagger
+        className="grid grid-cols-3 gap-2.5 sm:gap-3 md:grid-cols-6 md:gap-4"
+        stagger={0.05}
+        delayChildren={0.08}
+        inView
+      >
+        {displayTiles.map((tile) => (
+          <StaggerItem key={tile.id} className="origin-bottom">
+            {tile.imageUrl ? (
+              <MotionPressable intensity="lift">
                 <a
-                  href={n.path}
-                  className="club-interactive flex min-h-11 gap-4 px-4 py-3 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                  href={tile.url || instagramProfileUrl()}
+                  className="relative block aspect-[4/5] overflow-hidden rounded-[2px] border border-line bg-white shadow-sm transition-shadow motion-reduce:transition-none hover:border-navy/35 hover:shadow-[0_12px_28px_rgba(34,34,58,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-90"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  aria-label={tile.caption?.slice(0, 80) || 'Instagram-Beitrag öffnen'}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wide text-pitch">
-                    {n.publishedAt
-                      ? new Date(n.publishedAt).toLocaleDateString('de-DE', {
-                          day: '2-digit',
-                          month: 'short',
-                        })
-                      : '—'}
-                  </span>
-                  <span className="font-semibold text-ink">{n.title}</span>
+                  <Image
+                    src={tile.imageUrl}
+                    alt={tile.caption || ''}
+                    fill
+                    className="object-contain"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 33vw, 16vw"
+                    unoptimized={tile.source === 'feedframer'}
+                  />
                 </a>
-              </li>
+              </MotionPressable>
+            ) : (
+              <div
+                className="aspect-[4/5] rounded-[2px] border border-line bg-white odd:bg-line/40"
+                aria-hidden
+              />
+            )}
+          </StaggerItem>
+        ))}
+      </Stagger>
+
+      {notices.length ? (
+        <div className="mt-14">
+          <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+            Offizielle Mitteilungen
+          </p>
+          <Stagger as="ul" className="divide-y divide-line border border-line bg-white" inView stagger={0.05}>
+            {notices.slice(0, 3).map((n) => (
+              <StaggerItem key={n.path} as="li">
+                <MotionPressable>
+                  <a
+                    href={n.path}
+                    className="club-interactive flex min-h-11 gap-4 px-4 py-3 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                  >
+                    <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-pitch">
+                      {n.publishedAt
+                        ? new Date(n.publishedAt).toLocaleDateString('de-DE', {
+                            day: '2-digit',
+                            month: 'short',
+                          })
+                        : '—'}
+                    </span>
+                    <span className="font-semibold text-ink">{n.title}</span>
+                  </a>
+                </MotionPressable>
+              </StaggerItem>
             ))}
-          </ul>
+          </Stagger>
         </div>
       ) : null}
     </Wrap>
