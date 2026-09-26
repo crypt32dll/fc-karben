@@ -14,8 +14,8 @@ function pageHasBody(page: CatalogPage | null | undefined): boolean {
 
 /**
  * Collision policy for /:slug —
- * Mannschaft owns the slug when present (TeamTabs + widgets); companion Seite
- * body is passed through for the Team tab. Else Seite / Verein redirect / Redirect map.
+ * Mannschaft owns the slug when present (TeamPage + widgets); companion Seite
+ * body is passed through for the Über-uns section. Else Seite / Verein redirect / Redirect map.
  */
 export function decideRootSlug(input: {
   slug: string

@@ -105,7 +105,7 @@ export const Teams: CollectionConfig = {
       type: 'text',
       admin: {
         description:
-          'Optional: Kategorie-Slug für Spielberichte-Tab (z. B. spielberichte-1-mannschaft)',
+          'Optional: Kategorie-Slug für Spielberichte (z. B. spielberichte-1-mannschaft)',
       },
     },
     {

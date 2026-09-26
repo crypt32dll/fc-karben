@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect, redirect } from 'next/navigation'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
-import { TeamTabs } from '@/components/teams/TeamTabs'
+import { TeamPage } from '@/components/teams/TeamPage'
 import { catalogSeoToMetadata, listBeitrage, resolveRootSlug } from '@/lib/content-catalog'
 
 export const revalidate = false
@@ -56,13 +56,15 @@ export default async function SlugPage({ params }: Props) {
       : []
 
     return (
-      <article className="mx-auto max-w-[800px] px-8 py-16">
-        <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
-          Mannschaft
-        </p>
-        <h1 className="text-5xl text-navy">{team.name}</h1>
-        {team.league ? <p className="mt-3 text-ink-soft">{team.league}</p> : null}
-        <TeamTabs team={teamView} reports={reports} />
+      <article className="px-8 py-16">
+        <div className="mx-auto max-w-[800px]">
+          <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+            Mannschaft
+          </p>
+          <h1 className="text-5xl text-navy">{team.name}</h1>
+          {team.league ? <p className="mt-3 text-ink-soft">{team.league}</p> : null}
+        </div>
+        <TeamPage team={teamView} reports={reports} />
       </article>
     )
   }
