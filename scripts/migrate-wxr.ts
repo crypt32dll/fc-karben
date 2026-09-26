@@ -412,6 +412,10 @@ async function applyMigration() {
       log.warn('Post import failed', {
         slug: post.slug,
         error: err instanceof Error ? err.message : String(err),
+        details:
+          err && typeof err === 'object' && 'data' in err
+            ? (err as { data?: unknown }).data
+            : undefined,
       })
     }
   }

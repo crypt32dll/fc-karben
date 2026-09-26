@@ -21,28 +21,32 @@ export function normalizeWpHtml(html: string): string {
  * does not invent upload nodes without IDs.
  */
 export function imgsToLinks(html: string): string {
-  return html.replace(/<img([^>]*?)src=["']([^"']+)["']([^>]*)>/gi, (_m, _pre, src: string) => {
-    const label = src.split('/').pop() || src
-    return `<p><a href="${src}">${label}</a></p>`
-  })
+  return replaceImages(html, (src) => src)
 }
 
 /**
- * Rewrite absolute/relative WP upload URLs to Payload media file URLs when known.
- * Leaves unknown imgs as links.
+ * Rewrite WP images to plain links (mapped URL when known).
+ * Never leave raw <img> tags — Lexical would create upload nodes without IDs.
  */
 export function rewriteImgSrcs(html: string, mediaUrlBySource: Map<string, string>): string {
-  return html.replace(
-    /<img([^>]*?)src=["']([^"']+)["']([^>]*)>/gi,
-    (_full, pre: string, src: string, post: string) => {
-      const mapped = lookupMediaUrl(src, mediaUrlBySource)
-      if (mapped) {
-        return `<img${pre}src="${mapped}"${post}>`
-      }
-      const label = src.split('/').pop() || src
-      return `<p><a href="${src}">${label}</a></p>`
+  return replaceImages(html, (src) => lookupMediaUrl(src, mediaUrlBySource) || src)
+}
+
+/** Linked images first, then bare imgs → always <p><a href>…</a></p>. */
+function replaceImages(html: string, resolveSrc: (src: string) => string): string {
+  const linked = html.replace(
+    /<a\b[^>]*>\s*<img\b[^>]*?\bsrc=["']([^"']+)["'][^>]*>\s*<\/a>/gi,
+    (_m, src: string) => {
+      const href = resolveSrc(src)
+      const label = decodeURIComponent((href.split('/').pop() || href).split('?')[0])
+      return `<p><a href="${href}">${label}</a></p>`
     },
   )
+  return linked.replace(/<img\b[^>]*?\bsrc=["']([^"']+)["'][^>]*>/gi, (_m, src: string) => {
+    const href = resolveSrc(src)
+    const label = decodeURIComponent((href.split('/').pop() || href).split('?')[0])
+    return `<p><a href="${href}">${label}</a></p>`
+  })
 }
 
 function lookupMediaUrl(src: string, map: Map<string, string>): string | undefined {
