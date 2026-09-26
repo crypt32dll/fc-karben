@@ -6,6 +6,7 @@ export {
   pickNextMatch,
   pickNextMatchForTeam,
   SECOND_TEAM_FUSSBALL_DE_ID,
+  THIRD_TEAM_FUSSBALL_DE_ID,
 } from './dto'
 export { fussballDeMatchFeedSource } from './fussball-de'
 export { parseBerlinKickoff } from './kickoff'

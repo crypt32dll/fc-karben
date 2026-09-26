@@ -546,7 +546,7 @@ export interface Team {
    */
   reportCategorySlug?: string | null;
   /**
-   * Nächstes Spiel auf der Startseite (1. und 2. Mannschaft).
+   * Nächstes Spiel auf der Startseite (1.–3. Mannschaft).
    */
   syncMatches?: boolean | null;
   meta?: {

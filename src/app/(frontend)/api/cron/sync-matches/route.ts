@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { syncMatchFeed } from '@/lib/match-feed'
 
 /**
- * Manual + GitHub Actions cron: sync 1. Mannschaft fixtures from fussball.de → Matches.
+ * Manual + GitHub Actions cron: sync MatchFeed teams from fussball.de → Matches.
  * Auth: Authorization: Bearer $CRON_SECRET
  * Schedule: `.github/workflows/sync-matches.yml` (daily 06:00 UTC)
  */

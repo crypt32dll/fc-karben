@@ -13,6 +13,7 @@ import {
   pickNextMatch,
   pickNextMatchForTeam,
   SECOND_TEAM_FUSSBALL_DE_ID,
+  THIRD_TEAM_FUSSBALL_DE_ID,
 } from './dto'
 import { fussballDeMatchFeedSource } from './fussball-de'
 import { extractFussballDeTeamId } from './parse-html'
@@ -22,6 +23,7 @@ const log = createLogger('MatchFeed')
 const fallbackFussballDeTeamId = (slug: string | null | undefined): string | null => {
   if (slug === clubTeams.first.slug) return FIRST_TEAM_FUSSBALL_DE_ID
   if (slug === clubTeams.second.slug) return SECOND_TEAM_FUSSBALL_DE_ID
+  if (slug === clubTeams.third.slug) return THIRD_TEAM_FUSSBALL_DE_ID
   return null
 }
 
@@ -150,6 +152,7 @@ export type ScoreboardFixture = {
 const SCOREBOARD_ROWS = [
   { teamSlug: clubTeams.first.slug, teamLabel: clubTeams.first.label },
   { teamSlug: clubTeams.second.slug, teamLabel: clubTeams.second.label },
+  { teamSlug: clubTeams.third.slug, teamLabel: clubTeams.third.label },
 ] as const
 
 /** Upcoming fixtures from CMS (tag-cached). Dates are revived after the JSON cache. */
@@ -189,7 +192,7 @@ async function loadUpcomingMatches(): Promise<MatchDto[]> {
       collection: 'matches',
       where: { status: { in: ['scheduled', 'live'] } },
       sort: 'kickoff',
-      limit: 40,
+      limit: 60,
       depth: 1,
       overrideAccess: true,
     })

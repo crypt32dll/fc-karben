@@ -194,7 +194,7 @@ export const Teams: CollectionConfig = {
               defaultValue: false,
               label: 'MatchFeed synchronisieren',
               admin: {
-                description: 'Nächstes Spiel auf der Startseite (1. und 2. Mannschaft).',
+                description: 'Nächstes Spiel auf der Startseite (1.–3. Mannschaft).',
               },
             },
           ],

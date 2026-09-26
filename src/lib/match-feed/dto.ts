@@ -91,3 +91,6 @@ export const FIRST_TEAM_FUSSBALL_DE_ID = '01OT7G9AUK000000VV0AG80NVT74RFIN'
 
 /** 2. Mannschaft FC Karben — season 26/27 team-id on fussball.de */
 export const SECOND_TEAM_FUSSBALL_DE_ID = '01OT7GCS8S000000VV0AG80NVT74RFIN'
+
+/** 3. Mannschaft / SG Karben III — season 26/27 team-id on fussball.de */
+export const THIRD_TEAM_FUSSBALL_DE_ID = '02IDOPSOPK000000VS5489B1VUG7QVAU'

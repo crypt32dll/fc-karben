@@ -1,67 +1,30 @@
-import { getScoreboardFixtures, listUpcomingMatches } from '../src/lib/match-feed'
+import { clubTeams } from '../src/lib/club-paths'
 import { getPayloadClient } from '../src/lib/payload'
 
 async function main() {
   const payload = await getPayloadClient()
-  const second = await payload.find({
-    collection: 'matches',
-    where: {
-      and: [
-        { status: { in: ['scheduled', 'live'] } },
-        { 'team.slug': { equals: '2-mannschaft' } },
-      ],
-    },
-    sort: 'kickoff',
-    limit: 3,
-    depth: 1,
+  const found = await payload.find({
+    collection: 'teams',
+    where: { slug: { equals: clubTeams.third.slug } },
+    limit: 1,
+    depth: 0,
     overrideAccess: true,
   })
-  console.log(
-    'cms second',
-    JSON.stringify(
-      second.docs.map((m) => ({
-        home: m.homeName,
-        away: m.awayName,
-        kickoff: m.kickoff,
-        team: typeof m.team === 'object' && m.team ? m.team.slug : m.team,
-      })),
-      null,
-      2,
-    ),
-  )
+  const team = found.docs[0]
+  if (!team) {
+    console.error('3. Mannschaft missing')
+    process.exit(1)
+  }
 
-  const upcoming = await listUpcomingMatches()
-  console.log('upcoming by team', {
-    first: upcoming.filter((m) => m.teamSlug === '1-mannschaft').length,
-    second: upcoming.filter((m) => m.teamSlug === '2-mannschaft').length,
-    untagged: upcoming.filter((m) => !m.teamSlug).length,
-    sampleSecond: upcoming
-      .filter((m) => m.teamSlug === '2-mannschaft')
-      .slice(0, 2)
-      .map((m) => ({
-        home: m.homeName,
-        away: m.awayName,
-        kickoff: m.kickoff.toISOString(),
-        teamSlug: m.teamSlug,
-      })),
+  await payload.update({
+    collection: 'teams',
+    id: team.id,
+    data: { syncMatches: true, _status: 'published' },
+    draft: false,
+    overrideAccess: true,
+    context: { disableRevalidate: true },
   })
-  console.log(
-    'fixtures',
-    JSON.stringify(
-      (await getScoreboardFixtures()).map((row) => ({
-        team: row.teamLabel,
-        match: row.match
-          ? {
-              home: row.match.homeName,
-              away: row.match.awayName,
-              kickoff: row.match.kickoff.toISOString(),
-            }
-          : null,
-      })),
-      null,
-      2,
-    ),
-  )
+  console.log('enabled syncMatches', { id: team.id, slug: team.slug })
 }
 
 main()

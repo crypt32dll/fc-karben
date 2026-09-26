@@ -1,6 +1,18 @@
 import type { MatchDto } from './dto'
 import { parseBerlinKickoff } from './kickoff'
 
+const decodeHtmlText = (value: string): string =>
+  value
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#8203;/g, '')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+
 /**
  * Parse HTML from fussball.de ajax.team.next.games / matchplan endpoints.
  * Structure: competition row (date + league) followed by fixture row (clubs + spiel-id).
@@ -19,9 +31,9 @@ export function parseFussballDeMatchplanHtml(html: string): MatchDto[] {
     matches.push({
       externalId: spielId,
       kickoff,
-      homeName: home.trim(),
-      awayName: away.trim(),
-      competition: competition.trim() || undefined,
+      homeName: decodeHtmlText(home),
+      awayName: decodeHtmlText(away),
+      competition: decodeHtmlText(competition) || undefined,
       status: cancelled ? 'cancelled' : 'scheduled',
       sourceUrl: `https://www.fussball.de/spiel/-/spiel/${spielId}`,
       homeScore: null,

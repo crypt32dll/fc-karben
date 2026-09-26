@@ -235,6 +235,7 @@ const formatKickoff = (kickoff: Date): string =>
 const defaultScoreboardRows = (): ScoreboardFixture[] => [
   { teamSlug: clubTeams.first.slug, teamLabel: clubTeams.first.label, match: null },
   { teamSlug: clubTeams.second.slug, teamLabel: clubTeams.second.label, match: null },
+  { teamSlug: clubTeams.third.slug, teamLabel: clubTeams.third.label, match: null },
 ]
 
 function ScoreboardFromBlock({
