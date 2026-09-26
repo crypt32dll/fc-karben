@@ -31,6 +31,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
+  // ssh2 loads a native .node addon (sshcrypto.node). Turbopack cannot place that
+  // binary in an ESM chunk, so the SFTP client must stay a Node require.
+  serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
