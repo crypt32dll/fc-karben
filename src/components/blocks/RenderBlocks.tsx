@@ -282,7 +282,8 @@ function SocialGridFromBlock({
           Mehr auf Instagram →
         </a>
       </div>
-      <div className="mb-10 grid grid-cols-3 gap-0.5 md:grid-cols-6">
+      {/* Instagram feed posts are 4:5 (e.g. 480×600); gaps keep the row full-bleed width. */}
+      <div className="mb-10 grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
         {(tiles.length
           ? tiles
           : Array.from(
@@ -300,7 +301,7 @@ function SocialGridFromBlock({
             <a
               key={tile.id}
               href={tile.url || instagramProfileUrl()}
-              className="relative aspect-square overflow-hidden bg-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
+              className="relative aspect-[4/5] overflow-hidden bg-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
               rel="noopener noreferrer"
               target="_blank"
             >
@@ -308,16 +309,16 @@ function SocialGridFromBlock({
                 src={tile.imageUrl}
                 alt={tile.caption || ''}
                 fill
-                className="object-cover"
+                className="object-contain"
                 loading="lazy"
-                sizes="(max-width: 768px) 50vw, 33vw"
+                sizes="(max-width: 768px) 33vw, 16vw"
                 unoptimized={tile.source === 'feedframer'}
               />
             </a>
           ) : (
             <div
               key={tile.id}
-              className="aspect-square bg-navy odd:bg-navy-mid even:bg-navy-deep"
+              className="aspect-[4/5] bg-navy odd:bg-navy-mid even:bg-navy-deep"
             />
           ),
         )}
