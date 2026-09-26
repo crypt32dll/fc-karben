@@ -5,10 +5,16 @@ import { Suspense } from 'react'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { DraftModeGate } from '@/components/preview/DraftModeGate'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { getSiteSettings } from '@/lib/content-catalog'
 import { defaultFooterNav, defaultPrimaryNav } from '@/lib/navigation/defaults'
 import { getPublicSiteURL } from '@/lib/preview/urls'
-import { toNextMetadata } from '@/lib/seo'
+import {
+  absoluteUrl,
+  buildOrganizationJsonLd,
+  DEFAULT_OG_IMAGE_PATH,
+  toNextMetadata,
+} from '@/lib/seo'
 import { allowSearchIndexing } from '@/lib/seo/generate'
 
 import './globals.css'
@@ -47,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
         'FC Karben e.V. — Fußball in Karben seit 2015. Mannschaften, News und Verein am Günter-Reutzel-Sportfeld.',
       path: '/',
       noIndex: !allowSearchIndexing(),
-      ogImageUrl: settings?.defaultSeo?.ogImageUrl,
+      ogImageUrl: settings?.defaultSeo?.ogImageUrl || DEFAULT_OG_IMAGE_PATH,
     },
     { metadataBase: siteUrl },
   )
@@ -56,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...defaults,
     metadataBase: new URL(siteUrl),
     title: {
-      default: settings?.defaultSeo?.metaTitle || 'FC Karben e.V. | Fußball in Karben seit 2015',
+      default: 'FC Karben e.V. | Fußball in Karben seit 2015',
       template: '%s | FC Karben',
     },
     verification: settings?.gscVerification ? { google: settings.gscVerification } : undefined,
@@ -68,12 +74,25 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   const nav = settings?.primaryNav?.length ? settings.primaryNav : defaultPrimaryNav()
   const footerNav = settings?.footerNav?.length ? settings.footerNav : defaultFooterNav()
   const addressLine = [settings?.venue, settings?.address].filter(Boolean).join(' · ')
+  const orgJsonLd = buildOrganizationJsonLd({
+    name: settings?.clubName || 'FC Karben e.V.',
+    url: siteUrl,
+    logoUrl: absoluteUrl(DEFAULT_OG_IMAGE_PATH, { metadataBase: siteUrl }),
+    sameAs: [
+      settings?.social?.instagram,
+      settings?.social?.facebook,
+      settings?.social?.tiktok,
+    ].filter((u): u is string => Boolean(u)),
+    address: settings?.address,
+    foundingDate: settings?.foundingYear,
+  })
 
   return (
     <html lang="de" data-scroll-behavior="smooth">
       <body
         className={`${barlow.variable} ${archivo.variable} ${inter.variable} font-body antialiased`}
       >
+        <JsonLd data={orgJsonLd} />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-[2px] focus:bg-navy focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-pitch"

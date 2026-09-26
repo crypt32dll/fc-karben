@@ -4,9 +4,12 @@ import { notFound } from 'next/navigation'
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { Reveal } from '@/components/motion/Reveal'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { ClubLink } from '@/components/ui/ClubLink'
 import { hrefForPage } from '@/lib/club-paths'
 import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
+import { absoluteUrl, buildArticleJsonLd, DEFAULT_OG_IMAGE_PATH } from '@/lib/seo'
+import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
@@ -33,8 +36,24 @@ export default async function PresseArtikelPage({ params }: Props) {
   const post = await getBeitragBySlug(slug)
   if (!post) notFound()
 
+  const siteUrl = getPublicSiteURL()
+  const image =
+    post.seo?.ogImageUrl ||
+    post.featuredImageUrl ||
+    absoluteUrl(DEFAULT_OG_IMAGE_PATH, { metadataBase: siteUrl })
+
   return (
     <article className="mx-auto max-w-[800px] px-8 py-16">
+      <JsonLd
+        data={buildArticleJsonLd({
+          headline: post.title,
+          url: absoluteUrl(post.path, { metadataBase: siteUrl }),
+          datePublished: post.publishedAt,
+          dateModified: post.updatedAt,
+          image,
+          publisherName: 'FC Karben',
+        })}
+      />
       <Reveal immediate>
         <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
           <ClubLink

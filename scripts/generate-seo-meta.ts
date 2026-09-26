@@ -7,8 +7,8 @@
  *   pnpm migrate:seo -- --apply --collections pages,posts
  *   pnpm migrate:seo --                                 # dry-run
  *
- * Without --force: fills empty meta AND truncates descriptions/titles that exceed
- * plugin limits (150 / 60 chars).
+ * Without --force: fills empty meta, regenerates too-short descriptions (<70),
+ * truncates over-long fields, and strips legacy ` | FC Karben` from meta titles.
  */
 import { existsSync } from 'node:fs'
 import path from 'node:path'
@@ -18,6 +18,7 @@ import { pathToFileURL } from 'node:url'
 import { getPayload, type Payload } from 'payload'
 
 import { createLogger } from '../src/lib/logger'
+import { META_DESCRIPTION_SOFT_MIN } from '../src/lib/seo/audit-content'
 import {
   generateSeoDescription,
   generateSeoTitle,
@@ -26,6 +27,7 @@ import {
   truncateSeoDescription,
   truncateSeoTitle,
 } from '../src/lib/seo/generate'
+import { normalizePageTitle } from '../src/lib/seo'
 
 if (existsSync('.env')) {
   loadEnvFile('.env')
@@ -91,22 +93,44 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
       const hasDescription = Boolean(currentDescription)
       const titleTooLong = currentTitle.length > SEO_TITLE_MAX
       const descriptionTooLong = currentDescription.length > SEO_DESCRIPTION_MAX
+      const descriptionTooShort =
+        hasDescription && currentDescription.length < META_DESCRIPTION_SOFT_MIN
+      const titleHasBrandSuffix = /\| FC Karben(?: e\.V\.)?$/i.test(currentTitle)
 
-      if (!force && hasTitle && hasDescription && !titleTooLong && !descriptionTooLong) {
+      if (
+        !force &&
+        hasTitle &&
+        hasDescription &&
+        !titleTooLong &&
+        !descriptionTooLong &&
+        !descriptionTooShort &&
+        !titleHasBrandSuffix
+      ) {
         skipped += 1
         continue
       }
 
-      const nextTitle = force || !hasTitle ? generatedTitle : truncateSeoTitle(currentTitle)
+      const nextTitle = truncateSeoTitle(
+        force || !hasTitle || titleHasBrandSuffix
+          ? generatedTitle
+          : normalizePageTitle(truncateSeoTitle(currentTitle)),
+      )
       const nextDescription =
-        force || !hasDescription ? generatedDescription : truncateSeoDescription(currentDescription)
+        force || !hasDescription || descriptionTooShort
+          ? generatedDescription
+          : truncateSeoDescription(currentDescription)
 
       if (nextTitle === currentTitle && nextDescription === currentDescription && !force) {
         skipped += 1
         continue
       }
 
-      if ((titleTooLong || descriptionTooLong) && !force) truncated += 1
+      if (
+        (titleTooLong || descriptionTooLong || descriptionTooShort || titleHasBrandSuffix) &&
+        !force
+      ) {
+        truncated += 1
+      }
 
       const data = {
         meta: {
@@ -131,7 +155,11 @@ async function generateForCollection(payload: Payload, collection: 'pages' | 'po
         await payload.update({
           collection,
           id: doc.id,
-          data,
+          data: {
+            ...data,
+            _status: 'published',
+          },
+          draft: false,
           overrideAccess: true,
           context: { disableRevalidate: true },
         })

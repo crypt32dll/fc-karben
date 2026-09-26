@@ -90,12 +90,14 @@ type SeoDoc = {
   path?: string | null
 }
 
-/** Shared with @payloadcms/plugin-seo generateTitle. */
+/** Shared with @payloadcms/plugin-seo generateTitle — page segment only (layout adds brand). */
 export function generateSeoTitle(doc: SeoDoc): string {
-  const headline = doc.title || doc.name || SITE_NAME
-  if (headline === SITE_NAME) return truncateSeoTitle(SITE_NAME)
-  if (headline.includes('|')) return truncateSeoTitle(headline)
-  return truncateSeoTitle(`${headline} | ${SITE_NAME}`)
+  const headline = (doc.title || doc.name || SITE_NAME).trim()
+  // Strip legacy brand suffixes stored from older generators
+  let clean = headline
+  const suffix = ` | ${SITE_NAME}`
+  while (clean.endsWith(suffix)) clean = clean.slice(0, -suffix.length).trim()
+  return truncateSeoTitle(clean || SITE_NAME)
 }
 
 /**
@@ -103,17 +105,27 @@ export function generateSeoTitle(doc: SeoDoc): string {
  * Prefers excerpt/summary, then Lexical body, then a title-based fallback
  * so Auto-generate never returns an empty string for pages.
  * Always ≤ SEO_DESCRIPTION_MAX (150) to match the CMS length indicator.
+ * Soft minimum ~70 chars for search snippets.
  */
 export function generateSeoDescription(doc: SeoDoc): string {
   const fromExcerpt = (doc.excerpt || doc.summary || '').trim()
-  if (fromExcerpt) return truncateSeoDescription(fromExcerpt)
-
   const fromBody = lexicalToPlainText(doc.content)
-  if (fromBody) return truncateSeoDescription(fromBody)
-
   const headline = (doc.title || doc.name || '').trim()
-  if (headline) {
-    return truncateSeoDescription(`${headline} — FC Karben e.V. Fußball in Karben.`)
+
+  const pick = fromExcerpt.length >= 70 ? fromExcerpt : fromBody.length >= 70 ? fromBody : ''
+  if (pick) return truncateSeoDescription(pick)
+
+  const short = fromExcerpt || fromBody
+  if (short) {
+    return truncateSeoDescription(
+      `${short} — FC Karben e.V. am Günter-Reutzel-Sportfeld in Karben.`,
+    )
   }
-  return 'FC Karben e.V. — Fußball in Karben seit 2015.'
+
+  if (headline) {
+    return truncateSeoDescription(
+      `${headline} beim FC Karben e.V. — Infos, Termine und Neuigkeiten vom Günter-Reutzel-Sportfeld in Karben.`,
+    )
+  }
+  return 'FC Karben e.V. — Fußball in Karben seit 2015. Mannschaften, Presse und Verein am Günter-Reutzel-Sportfeld.'
 }

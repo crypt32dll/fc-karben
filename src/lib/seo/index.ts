@@ -22,15 +22,44 @@ export type AbsoluteUrlOptions = {
   metadataBase: string
 }
 
+/** Default share image when a doc has no featured/OG image. */
+export const DEFAULT_OG_IMAGE_PATH = '/logo.png'
+
 export function absoluteUrl(path: string, { metadataBase }: AbsoluteUrlOptions): string {
   const base = metadataBase.replace(/\/$/, '')
   const p = path.startsWith('/') ? path : `/${path}`
   return `${base}${p}`
 }
 
+/**
+ * Strip repeated ` | SiteName` suffixes from CMS / migrated titles so the
+ * layout `title.template` (`%s | FC Karben`) only appends the brand once.
+ */
+export function normalizePageTitle(
+  pageTitle: string | null | undefined,
+  siteName = 'FC Karben',
+): string {
+  let t = (pageTitle || '').replace(/\s+/g, ' ').trim()
+  if (!t) return siteName
+
+  const suffix = ` | ${siteName}`
+  while (t.endsWith(suffix)) {
+    t = t.slice(0, -suffix.length).trim()
+  }
+  // Also strip " | FC Karben e.V." style leftovers
+  const evSuffix = ` | ${siteName} e.V.`
+  while (t.endsWith(evSuffix)) {
+    t = t.slice(0, -evSuffix.length).trim()
+  }
+
+  return t || siteName
+}
+
+/** Absolute document title (for OG / places without the layout template). */
 export function buildTitle(pageTitle: string | null | undefined, siteName = 'FC Karben'): string {
-  if (!pageTitle || pageTitle === siteName) return siteName
-  return `${pageTitle} | ${siteName}`
+  const segment = normalizePageTitle(pageTitle, siteName)
+  if (segment === siteName || segment === `${siteName} e.V.`) return segment
+  return `${segment} | ${siteName}`
 }
 
 export function buildCanonical(input: SeoInput, opts: AbsoluteUrlOptions): string {
@@ -103,6 +132,15 @@ export function robotsFromFlags(noIndex?: boolean, noFollow?: boolean) {
   }
 }
 
+function resolveOgImageUrl(input: SeoInput, metadataBase: string): string {
+  if (input.ogImageUrl?.trim()) {
+    const raw = input.ogImageUrl.trim()
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
+    return absoluteUrl(raw.startsWith('/') ? raw : `/${raw}`, { metadataBase })
+  }
+  return absoluteUrl(DEFAULT_OG_IMAGE_PATH, { metadataBase })
+}
+
 /** Canonical Next.js Metadata factory — exclusive SeoSurface seam for ClubSite. */
 export function toNextMetadata(
   input: SeoInput,
@@ -112,43 +150,29 @@ export function toNextMetadata(
   const siteName = opts?.siteName || input.siteName || 'FC Karben'
   const canonical = buildCanonical(input, { metadataBase })
   const robots = robotsFromFlags(input.noIndex, input.noFollow)
-  const titleText = input.title || siteName
+  const pageTitle = normalizePageTitle(input.title || siteName, siteName)
+  const absoluteTitle = buildTitle(pageTitle, siteName)
+  const ogImage = resolveOgImageUrl(input, metadataBase)
 
-  const meta: Metadata = {
-    title: buildTitle(titleText, siteName),
+  return {
+    // Segment only — root layout `title.template` appends ` | FC Karben` once.
+    title: pageTitle,
     description: input.description || undefined,
     alternates: { canonical },
     robots,
     openGraph: {
-      title: titleText,
+      title: absoluteTitle,
       description: input.description || undefined,
       url: canonical,
       locale: 'de_DE',
       type: input.type === 'article' ? 'article' : 'website',
-      images: input.ogImageUrl ? [{ url: input.ogImageUrl }] : undefined,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: titleText,
+      title: absoluteTitle,
       description: input.description || undefined,
-      images: input.ogImageUrl ? [input.ogImageUrl] : undefined,
+      images: [ogImage],
     },
   }
-
-  if (input.type === 'article') {
-    meta.other = {
-      'script:ld+json': JSON.stringify(
-        buildArticleJsonLd({
-          headline: input.headline || titleText,
-          url: canonical,
-          datePublished: input.publishedAt,
-          dateModified: input.modifiedAt,
-          image: input.ogImageUrl,
-          publisherName: siteName,
-        }),
-      ),
-    }
-  }
-
-  return meta
 }

@@ -6,6 +6,7 @@ import {
   buildArticleJsonLd,
   buildOrganizationJsonLd,
   buildTitle,
+  normalizePageTitle,
   robotsFromFlags,
   toNextMetadata,
 } from '../../src/lib/seo/index'
@@ -16,8 +17,23 @@ import {
 } from '../../src/lib/social-feed/index'
 
 describe('SeoSurface', () => {
-  it('builds title template', () => {
+  it('normalizes titles that already include the brand', () => {
+    expect(normalizePageTitle('Vorstand | FC Karben')).toBe('Vorstand')
+    expect(normalizePageTitle('Vorstand | FC Karben | FC Karben')).toBe('Vorstand')
+  })
+
+  it('builds absolute title once', () => {
     expect(buildTitle('Presse')).toBe('Presse | FC Karben')
+    expect(buildTitle('Presse | FC Karben')).toBe('Presse | FC Karben')
+  })
+
+  it('toNextMetadata uses page segment (layout template adds brand)', () => {
+    const meta = toNextMetadata(
+      { title: 'Vorstand | FC Karben', path: '/verein/vorstand', description: 'x'.repeat(80) },
+      { metadataBase: 'https://fc-karben.de' },
+    )
+    expect(meta.title).toBe('Vorstand')
+    expect(meta.openGraph?.images).toBeTruthy()
   })
 
   it('builds absolute urls', () => {
@@ -59,7 +75,7 @@ describe('SeoSurface', () => {
       { title: 'Presse', path: '/presse', description: 'News' },
       { metadataBase: 'https://fc-karben.de' },
     )
-    expect(meta.title).toBe('Presse | FC Karben')
+    expect(meta.title).toBe('Presse')
     expect(meta.alternates?.canonical).toBe('https://fc-karben.de/presse')
   })
 })

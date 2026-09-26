@@ -9,16 +9,28 @@ import {
 
 describe('SEO generate helpers', () => {
   it('builds title template', () => {
-    expect(generateSeoTitle({ title: 'Vorstand' })).toBe('Vorstand | FC Karben')
+    expect(generateSeoTitle({ title: 'Vorstand' })).toBe('Vorstand')
   })
 
   it('uses excerpt for description when present', () => {
+    const longEnough =
+      'Kurztext aus dem Excerpt-Feld mit genug Zeichen für das SEO Soft-Minimum von siebzig.'
+    expect(longEnough.length).toBeGreaterThanOrEqual(70)
     expect(
       generateSeoDescription({
         title: 'Seite',
-        excerpt: 'Kurztext aus dem Excerpt-Feld.',
+        excerpt: longEnough,
       }),
-    ).toBe('Kurztext aus dem Excerpt-Feld.')
+    ).toBe(longEnough)
+  })
+
+  it('pads short excerpts to soft SEO length', () => {
+    const out = generateSeoDescription({
+      title: 'Seite',
+      excerpt: 'Kurztext aus dem Excerpt-Feld.',
+    })
+    expect(out.length).toBeGreaterThanOrEqual(70)
+    expect(out).toContain('Kurztext aus dem Excerpt-Feld.')
   })
 
   it('falls back to Lexical plaintext for pages without excerpt', () => {
