@@ -800,6 +800,7 @@ export interface Export {
     | number
     | boolean
     | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -837,6 +838,7 @@ export interface Import {
       | boolean
       | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1555,6 +1557,7 @@ export interface ExportsSelect<T extends boolean = true> {
   fields?: T;
   collectionSlug?: T;
   where?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1585,6 +1588,7 @@ export interface ImportsSelect<T extends boolean = true> {
         issues?: T;
         issueDetails?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
