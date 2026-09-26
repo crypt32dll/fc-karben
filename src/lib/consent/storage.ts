@@ -21,10 +21,10 @@ export const DEFAULT_CONSENT: ConsentPreferences = {
 }
 
 export function parseConsent(raw: string | null): ConsentPreferences {
-  if (!raw) return { ...DEFAULT_CONSENT }
+  if (!raw) return DEFAULT_CONSENT
   try {
     const data = JSON.parse(raw) as Partial<ConsentPreferences>
-    if (data.version !== CONSENT_VERSION) return { ...DEFAULT_CONSENT }
+    if (data.version !== CONSENT_VERSION) return DEFAULT_CONSENT
     return {
       version: CONSENT_VERSION,
       decidedAt: typeof data.decidedAt === 'string' ? data.decidedAt : null,
@@ -32,16 +32,16 @@ export function parseConsent(raw: string | null): ConsentPreferences {
       googleCalendar: Boolean(data.googleCalendar),
     }
   } catch {
-    return { ...DEFAULT_CONSENT }
+    return DEFAULT_CONSENT
   }
 }
 
 export function readConsentFromStorage(): ConsentPreferences {
-  if (typeof window === 'undefined') return { ...DEFAULT_CONSENT }
+  if (typeof window === 'undefined') return DEFAULT_CONSENT
   try {
     return parseConsent(window.localStorage.getItem(CONSENT_STORAGE_KEY))
   } catch {
-    return { ...DEFAULT_CONSENT }
+    return DEFAULT_CONSENT
   }
 }
 

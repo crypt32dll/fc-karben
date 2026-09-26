@@ -3,9 +3,10 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
 import {
+  CONSENT_STORAGE_KEY,
   type ConsentPreferences,
   DEFAULT_CONSENT,
-  readConsentFromStorage,
+  parseConsent,
   writeConsentToStorage,
 } from './storage'
 
@@ -20,8 +21,21 @@ function subscribe(onStoreChange: () => void) {
   }
 }
 
+/** Cached so getSnapshot returns a stable reference unless storage changed. */
+let cachedRaw: string | null | undefined
+let cachedSnapshot: ConsentPreferences = DEFAULT_CONSENT
+
 function getSnapshot(): ConsentPreferences {
-  return readConsentFromStorage()
+  let raw: string | null = null
+  try {
+    raw = window.localStorage.getItem(CONSENT_STORAGE_KEY)
+  } catch {
+    raw = null
+  }
+  if (raw === cachedRaw) return cachedSnapshot
+  cachedRaw = raw
+  cachedSnapshot = parseConsent(raw)
+  return cachedSnapshot
 }
 
 function getServerSnapshot(): ConsentPreferences {
