@@ -64,6 +64,8 @@ export function catalogSeoToMetadata(
     publishedAt?: string | null
     updatedAt?: string | null
     seo?: CatalogSeo
+    /** Fallback when SEO plugin has no explicit OG image (e.g. post featured image). */
+    featuredImageUrl?: string | null
     type?: 'website' | 'article'
   },
   siteUrl = getPublicSiteURL(),
@@ -76,7 +78,7 @@ export function catalogSeoToMetadata(
       noIndex: input.seo?.noIndex || undefined,
       noFollow: input.seo?.noFollow || undefined,
       canonicalOverride: input.seo?.canonicalOverride,
-      ogImageUrl: input.seo?.ogImageUrl,
+      ogImageUrl: input.seo?.ogImageUrl || input.featuredImageUrl || undefined,
       publishedAt: input.publishedAt,
       modifiedAt: input.updatedAt,
       type: input.type || 'website',

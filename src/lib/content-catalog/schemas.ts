@@ -39,9 +39,13 @@ export const payloadMetaSchema = z
   .transform((meta): CatalogSeoParsed => {
     const og = meta.image ?? meta.ogImage
     let ogImageUrl: string | null = null
-    if (og && typeof og === 'object' && 'url' in og) {
-      const url = (og as { url?: string | null }).url
-      ogImageUrl = url || null
+    if (og && typeof og === 'object') {
+      const media = og as { url?: string | null; wpSourceUrl?: string | null }
+      const raw =
+        (typeof media.url === 'string' && media.url) ||
+        (typeof media.wpSourceUrl === 'string' && media.wpSourceUrl) ||
+        null
+      ogImageUrl = raw && !/\.svg(?:$|\?)/i.test(raw) ? raw : null
     }
     return {
       metaTitle: meta.title || meta.metaTitle || null,

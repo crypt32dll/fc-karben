@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       path: hit.team.path,
       excerpt: hit.team.summary,
       seo: hit.team.seo,
+      featuredImageUrl: hit.team.photoUrl,
     })
   }
 

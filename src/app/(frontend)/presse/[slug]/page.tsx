@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     publishedAt: post.publishedAt,
     updatedAt: post.updatedAt,
     seo: post.seo,
+    featuredImageUrl: post.featuredImageUrl,
     type: 'article',
   })
 }
