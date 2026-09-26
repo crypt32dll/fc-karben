@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+import logo from '../../../public/logo.png'
+
 type Props = {
   src?: string | null
   alt?: string | null
@@ -12,6 +14,7 @@ type Props = {
 
 /**
  * ClubSite featured / header media with navy fallback when no image is set yet.
+ * Fallback shows the club crest centered; real images render as-is.
  * Header: `priority` (eager). Inline/body images should omit priority (lazy default).
  */
 export function FeaturedMedia({
@@ -34,7 +37,15 @@ export function FeaturedMedia({
           {...(priority ? { priority: true as const } : { loading: 'lazy' as const })}
         />
       ) : (
-        <div className="absolute inset-0 bg-navy" aria-hidden />
+        <div className="absolute inset-0 flex items-center justify-center bg-navy" aria-hidden>
+          <Image
+            src={logo}
+            alt=""
+            width={88}
+            height={110}
+            className="h-[46%] w-auto max-h-28 object-contain"
+          />
+        </div>
       )}
     </div>
   )
