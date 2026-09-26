@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { ClubLink } from '@/components/ui/ClubLink'
 import { clubPages, hrefForPage } from '@/lib/club-paths'
 import { catalogSeoToMetadata, getSeiteBySlug, listBeitrage } from '@/lib/content-catalog'
+import { absoluteUrl, buildCollectionPageJsonLd } from '@/lib/seo'
+import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
@@ -22,9 +25,23 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PressePage() {
   const { posts, totalDocs } = await listBeitrage({ limit: 100 })
+  const siteUrl = getPublicSiteURL()
+  const absOpts = { metadataBase: siteUrl }
+  const presseUrl = absoluteUrl(hrefForPage('presse'), absOpts)
 
   return (
     <div className="mx-auto max-w-[1120px] px-8 py-16">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: 'Presse',
+          url: presseUrl,
+          description: `${totalDocs} Beiträge aus dem Vereinsarchiv.`,
+          items: posts.slice(0, 20).map((post) => ({
+            name: post.title,
+            url: absoluteUrl(post.path, absOpts),
+          })),
+        })}
+      />
       <Reveal immediate>
         <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
           News &amp; Spielberichte

@@ -85,15 +85,97 @@ export function buildOrganizationJsonLd(opts: {
     url: opts.url,
     logo: opts.logoUrl || undefined,
     sameAs: opts.sameAs?.filter(Boolean),
-    address: opts.address
-      ? {
-          '@type': 'PostalAddress',
-          streetAddress: opts.address,
-          addressLocality: 'Karben',
-          addressCountry: 'DE',
-        }
-      : undefined,
+    address: opts.address ? toPostalAddress(opts.address) : undefined,
     foundingDate: opts.foundingDate ? String(opts.foundingDate) : undefined,
+  }
+}
+
+/** Parse CMS address lines like "Karl-Liebknecht-Str. 48, 61184 Karben". */
+export function toPostalAddress(raw: string) {
+  const trimmed = raw.trim()
+  const match = trimmed.match(/^(.*?),\s*(\d{5})\s+(.+)$/)
+  if (match) {
+    return {
+      '@type': 'PostalAddress' as const,
+      streetAddress: match[1]!.trim(),
+      postalCode: match[2],
+      addressLocality: match[3]!.trim(),
+      addressCountry: 'DE',
+    }
+  }
+  const loose = trimmed.match(/(\d{5})\s+([A-Za-zÄÖÜäöüß.\-\s]+)$/)
+  if (loose) {
+    const street = trimmed.slice(0, loose.index).replace(/[,\s]+$/, '').trim()
+    return {
+      '@type': 'PostalAddress' as const,
+      streetAddress: street || undefined,
+      postalCode: loose[1],
+      addressLocality: loose[2]!.trim(),
+      addressCountry: 'DE',
+    }
+  }
+  return {
+    '@type': 'PostalAddress' as const,
+    streetAddress: trimmed,
+    postalCode: '61184',
+    addressLocality: 'Karben',
+    addressCountry: 'DE',
+  }
+}
+
+export type BreadcrumbCrumb = {
+  name: string
+  /** Absolute or site-relative URL. Omit on the last crumb (current page). */
+  path?: string | null
+}
+
+/** Sitewide WebSite + SearchAction (Sitelinks search box when Google shows it). */
+export function buildWebSiteJsonLd(opts: {
+  name: string
+  url: string
+  searchUrlTemplate: string
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: opts.name,
+    url: opts.url,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: opts.searchUrlTemplate,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+}
+
+export function buildBreadcrumbJsonLd(
+  crumbs: BreadcrumbCrumb[],
+  opts: AbsoluteUrlOptions,
+) {
+  const itemListElement = crumbs.map((crumb, index) => {
+    const position = index + 1
+    const isLast = index === crumbs.length - 1
+    const item =
+      crumb.path && !isLast
+        ? absoluteUrl(crumb.path, opts)
+        : crumb.path
+          ? absoluteUrl(crumb.path, opts)
+          : undefined
+    return {
+      '@type': 'ListItem' as const,
+      position,
+      name: crumb.name,
+      ...(item ? { item } : {}),
+    }
+  })
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement,
   }
 }
 
@@ -103,16 +185,26 @@ export function buildArticleJsonLd(opts: {
   datePublished?: string | null
   dateModified?: string | null
   image?: string | null
+  description?: string | null
+  articleSection?: string | null
   publisherName: string
+  publisherLogoUrl?: string | null
 }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: opts.headline,
     url: opts.url,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': opts.url,
+    },
     datePublished: opts.datePublished || undefined,
     dateModified: opts.dateModified || opts.datePublished || undefined,
     image: opts.image || undefined,
+    description: opts.description || undefined,
+    articleSection: opts.articleSection || undefined,
+    isAccessibleForFree: true,
     author: {
       '@type': 'Organization',
       name: opts.publisherName,
@@ -120,7 +212,67 @@ export function buildArticleJsonLd(opts: {
     publisher: {
       '@type': 'Organization',
       name: opts.publisherName,
+      ...(opts.publisherLogoUrl
+        ? {
+            logo: {
+              '@type': 'ImageObject',
+              url: opts.publisherLogoUrl,
+            },
+          }
+        : {}),
     },
+  }
+}
+
+/** Presse index — CollectionPage + compact ItemList (not every archive row). */
+export function buildCollectionPageJsonLd(opts: {
+  name: string
+  url: string
+  description?: string | null
+  items: Array<{ name: string; url: string }>
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: opts.name,
+    url: opts.url,
+    description: opts.description || undefined,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: opts.items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: item.url,
+        name: item.name,
+      })),
+    },
+  }
+}
+
+export function buildSportsTeamJsonLd(opts: {
+  name: string
+  url: string
+  sport?: string | null
+  description?: string | null
+  image?: string | null
+  memberOfName?: string | null
+  memberOfUrl?: string | null
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SportsTeam',
+    name: opts.name,
+    url: opts.url,
+    sport: opts.sport || 'Soccer',
+    description: opts.description || undefined,
+    image: opts.image || undefined,
+    memberOf: opts.memberOfName
+      ? {
+          '@type': 'SportsOrganization',
+          name: opts.memberOfName,
+          url: opts.memberOfUrl || undefined,
+        }
+      : undefined,
   }
 }
 

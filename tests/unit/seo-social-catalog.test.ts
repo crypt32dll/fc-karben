@@ -4,8 +4,10 @@ import { cleanSeoValue, extractSeoFromMeta } from '../../src/lib/migration/wxr'
 import {
   absoluteUrl,
   buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
   buildOrganizationJsonLd,
   buildTitle,
+  buildWebSiteJsonLd,
   normalizePageTitle,
   robotsFromFlags,
   toNextMetadata,
@@ -47,8 +49,58 @@ describe('SeoSurface', () => {
       name: 'FC Karben e.V.',
       url: 'https://fc-karben.de',
       foundingDate: 2015,
+      address: 'Karl-Liebknecht-Str. 48, 61184 Karben',
     })
     expect(json['@type']).toBe('SportsOrganization')
+    expect(json.address).toEqual({
+      '@type': 'PostalAddress',
+      streetAddress: 'Karl-Liebknecht-Str. 48',
+      postalCode: '61184',
+      addressLocality: 'Karben',
+      addressCountry: 'DE',
+    })
+  })
+
+  it('builds article json-ld with publisher logo and section', () => {
+    const json = buildArticleJsonLd({
+      headline: 'Testbericht',
+      url: 'https://fc-karben.de/presse/test',
+      publisherName: 'FC Karben e.V.',
+      publisherLogoUrl: 'https://fc-karben.de/logo.png',
+      articleSection: 'Spielberichte',
+      description: 'Kurztext',
+    })
+    expect(json['@type']).toBe('NewsArticle')
+    expect(json.articleSection).toBe('Spielberichte')
+    expect(json.publisher).toMatchObject({
+      '@type': 'Organization',
+      logo: { '@type': 'ImageObject', url: 'https://fc-karben.de/logo.png' },
+    })
+  })
+
+  it('builds website search action and breadcrumbs', () => {
+    const site = buildWebSiteJsonLd({
+      name: 'FC Karben',
+      url: 'https://fc-karben.de',
+      searchUrlTemplate: 'https://fc-karben.de/suche?q={search_term_string}',
+    })
+    expect(site.potentialAction).toMatchObject({
+      '@type': 'SearchAction',
+      'query-input': 'required name=search_term_string',
+    })
+
+    const crumbs = buildBreadcrumbJsonLd(
+      [
+        { name: 'Presse', path: '/presse' },
+        { name: 'Bericht', path: '/presse/bericht' },
+      ],
+      { metadataBase: 'https://fc-karben.de' },
+    )
+    expect(crumbs.itemListElement).toHaveLength(2)
+    expect(crumbs.itemListElement[0]).toMatchObject({
+      position: 1,
+      item: 'https://fc-karben.de/presse',
+    })
   })
 
   it('article author is organization not person', () => {

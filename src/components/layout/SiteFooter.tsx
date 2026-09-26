@@ -31,27 +31,32 @@ export function SiteFooter({ columns, email, addressLine }: Props) {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-3">
-            {cols.map((col) => (
-              <div key={col.heading} className="text-sm">
-                <h4 className="mb-1 font-semibold text-navy">{col.heading}</h4>
-                <nav className="flex flex-col" aria-label={`Footer ${col.heading}`}>
-                  {col.heading === 'Kontakt' ? (
-                    <a href={`mailto:${mail}`} className={footerLinkClass}>
-                      {mail}
-                    </a>
-                  ) : null}
-                  {col.items.map((item) => (
-                    <ClubLink
-                      key={item.href + item.label}
-                      href={item.href}
-                      className={footerLinkClass}
-                    >
-                      {item.label}
-                    </ClubLink>
-                  ))}
-                </nav>
-              </div>
-            ))}
+            {cols.map((col) => {
+              const headingId = `footer-col-${col.heading.toLowerCase().replace(/\s+/g, '-')}`
+              return (
+                <div key={col.heading} className="text-sm">
+                  <p id={headingId} className="mb-1 font-semibold text-navy">
+                    {col.heading}
+                  </p>
+                  <nav className="flex flex-col" aria-labelledby={headingId}>
+                    {col.heading === 'Kontakt' ? (
+                      <a href={`mailto:${mail}`} className={footerLinkClass}>
+                        {mail}
+                      </a>
+                    ) : null}
+                    {col.items.map((item) => (
+                      <ClubLink
+                        key={item.href + item.label}
+                        href={item.href}
+                        className={footerLinkClass}
+                      >
+                        {item.label}
+                      </ClubLink>
+                    ))}
+                  </nav>
+                </div>
+              )
+            })}
           </div>
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-sm text-ink-soft">

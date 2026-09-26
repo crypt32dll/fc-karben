@@ -8,7 +8,12 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { ClubLink } from '@/components/ui/ClubLink'
 import { hrefForPage } from '@/lib/club-paths'
 import { catalogSeoToMetadata, getBeitragBySlug } from '@/lib/content-catalog'
-import { absoluteUrl, buildArticleJsonLd, DEFAULT_OG_IMAGE_PATH } from '@/lib/seo'
+import {
+  absoluteUrl,
+  buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
+  DEFAULT_OG_IMAGE_PATH,
+} from '@/lib/seo'
 import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
@@ -37,22 +42,38 @@ export default async function PresseArtikelPage({ params }: Props) {
   if (!post) notFound()
 
   const siteUrl = getPublicSiteURL()
+  const absOpts = { metadataBase: siteUrl }
+  const articleUrl = absoluteUrl(post.path, absOpts)
   const image =
     post.seo?.ogImageUrl ||
     post.featuredImageUrl ||
-    absoluteUrl(DEFAULT_OG_IMAGE_PATH, { metadataBase: siteUrl })
+    absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts)
+  const publisherLogo = absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts)
+  const category = post.categories?.[0]
 
   return (
     <article className="mx-auto max-w-[800px] px-8 py-16">
       <JsonLd
-        data={buildArticleJsonLd({
-          headline: post.title,
-          url: absoluteUrl(post.path, { metadataBase: siteUrl }),
-          datePublished: post.publishedAt,
-          dateModified: post.updatedAt,
-          image,
-          publisherName: 'FC Karben',
-        })}
+        data={[
+          buildArticleJsonLd({
+            headline: post.title,
+            url: articleUrl,
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt,
+            image,
+            description: post.excerpt || post.seo?.metaDescription,
+            articleSection: category?.title,
+            publisherName: 'FC Karben e.V.',
+            publisherLogoUrl: publisherLogo,
+          }),
+          buildBreadcrumbJsonLd(
+            [
+              { name: 'Presse', path: hrefForPage('presse') },
+              { name: post.title, path: post.path },
+            ],
+            absOpts,
+          ),
+        ]}
       />
       <Reveal immediate>
         <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
@@ -62,7 +83,7 @@ export default async function PresseArtikelPage({ params }: Props) {
           >
             Presse
           </ClubLink>
-          {post.categories?.[0] ? ` · ${post.categories[0].title}` : null}
+          {category ? ` · ${category.title}` : null}
         </p>
         <h1 className="text-5xl text-navy">{post.title}</h1>
         {post.publishedAt ? (

@@ -2,8 +2,16 @@ import type { Metadata } from 'next'
 import { notFound, permanentRedirect, redirect } from 'next/navigation'
 
 import { CmsPageBody } from '@/components/cms/CmsPageBody'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { TeamPage } from '@/components/teams/TeamPage'
 import { catalogSeoToMetadata, listBeitrage, resolveRootSlug } from '@/lib/content-catalog'
+import {
+  absoluteUrl,
+  buildBreadcrumbJsonLd,
+  buildSportsTeamJsonLd,
+  DEFAULT_OG_IMAGE_PATH,
+} from '@/lib/seo'
+import { getPublicSiteURL } from '@/lib/seo/generate'
 
 export const revalidate = false
 
@@ -58,8 +66,31 @@ export default async function SlugPage({ params }: Props) {
       ? (await listBeitrage({ limit: 12, categorySlug: team.reportCategorySlug })).posts
       : []
 
+    const siteUrl = getPublicSiteURL()
+    const absOpts = { metadataBase: siteUrl }
+    const teamUrl = absoluteUrl(team.path, absOpts)
+
     return (
       <article className="px-8 py-16">
+        <JsonLd
+          data={[
+            buildSportsTeamJsonLd({
+              name: team.name,
+              url: teamUrl,
+              description: team.summary || team.league,
+              image: team.photoUrl || absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts),
+              memberOfName: 'FC Karben e.V.',
+              memberOfUrl: siteUrl,
+            }),
+            buildBreadcrumbJsonLd(
+              [
+                { name: 'Mannschaften', path: '/#mannschaften' },
+                { name: team.name, path: team.path },
+              ],
+              absOpts,
+            ),
+          ]}
+        />
         <div className="mx-auto max-w-[800px]">
           <p className="mb-2 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
             Mannschaft
