@@ -18,6 +18,7 @@
     "seed:sponsors": "tsx --env-file=.env scripts/seed-sponsors.ts",
     "migrate:seo": "tsx --env-file=.env scripts/generate-seo-meta.ts",
     "audit:seo": "tsx --env-file=.env scripts/audit-seo-content.ts",
+    "sync:matches": "tsx --env-file=.env scripts/sync-matches.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:unit",

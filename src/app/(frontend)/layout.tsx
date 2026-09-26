@@ -70,7 +70,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   const addressLine = [settings?.venue, settings?.address].filter(Boolean).join(' · ')
 
   return (
-    <html lang="de">
+    <html lang="de" data-scroll-behavior="smooth">
       <body
         className={`${barlow.variable} ${archivo.variable} ${inter.variable} font-body antialiased`}
       >
