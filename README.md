@@ -123,7 +123,7 @@ CI (`.github/workflows/ci.yml`) runs lint, unit tests, and `tsc --noEmit` on Nod
 | **ContentCatalog** | Tag-cached read DTOs; draft-aware for Preview |
 | **Page Builder** | Zod `LayoutView` → `RenderBlocks` ([ADR 0002](docs/adr/0002-page-builder.md)) |
 | **Media** | SFTP cloud-storage adapter → HTTPS public URLs ([ADR 0001](docs/adr/0001-media-storage.md)) |
-| **MatchFeed** | Cron `/api/cron/sync-matches` (06:00 UTC daily on Vercel `fra1`) |
+| **MatchFeed** | GitHub Action → `/api/cron/sync-matches` (06:00 UTC daily; requires `CRON_SECRET` + `SITE_URL` secrets) |
 
 Domain terms (Beitrag, Seite, Mannschaft, …) live in [CONTEXT.md](CONTEXT.md).
 
@@ -153,7 +153,7 @@ Editors: **Admin** (full) or **Editor** (content + page builder, no user admin).
 | Admin empty / stale UI after schema change | `pnpm generate:importmap` and restart `pnpm dev` |
 | Uploads fail on Vercel | `SFTP_*` + `MEDIA_PUBLIC_BASE_URL`; probe with `pnpm exec tsx scripts/probe-sftp.ts` |
 | Preview button broken | `PREVIEW_SECRET` set in env and Payload live-preview config |
-| MatchFeed / cron 401 | `CRON_SECRET` matches Vercel cron Bearer token |
+| MatchFeed / cron 401 | `CRON_SECRET` matches GitHub Action / Bearer token |
 | Site not indexed | Soft-launch: set `ALLOW_SEARCH_INDEXING=true` only at cutover |
 
 > [!NOTE]

@@ -13,13 +13,24 @@ const nextConfig: NextConfig = {
       // Club media on 1&1 webspace (legacy WP + Payload SFTP uploads)
       { protocol: 'https', hostname: 'fc-karben.de', pathname: '/wp-content/**' },
       { protocol: 'https', hostname: 'www.fc-karben.de', pathname: '/wp-content/**' },
-      { protocol: 'https', hostname: 'media.fc-karben.de', pathname: '/**' },
-      // Instagram / Feedframer social tiles (Feedframer tiles also use unoptimized)
-      { protocol: 'https', hostname: '*.cdninstagram.com', pathname: '/**' },
-      { protocol: 'https', hostname: 'cdninstagram.com', pathname: '/**' },
-      { protocol: 'https', hostname: '*.fbcdn.net', pathname: '/**' },
-      { protocol: 'https', hostname: 'feedframer.com', pathname: '/**' },
-      { protocol: 'https', hostname: '*.feedframer.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'media.fc-karben.de', pathname: '/wp-content/**' },
+      // Instagram CDN only when CMS tiles use next/image without unoptimized.
+      // Feedframer tiles set unoptimized and do not need Image Optimization.
+      {
+        protocol: 'https',
+        hostname: '*.cdninstagram.com',
+        pathname: '/v/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdninstagram.com',
+        pathname: '/v/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.fbcdn.net',
+        pathname: '/v/**',
+      },
     ],
     localPatterns: [
       { pathname: '/api/media/file/**' },

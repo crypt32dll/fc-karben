@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server'
 import { syncMatchFeed } from '@/lib/match-feed'
 
 /**
- * Vercel Cron + manual trigger: sync 1. Mannschaft fixtures from fussball.de → Matches.
- * Auth: Authorization: Bearer $CRON_SECRET (Vercel sets this automatically for crons).
+ * Manual + GitHub Actions cron: sync 1. Mannschaft fixtures from fussball.de → Matches.
+ * Auth: Authorization: Bearer $CRON_SECRET
+ * Schedule: `.github/workflows/sync-matches.yml` (daily 06:00 UTC)
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET

@@ -19,9 +19,6 @@ export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
  */
 export const CATALOG_REVALIDATE = false as const
 
-/** @deprecated Alias — prefer CATALOG_REVALIDATE. */
-export const CATALOG_REVALIDATE_SECONDS = CATALOG_REVALIDATE
-
 export type CachePolicy = {
   tags: CacheTag[]
   /** Static paths always revalidated (Full Route Cache). */

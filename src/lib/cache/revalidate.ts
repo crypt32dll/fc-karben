@@ -6,7 +6,6 @@ import type { CachePolicy, CacheTag } from './tags'
 export {
   CACHE_TAGS,
   CATALOG_REVALIDATE,
-  CATALOG_REVALIDATE_SECONDS,
   type CachePolicy,
   type CacheTag,
 } from './tags'

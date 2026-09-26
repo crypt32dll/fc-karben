@@ -1,0 +1,8 @@
+# Not deployed with the app (also in .gitignore). Keeps Vercel upload lean if present locally.
+media
+public/media
+content/wxr
+tmp
+playwright-report
+test-results
+coverage
