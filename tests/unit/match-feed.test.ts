@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { normalizeFussballDeMatch, pickNextMatch } from '../../src/lib/match-feed/dto'
+import { parseBerlinKickoff } from '../../src/lib/match-feed/kickoff'
 import {
   extractFussballDeTeamId,
-  normalizeFussballDeMatch,
-  parseBerlinKickoff,
   parseFussballDeMatchplanHtml,
-  pickNextMatch,
-} from '../../src/lib/match-feed/index'
+} from '../../src/lib/match-feed/parse-html'
 
 describe('MatchFeed', () => {
   it('normalizes fussball.de-like payload', () => {
