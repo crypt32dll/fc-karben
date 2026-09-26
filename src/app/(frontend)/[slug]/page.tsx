@@ -32,7 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     })
   }
 
-  return { title: slug }
+  return {
+    title: 'Seite nicht gefunden',
+    robots: { index: false, follow: true },
+  }
 }
 
 export default async function SlugPage({ params }: Props) {
