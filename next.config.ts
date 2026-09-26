@@ -8,9 +8,9 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
-  // Tailwind (~10 KiB) — inline into HTML to drop the render-blocking CSS round-trip (PSI LCP).
   experimental: {
-    inlineCss: true,
+    // Do NOT enable inlineCss: Tailwind was ~50KB inlined + duplicated in the RSC
+    // payload (~200KB HTML), which hurt TTFB/LCP more than the CSS round-trip saved.
     optimizePackageImports: ['lucide-react', 'motion'],
   },
   images: {
