@@ -10,6 +10,8 @@ export type SeedTeam = {
   fussballDeId?: string
   widgetSpielplanId?: string
   widgetTabelleId?: string
+  /** fussball.de news widget (Spielberichte tab) */
+  widgetSpielberichteId?: string
   reportCategorySlug?: string
   syncMatches?: boolean
   path: string
@@ -34,6 +36,7 @@ export const DEFAULT_TEAMS: SeedTeam[] = [
       'https://www.fussball.de/mannschaft/fc-karben-fc-karben-hessen/-/saison/2627/team-id/01OT7G9AUK000000VV0AG80NVT74RFIN#!/',
     widgetSpielplanId: 'b25a6f2a-3183-4001-a124-6de8af1c9b65',
     widgetTabelleId: '8037ae4f-d8d2-4248-949f-4bbf7b5339fb',
+    widgetSpielberichteId: '4c9e2dee-3900-4196-9fc6-0070229669d0',
     reportCategorySlug: 'spielberichte-1-mannschaft',
     syncMatches: true,
     path: '/1-mannschaft',
@@ -47,6 +50,7 @@ export const DEFAULT_TEAMS: SeedTeam[] = [
       'https://www.fussball.de/mannschaft/fc-karben-ii-fc-karben-hessen/-/saison/2627/team-id/01OT7GCS8S000000VV0AG80NVT74RFIN#!/',
     widgetSpielplanId: '8cf21fc1-894b-42b0-8f53-257f6d6b3a9f',
     widgetTabelleId: 'c49682d4-7ae6-4a19-883b-faf2ea8dd8bc',
+    widgetSpielberichteId: '142f5fa1-52e8-45fc-95ba-745867b0cba9',
     reportCategorySlug: 'spielberichte-2-mannschaft',
     path: '/2-mannschaft',
   }),

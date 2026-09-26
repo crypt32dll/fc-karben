@@ -73,6 +73,7 @@ export function mapTeamsForGrid(
     fussballDeId?: string | null
     widgetSpielplanId?: string | null
     widgetTabelleId?: string | null
+    widgetSpielberichteId?: string | null
     reportCategorySlug?: string | null
     syncMatches?: boolean | null
     trainingTimes?: string | null
@@ -101,6 +102,7 @@ export function mapTeamsForGrid(
         fussballDeId: doc.fussballDeId,
         widgetSpielplanId: doc.widgetSpielplanId,
         widgetTabelleId: doc.widgetTabelleId,
+        widgetSpielberichteId: doc.widgetSpielberichteId,
         reportCategorySlug: doc.reportCategorySlug,
         syncMatches: doc.syncMatches,
         trainingTimes: doc.trainingTimes,

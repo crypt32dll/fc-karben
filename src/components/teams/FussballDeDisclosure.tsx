@@ -14,7 +14,7 @@ type Props = {
   /** Button / empty-state label, e.g. Spielplan */
   label: string
   dataId?: string | null
-  type: 'team-matches' | 'table'
+  type: 'team-matches' | 'table' | 'news'
   fussballDeUrl?: string | null
 }
 
@@ -75,7 +75,7 @@ export function FussballDeDisclosure({
       ) : !active ? (
         <div className="flex min-h-[14rem] flex-col items-start justify-center gap-4 px-6 py-10 sm:px-8">
           <p className="max-w-xl text-[15px] leading-relaxed text-ink">
-            {label} wird von fussball.de geladen. Beim Öffnen werden Verbindungsdaten an den DFB
+            „{label}“ wird von fussball.de geladen. Beim Öffnen werden Verbindungsdaten an den DFB
             übertragen. Details stehen in der{' '}
             <a
               href={hrefForPage('datenschutz')}

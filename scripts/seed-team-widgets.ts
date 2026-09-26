@@ -26,7 +26,14 @@ async function main() {
 
   let updated = 0
   for (const seed of DEFAULT_TEAMS) {
-    if (!seed.widgetSpielplanId && !seed.widgetTabelleId && !seed.reportCategorySlug) continue
+    if (
+      !seed.widgetSpielplanId &&
+      !seed.widgetTabelleId &&
+      !seed.widgetSpielberichteId &&
+      !seed.reportCategorySlug
+    ) {
+      continue
+    }
     const found = await payload.find({
       collection: 'teams',
       where: { slug: { equals: seed.slug } },
@@ -40,10 +47,17 @@ async function main() {
       log.warn('Team missing', { slug: seed.slug })
       continue
     }
+    const existing = doc as {
+      widgetSpielplanId?: string | null
+      widgetTabelleId?: string | null
+      widgetSpielberichteId?: string | null
+      reportCategorySlug?: string | null
+    }
     const data = {
-      widgetSpielplanId: seed.widgetSpielplanId || doc.widgetSpielplanId,
-      widgetTabelleId: seed.widgetTabelleId || doc.widgetTabelleId,
-      reportCategorySlug: seed.reportCategorySlug || doc.reportCategorySlug,
+      widgetSpielplanId: seed.widgetSpielplanId || existing.widgetSpielplanId,
+      widgetTabelleId: seed.widgetTabelleId || existing.widgetTabelleId,
+      widgetSpielberichteId: seed.widgetSpielberichteId || existing.widgetSpielberichteId,
+      reportCategorySlug: seed.reportCategorySlug || existing.reportCategorySlug,
       _status: 'published' as const,
     }
     log.info(apply ? 'Update team widgets' : 'Would update', { slug: seed.slug, ...data })

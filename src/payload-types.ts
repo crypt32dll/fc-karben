@@ -467,10 +467,12 @@ export interface Team {
   name: string;
   slug: string;
   /**
-   * e.g. 01 for grid display
+   * z. B. 01 für die Mannschafts-Grid
    */
   shortLabel?: string | null;
   league?: string | null;
+  active?: boolean | null;
+  sortOrder?: number | null;
   summary?: string | null;
   content?: {
     root: {
@@ -488,39 +490,65 @@ export interface Team {
     [k: string]: unknown;
   } | null;
   photo?: (number | null) | Media;
+  /**
+   * Freitext für den Kontakt-Bereich (Trainer, Ansprechpartner, Hinweise).
+   */
+  contactContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional, wird oberhalb der Ansprechpartner angezeigt.
+   */
+  trainingTimes?: string | null;
+  /**
+   * Strukturierte Kontakte (optional, zusätzlich zum Kontakttext).
+   */
   contacts?:
     | {
-        role: string;
-        name: string;
+        role?: string | null;
+        name?: string | null;
         phone?: string | null;
         email?: string | null;
         id?: string | null;
       }[]
     | null;
-  trainingTimes?: string | null;
   /**
    * Fussball.de team-id
    */
   fussballDeId?: string | null;
   fussballDeUrl?: string | null;
   /**
-   * Fussball.de widget data-id (type team-matches / Spielplan)
+   * data-id für type team-matches
    */
   widgetSpielplanId?: string | null;
   /**
-   * Fussball.de widget data-id (type table / Tabelle)
+   * data-id für type table
    */
   widgetTabelleId?: string | null;
   /**
-   * Optional: Kategorie-Slug für Spielberichte-Tab (z. B. spielberichte-1-mannschaft)
+   * data-id für type news (Spielberichte)
+   */
+  widgetSpielberichteId?: string | null;
+  /**
+   * Optional: Kategorie-Slug für zusätzliche CMS-Spielberichte (z. B. spielberichte-1-mannschaft)
    */
   reportCategorySlug?: string | null;
   /**
-   * Only 1. Mannschaft should sync MatchFeed
+   * Nur für die 1. Mannschaft aktivieren
    */
   syncMatches?: boolean | null;
-  active?: boolean | null;
-  sortOrder?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -1395,9 +1423,13 @@ export interface TeamsSelect<T extends boolean = true> {
   slug?: T;
   shortLabel?: T;
   league?: T;
+  active?: T;
+  sortOrder?: T;
   summary?: T;
   content?: T;
   photo?: T;
+  contactContent?: T;
+  trainingTimes?: T;
   contacts?:
     | T
     | {
@@ -1407,15 +1439,13 @@ export interface TeamsSelect<T extends boolean = true> {
         email?: T;
         id?: T;
       };
-  trainingTimes?: T;
   fussballDeId?: T;
   fussballDeUrl?: T;
   widgetSpielplanId?: T;
   widgetTabelleId?: T;
+  widgetSpielberichteId?: T;
   reportCategorySlug?: T;
   syncMatches?: T;
-  active?: T;
-  sortOrder?: T;
   meta?:
     | T
     | {

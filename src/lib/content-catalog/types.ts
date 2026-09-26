@@ -49,6 +49,7 @@ export type CatalogTeam = {
   fussballDeId?: string | null
   widgetSpielplanId?: string | null
   widgetTabelleId?: string | null
+  widgetSpielberichteId?: string | null
   reportCategorySlug?: string | null
   syncMatches?: boolean | null
   trainingTimes?: string | null
@@ -62,6 +63,7 @@ export type CatalogTeam = {
   }>
   path: string
   content?: CatalogBody | null
+  contactContent?: CatalogBody | null
   seo?: CatalogSeo
 }
 

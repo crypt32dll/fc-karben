@@ -54,16 +54,44 @@ export function TeamPage({ team, reports }: Props) {
             fussballDeUrl={team.fussballDeUrl}
           />
         </section>
+
+        <section id="berichte" className={sectionClass} aria-labelledby="heading-berichte">
+          {team.widgetSpielberichteId ? (
+            <FussballDeDisclosure
+              title="Spielberichte"
+              headingId="heading-berichte"
+              label="Spielberichte"
+              dataId={team.widgetSpielberichteId}
+              type="news"
+              fussballDeUrl={team.fussballDeUrl}
+            />
+          ) : (
+            <h2 id="heading-berichte" className="mb-6 font-display text-3xl text-navy">
+              Spielberichte
+            </h2>
+          )}
+          {reports.length ? (
+            <div className={team.widgetSpielberichteId ? 'mt-8' : undefined}>
+              {team.widgetSpielberichteId ? (
+                <h3 className="mb-4 font-display text-2xl text-navy">Aus der Presse</h3>
+              ) : null}
+              <ReportsSection reports={reports} />
+            </div>
+          ) : !team.widgetSpielberichteId ? (
+            <div>
+              <p className="text-ink-soft">Aktuell keine Spielberichte für diese Mannschaft.</p>
+              <ClubLink
+                href={hrefForPage('presse')}
+                className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-navy underline underline-offset-2"
+              >
+                Zur Presse →
+              </ClubLink>
+            </div>
+          ) : null}
+        </section>
       </div>
 
       <div className="mx-auto mt-16 max-w-[800px] space-y-16">
-        <section id="berichte" className={sectionClass} aria-labelledby="heading-berichte">
-          <h2 id="heading-berichte" className="mb-6 font-display text-3xl text-navy">
-            Spielberichte
-          </h2>
-          <ReportsSection reports={reports} />
-        </section>
-
         <section id="kontakt" className={sectionClass} aria-labelledby="heading-kontakt">
           <h2 id="heading-kontakt" className="mb-6 font-display text-3xl text-navy">
             Kontakt
@@ -91,19 +119,6 @@ function AboutSection({ team }: { team: CatalogTeam }) {
 }
 
 function ReportsSection({ reports }: { reports: CatalogPost[] }) {
-  if (!reports.length) {
-    return (
-      <div>
-        <p className="text-ink-soft">Aktuell keine Spielberichte für diese Mannschaft.</p>
-        <ClubLink
-          href={hrefForPage('presse')}
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-navy underline underline-offset-2"
-        >
-          Zur Presse →
-        </ClubLink>
-      </div>
-    )
-  }
   return (
     <ul className="divide-y divide-line border border-line">
       {reports.map((post) => (
@@ -127,8 +142,12 @@ function ReportsSection({ reports }: { reports: CatalogPost[] }) {
 
 function KontaktSection({ team }: { team: CatalogTeam }) {
   const contacts = team.contacts || []
+  const hasContactContent = Boolean(team.contactContent)
+  const empty = !hasContactContent && !team.trainingTimes && !contacts.length
+
   return (
     <div className="space-y-8">
+      {hasContactContent ? <LexicalContent data={team.contactContent as CatalogBody} /> : null}
       {team.trainingTimes ? (
         <div>
           <h3 className="mb-3 font-display text-2xl text-navy">Trainingszeiten</h3>
@@ -161,9 +180,7 @@ function KontaktSection({ team }: { team: CatalogTeam }) {
           </ul>
         </div>
       ) : null}
-      {!team.trainingTimes && !contacts.length ? (
-        <p className="text-ink-soft">Noch keine Kontaktdaten hinterlegt.</p>
-      ) : null}
+      {empty ? <p className="text-ink-soft">Noch keine Kontaktdaten hinterlegt.</p> : null}
     </div>
   )
 }
