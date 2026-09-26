@@ -15,10 +15,11 @@ Sentry.init({
         ? shared.integrations(defaults)
         : [...defaults, ...(Array.isArray(shared.integrations) ? shared.integrations : [])]
 
+    // Profiling adds Node HTTP hooks; skip in dev to avoid MaxListeners noise under HMR
+    if (!isProd) return base
     return [...base, nodeProfilingIntegration()]
   },
-  // Profile alongside sampled traces (relative session sample)
-  profileSessionSampleRate: isProd ? 0.1 : 1,
+  profileSessionSampleRate: isProd ? 0.1 : 0,
   profileLifecycle: 'trace',
 })
 
