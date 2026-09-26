@@ -12,7 +12,7 @@ export const Sponsors: CollectionConfig = {
   slug: 'sponsors',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'sortOrder', 'active'],
+    defaultColumns: ['name', 'group', 'sortOrder', 'active'],
   },
   access: {
     read: anyone,
@@ -23,11 +23,28 @@ export const Sponsors: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     {
+      name: 'group',
+      type: 'select',
+      required: true,
+      defaultValue: 'hauptsponsoren',
+      options: [
+        { label: 'Hauptsponsoren', value: 'hauptsponsoren' },
+        { label: 'Medienpartner', value: 'medienpartner' },
+        { label: 'Ausrüster', value: 'ausruester' },
+        { label: 'Kooperationspartner', value: 'kooperationspartner' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+    {
       name: 'logo',
       type: 'upload',
       relationTo: 'media',
     },
-    { name: 'url', type: 'text' },
+    {
+      name: 'url',
+      type: 'text',
+      admin: { description: 'Website des Sponsors (öffnet in neuem Tab)' },
+    },
     { name: 'sortOrder', type: 'number', defaultValue: 0 },
     { name: 'active', type: 'checkbox', defaultValue: true },
   ],

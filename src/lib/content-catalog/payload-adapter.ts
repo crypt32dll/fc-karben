@@ -310,6 +310,18 @@ export async function findMannschaftBySlug(
   }
 }
 
+const SPONSOR_GROUP_LABELS: Record<string, string> = {
+  hauptsponsoren: 'Hauptsponsoren',
+  medienpartner: 'Medienpartner',
+  ausruester: 'Ausrüster',
+  kooperationspartner: 'Kooperationspartner',
+}
+
+function groupLabel(group: string | null): string | null {
+  if (!group) return null
+  return SPONSOR_GROUP_LABELS[group] ?? group
+}
+
 export async function findSponsoren(): Promise<CatalogSponsor[]> {
   const payload = await getPayloadClient()
   try {
@@ -324,12 +336,20 @@ export async function findSponsoren(): Promise<CatalogSponsor[]> {
     return result.docs.map((doc) => {
       const logo = doc.logo
       const logoUrl =
-        typeof logo === 'object' && logo && 'url' in logo ? (logo.url as string) : null
+        typeof logo === 'object' && logo && 'url' in logo
+          ? ((logo.url as string | null | undefined) ??
+            (typeof (logo as { wpSourceUrl?: string }).wpSourceUrl === 'string'
+              ? (logo as { wpSourceUrl: string }).wpSourceUrl
+              : null))
+          : null
+      const group = typeof doc.group === 'string' ? doc.group : null
       return {
         id: String(doc.id),
         name: doc.name,
         url: doc.url,
         logoUrl,
+        group,
+        groupLabel: groupLabel(group),
         sortOrder: doc.sortOrder ?? 0,
       }
     })

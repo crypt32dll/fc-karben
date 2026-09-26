@@ -32,6 +32,7 @@ async function main() {
       where: { slug: { equals: seed.slug } },
       limit: 1,
       depth: 0,
+      draft: true,
       overrideAccess: true,
     })
     const doc = found.docs[0]
@@ -43,6 +44,7 @@ async function main() {
       widgetSpielplanId: seed.widgetSpielplanId || doc.widgetSpielplanId,
       widgetTabelleId: seed.widgetTabelleId || doc.widgetTabelleId,
       reportCategorySlug: seed.reportCategorySlug || doc.reportCategorySlug,
+      _status: 'published' as const,
     }
     log.info(apply ? 'Update team widgets' : 'Would update', { slug: seed.slug, ...data })
     if (apply) {
@@ -50,6 +52,7 @@ async function main() {
         collection: 'teams',
         id: doc.id,
         data,
+        draft: false,
         overrideAccess: true,
         context: { disableRevalidate: true },
       })

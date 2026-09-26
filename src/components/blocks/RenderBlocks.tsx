@@ -181,36 +181,36 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
   return (
     <Wrap>
       <div id="mannschaften" className="scroll-mt-[var(--header-height)]">
-      <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          {block.eyebrow ? (
-            <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
-              {block.eyebrow}
-            </p>
-          ) : null}
-          <h2 className="text-[38px] text-navy">{block.heading || 'Mannschaften'}</h2>
+        <div className="mb-11 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            {block.eyebrow ? (
+              <p className="mb-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
+                {block.eyebrow}
+              </p>
+            ) : null}
+            <h2 className="text-[38px] text-navy">{block.heading || 'Mannschaften'}</h2>
+          </div>
+          <a
+            href={clubAppRoutes.teamsSection}
+            className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
+          >
+            Alle Mannschaften →
+          </a>
         </div>
-        <a
-          href={clubAppRoutes.teamsSection}
-          className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
-        >
-          Alle Mannschaften →
-        </a>
-      </div>
-      <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-        {filtered.slice(0, 4).map((team) => (
-          <MotionPressable key={team.id}>
-            <a
-              href={team.path}
-              className="club-interactive block bg-white p-7 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
-            >
-              <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
-              <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
-              <p className="text-[13px] text-ink-soft">{team.league}</p>
-            </a>
-          </MotionPressable>
-        ))}
-      </div>
+        <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+          {filtered.slice(0, 4).map((team) => (
+            <MotionPressable key={team.id}>
+              <a
+                href={team.path}
+                className="club-interactive block bg-white p-7 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:-outline-offset-2 focus-visible:outline-navy active:bg-paper"
+              >
+                <div className="mb-3.5 font-accent text-[13px] text-pitch">{team.shortLabel}</div>
+                <h3 className="mb-1.5 text-2xl text-navy">{team.name}</h3>
+                <p className="text-[13px] text-ink-soft">{team.league}</p>
+              </a>
+            </MotionPressable>
+          ))}
+        </div>
       </div>
     </Wrap>
   )
@@ -355,26 +355,53 @@ function SponsorsFromBlock({
       <p className="mb-6 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
         {block.eyebrow || 'Unsere Sponsoren'}
       </p>
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {sponsors.length ? (
-          sponsors.map((s) => (
-            <a
-              key={s.id}
-              href={s.url || hrefForPage('sponsoren')}
-              className="club-interactive flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm text-ink-soft hover:border-navy hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
-            >
-              {s.name}
-            </a>
-          ))
+          sponsors.slice(0, 12).map((s) => {
+            const href = s.url || hrefForPage('sponsoren')
+            const external = Boolean(s.url)
+            return (
+              <a
+                key={s.id}
+                href={href}
+                {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                className="club-interactive flex h-20 items-center justify-center border border-line bg-white px-3 py-2 hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper"
+                aria-label={s.name}
+              >
+                {s.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.logoUrl}
+                    alt=""
+                    className="max-h-12 max-w-full object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span className="text-center text-xs font-semibold text-ink-soft">{s.name}</span>
+                )}
+              </a>
+            )
+          })
         ) : (
           <a
             href={hrefForPage('sponsoren')}
-            className="club-interactive flex h-16 min-w-[120px] flex-1 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
+            className="club-interactive col-span-full flex h-16 items-center justify-center border border-line bg-paper text-sm font-semibold text-navy hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-white"
           >
             Alle Sponsoren →
           </a>
         )}
       </div>
+      {sponsors.length > 0 ? (
+        <p className="mt-5">
+          <a
+            href={hrefForPage('sponsoren')}
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-navy underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+          >
+            Alle Sponsoren →
+          </a>
+        </p>
+      ) : null}
     </Wrap>
   )
 }

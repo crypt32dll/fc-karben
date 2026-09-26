@@ -666,7 +666,11 @@ export interface Match {
 export interface Sponsor {
   id: number;
   name: string;
+  group: 'hauptsponsoren' | 'medienpartner' | 'ausruester' | 'kooperationspartner';
   logo?: (number | null) | Media;
+  /**
+   * Website des Sponsors (öffnet in neuem Tab)
+   */
   url?: string | null;
   sortOrder?: number | null;
   active?: boolean | null;
@@ -1452,6 +1456,7 @@ export interface MatchesSelect<T extends boolean = true> {
  */
 export interface SponsorsSelect<T extends boolean = true> {
   name?: T;
+  group?: T;
   logo?: T;
   url?: T;
   sortOrder?: T;

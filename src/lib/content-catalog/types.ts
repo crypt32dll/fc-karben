@@ -93,6 +93,8 @@ export type CatalogSponsor = {
   name: string
   url?: string | null
   logoUrl?: string | null
+  group?: string | null
+  groupLabel?: string | null
   sortOrder: number
 }
 

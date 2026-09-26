@@ -15,6 +15,7 @@
     "lint": "biome check .",
     "migrate:wxr": "tsx --env-file=.env scripts/migrate-wxr.ts",
     "migrate:featured": "tsx --env-file=.env scripts/backfill-featured-images.ts",
+    "seed:sponsors": "tsx --env-file=.env scripts/seed-sponsors.ts",
     "migrate:seo": "tsx --env-file=.env scripts/generate-seo-meta.ts",
     "audit:seo": "tsx --env-file=.env scripts/audit-seo-content.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

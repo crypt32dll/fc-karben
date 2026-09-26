@@ -167,6 +167,8 @@ async function seedTeams(payload: Payload) {
       collection: 'teams',
       where: { slug: { equals: team.slug } },
       limit: 1,
+      depth: 0,
+      draft: true,
       overrideAccess: true,
     })
     const data = {
@@ -179,12 +181,14 @@ async function seedTeams(payload: Payload) {
       syncMatches: Boolean(team.syncMatches),
       active: true,
       sortOrder: index + 1,
+      _status: 'published' as const,
     }
     if (existing.docs[0]) {
       await payload.update({
         collection: 'teams',
         id: existing.docs[0].id,
         data,
+        draft: false,
         overrideAccess: true,
         context: { disableRevalidate: true },
       })
@@ -192,6 +196,7 @@ async function seedTeams(payload: Payload) {
       await payload.create({
         collection: 'teams',
         data,
+        draft: false,
         overrideAccess: true,
         context: { disableRevalidate: true },
       })
