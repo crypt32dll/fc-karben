@@ -1,10 +1,4 @@
-import {
-  clubAppRoutes,
-  clubTeams,
-  hrefForPage,
-  hrefForTeam,
-  type ClubTeamKey,
-} from '../club-paths'
+import { type ClubTeamKey, clubAppRoutes, clubTeams, hrefForPage, hrefForTeam } from '../club-paths'
 
 export type NavChild = {
   label: string
@@ -39,6 +33,7 @@ export function defaultPrimaryNav(): NavItem[] {
         { label: 'Vereinssatzung', href: hrefForPage('vereinssatzung') },
         { label: 'Mitglied werden', href: hrefForPage('mitgliedWerden') },
         { label: 'Beitragsstruktur', href: hrefForPage('beitragsstruktur') },
+        { label: 'Platzbelegung', href: hrefForPage('platzbelegung') },
       ],
     },
     {
@@ -64,6 +59,7 @@ export function defaultFooterNav(): Array<{ heading: string; items: NavChild[] }
         { label: 'Vereinssatzung', href: hrefForPage('vereinssatzung') },
         { label: 'Mitglied werden', href: hrefForPage('mitgliedWerden') },
         { label: 'Beitragsstruktur', href: hrefForPage('beitragsstruktur') },
+        { label: 'Platzbelegung', href: hrefForPage('platzbelegung') },
       ],
     },
     {
@@ -108,9 +104,7 @@ export function normalizeNavItems(raw: unknown): NavItem[] {
   return items.length ? items : defaultPrimaryNav()
 }
 
-export function normalizeFooterNav(
-  raw: unknown,
-): Array<{ heading: string; items: NavChild[] }> {
+export function normalizeFooterNav(raw: unknown): Array<{ heading: string; items: NavChild[] }> {
   if (!Array.isArray(raw) || raw.length === 0) return defaultFooterNav()
   const cols: Array<{ heading: string; items: NavChild[] }> = []
   for (const entry of raw) {

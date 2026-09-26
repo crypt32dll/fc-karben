@@ -45,6 +45,10 @@ const HTML = `
 <p>Auf den Mannschaftsseiten laden Spielplan und Tabelle erst, wenn Sie den jeweiligen Reiter öffnen. Dann wird ein Fenster von next.fussball.de eingeblendet. Der Betreiber von fussball.de (DFB GmbH &amp; Co. KG) erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
 <p>Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Das Speichern von Informationen in Ihrem Browser erfolgt, weil Sie den Spielplan oder die Tabelle selbst abrufen (§ 25 Absatz 2 Nummer 2 TDDDG). Informationen des Anbieters: <a href="https://www.fussball.de/privacy">fussball.de/privacy</a>.</p>
 
+<h2>Platzbelegung (Google Calendar)</h2>
+<p>Auf der Seite Platzbelegung können Sie den Belegungsplan des Sportfelds laden. Der Plan wird erst angezeigt, wenn Sie den Button „Kalender anzeigen“ bzw. „Kalender laden“ betätigen. Dann wird ein Fenster von Google Calendar (Google Ireland Limited / Google LLC) eingeblendet. Google erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
+<p>Rechtsgrundlage ist Ihre Einwilligung über den Klick (Artikel 6 Absatz 1 Buchstabe a DSGVO) sowie § 25 Absatz 1 TDDDG. Datenschutzerklärung von Google: <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
+
 <h2>Links zu anderen Websites</h2>
 <p>Links zu Sponsoren, zu <a href="https://www.instagram.com/fckarben/">Instagram</a>, zu <a href="https://www.facebook.com/FCKarben">Facebook</a> und zu fussball.de sind gewöhnliche Verweise. Erst wenn Sie einen Link anklicken, gilt die Datenschutzerklärung der Zielseite. Wir binden keine Social-Media-Plugins ein, die schon beim Öffnen unserer Seite Daten an Meta senden. Instagram-Bilder werden auf der Startseite derzeit nicht automatisch von Instagram geladen.</p>
 
