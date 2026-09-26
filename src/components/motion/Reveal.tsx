@@ -142,9 +142,7 @@ export function MotionPressable({
   return (
     <motion.div
       className={className}
-      whileHover={
-        intensity === 'lift' ? { y: -4, scale: 1.03 } : { y: -2 }
-      }
+      whileHover={intensity === 'lift' ? { y: -4, scale: 1.03 } : { y: -2 }}
       whileTap={{ scale: 0.985 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}
     >

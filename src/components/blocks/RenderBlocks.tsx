@@ -69,13 +69,7 @@ export function RenderBlocks({
           case 'teamGrid':
             return <TeamGridFromBlock key={key} block={block} teams={context.teams || []} />
           case 'scoreboard':
-            return (
-              <ScoreboardFromBlock
-                key={key}
-                block={block}
-                fixtures={context.nextFixtures}
-              />
-            )
+            return <ScoreboardFromBlock key={key} block={block} fixtures={context.nextFixtures} />
           case 'socialGrid':
             return (
               <SocialGridFromBlock
@@ -327,8 +321,7 @@ function SocialGridFromBlock({
             rel="noopener noreferrer"
             target="_blank"
           >
-            Mehr auf Instagram →
-            <span className="sr-only"> (öffnet in neuem Tab)</span>
+            Mehr auf Instagram →<span className="sr-only"> (öffnet in neuem Tab)</span>
           </a>
         </MotionPressable>
       </div>
@@ -343,29 +336,29 @@ function SocialGridFromBlock({
         {displayTiles.map((tile) => (
           <StaggerItem key={tile.id} className="origin-bottom">
             {tile.imageUrl ? (
-                  <MotionPressable intensity="lift">
-                    <a
-                      href={tile.url || instagramProfileUrl()}
-                      className="relative block aspect-[4/5] overflow-hidden rounded-[2px] border border-line bg-white shadow-sm transition-shadow motion-reduce:transition-none hover:border-navy/35 hover:shadow-[0_12px_28px_rgba(34,34,58,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-90"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      aria-label={
-                        tile.caption
-                          ? `${tile.caption.slice(0, 80)} (öffnet in neuem Tab)`
-                          : 'Instagram-Beitrag öffnen (neuer Tab)'
-                      }
-                    >
-                      <Image
-                        src={tile.imageUrl}
-                        alt=""
-                        fill
-                        className="object-contain"
-                        loading="lazy"
-                        sizes="(max-width: 768px) 33vw, 16vw"
-                        unoptimized={tile.source === 'feedframer'}
-                      />
-                    </a>
-                  </MotionPressable>
+              <MotionPressable intensity="lift">
+                <a
+                  href={tile.url || instagramProfileUrl()}
+                  className="relative block aspect-[4/5] overflow-hidden rounded-[2px] border border-line bg-white shadow-sm transition-shadow motion-reduce:transition-none hover:border-navy/35 hover:shadow-[0_12px_28px_rgba(34,34,58,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-90"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  aria-label={
+                    tile.caption
+                      ? `${tile.caption.slice(0, 80)} (öffnet in neuem Tab)`
+                      : 'Instagram-Beitrag öffnen (neuer Tab)'
+                  }
+                >
+                  <Image
+                    src={tile.imageUrl}
+                    alt=""
+                    fill
+                    className="object-contain"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 33vw, 16vw"
+                    unoptimized={tile.source === 'feedframer'}
+                  />
+                </a>
+              </MotionPressable>
             ) : (
               <div
                 className="aspect-[4/5] rounded-[2px] border border-line bg-white odd:bg-line/40"
@@ -381,7 +374,12 @@ function SocialGridFromBlock({
           <p className="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
             Offizielle Mitteilungen
           </p>
-          <Stagger as="ul" className="divide-y divide-line border border-line bg-white" inView stagger={0.05}>
+          <Stagger
+            as="ul"
+            className="divide-y divide-line border border-line bg-white"
+            inView
+            stagger={0.05}
+          >
             {notices.slice(0, 3).map((n) => (
               <StaggerItem key={n.path} as="li">
                 <MotionPressable>

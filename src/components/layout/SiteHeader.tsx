@@ -28,14 +28,7 @@ export function SiteHeader({ nav }: Props) {
           prefetch
           className="flex min-w-0 items-center gap-2 rounded-[2px] sm:gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
         >
-          <Image
-            src={logo}
-            alt=""
-            width={44}
-            height={55}
-            className="h-9 w-auto sm:h-11"
-            priority
-          />
+          <Image src={logo} alt="" width={44} height={55} className="h-9 w-auto sm:h-11" priority />
           <div className="min-w-0">
             <div className="font-display text-[17px] font-bold uppercase tracking-wide text-navy sm:text-[19px]">
               FC Karben

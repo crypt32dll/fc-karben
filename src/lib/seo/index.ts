@@ -105,7 +105,10 @@ export function toPostalAddress(raw: string) {
   }
   const loose = trimmed.match(/(\d{5})\s+([A-Za-zÄÖÜäöüß.\-\s]+)$/)
   if (loose) {
-    const street = trimmed.slice(0, loose.index).replace(/[,\s]+$/, '').trim()
+    const street = trimmed
+      .slice(0, loose.index)
+      .replace(/[,\s]+$/, '')
+      .trim()
     return {
       '@type': 'PostalAddress' as const,
       streetAddress: street || undefined,
@@ -130,11 +133,7 @@ export type BreadcrumbCrumb = {
 }
 
 /** Sitewide WebSite + SearchAction (Sitelinks search box when Google shows it). */
-export function buildWebSiteJsonLd(opts: {
-  name: string
-  url: string
-  searchUrlTemplate: string
-}) {
+export function buildWebSiteJsonLd(opts: { name: string; url: string; searchUrlTemplate: string }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -151,10 +150,7 @@ export function buildWebSiteJsonLd(opts: {
   }
 }
 
-export function buildBreadcrumbJsonLd(
-  crumbs: BreadcrumbCrumb[],
-  opts: AbsoluteUrlOptions,
-) {
+export function buildBreadcrumbJsonLd(crumbs: BreadcrumbCrumb[], opts: AbsoluteUrlOptions) {
   const itemListElement = crumbs.map((crumb, index) => {
     const position = index + 1
     const isLast = index === crumbs.length - 1

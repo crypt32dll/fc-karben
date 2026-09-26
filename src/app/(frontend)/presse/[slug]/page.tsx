@@ -45,9 +45,7 @@ export default async function PresseArtikelPage({ params }: Props) {
   const absOpts = { metadataBase: siteUrl }
   const articleUrl = absoluteUrl(post.path, absOpts)
   const image =
-    post.seo?.ogImageUrl ||
-    post.featuredImageUrl ||
-    absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts)
+    post.seo?.ogImageUrl || post.featuredImageUrl || absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts)
   const publisherLogo = absoluteUrl(DEFAULT_OG_IMAGE_PATH, absOpts)
   const category = post.categories?.[0]
 

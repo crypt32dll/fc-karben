@@ -45,9 +45,9 @@ export function MobileNav({ items }: Props) {
         return
       }
       if (e.key !== 'Tab' || !panelRef.current) return
-      const nodes = [
-        ...panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
-      ].filter((n) => !n.hasAttribute('disabled') && n.tabIndex !== -1)
+      const nodes = [...panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+        (n) => !n.hasAttribute('disabled') && n.tabIndex !== -1,
+      )
       if (!nodes.length) return
       const first = nodes[0]!
       const last = nodes[nodes.length - 1]!

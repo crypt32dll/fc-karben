@@ -120,8 +120,7 @@ export function FussballDeDisclosure({
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Auf Fussball.de öffnen →
-                <span className="sr-only"> (öffnet in neuem Tab)</span>
+                Auf Fussball.de öffnen →<span className="sr-only"> (öffnet in neuem Tab)</span>
               </a>
             </p>
           ) : null}

@@ -12,8 +12,8 @@ import {
   type MatchDto,
   pickNextMatch,
   pickNextMatchForTeam,
-  sanitizeMatchLabel,
   SECOND_TEAM_FUSSBALL_DE_ID,
+  sanitizeMatchLabel,
   THIRD_TEAM_FUSSBALL_DE_ID,
 } from './dto'
 import { fussballDeMatchFeedSource } from './fussball-de'

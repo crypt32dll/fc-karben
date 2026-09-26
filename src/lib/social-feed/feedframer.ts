@@ -30,7 +30,9 @@ export function mapFeedframerPostToTile(post: FeedframerPost, index: number): So
  * Live Instagram tiles via Feedframer (https://feedframer.com/docs/examples/nextjs).
  * Returns [] when API key missing or request fails — caller falls back to CMS tiles.
  */
-export async function fetchFeedframerTiles(limit = FREE_TIER_MAX_PAGE_SIZE): Promise<SocialTileDto[]> {
+export async function fetchFeedframerTiles(
+  limit = FREE_TIER_MAX_PAGE_SIZE,
+): Promise<SocialTileDto[]> {
   const apiKey = process.env.FEEDFRAMER_API_KEY?.trim()
   if (!apiKey) return []
 

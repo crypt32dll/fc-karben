@@ -1,7 +1,7 @@
 import { RenderBlocks } from '@/components/blocks/RenderBlocks'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { getHomepage, getRenderContextData, getSiteSettings } from '@/lib/content-catalog'
 import { clubAppRoutes } from '@/lib/club-paths'
+import { getHomepage, getRenderContextData, getSiteSettings } from '@/lib/content-catalog'
 import { defaultHomepageLayout } from '@/lib/page-builder/default-homepage-layout'
 import { absoluteUrl, buildWebSiteJsonLd } from '@/lib/seo'
 import { getPublicSiteURL } from '@/lib/seo/generate'

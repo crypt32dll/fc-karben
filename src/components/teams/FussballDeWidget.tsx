@@ -24,12 +24,7 @@ const TYPE_LABEL: Record<string, string> = {
  * We mount the iframe ourselves because widgets.js only scans once on
  * script load — that breaks React Strict Mode and tab remounts.
  */
-export function FussballDeWidget({
-  dataId,
-  type = 'team-matches',
-  title,
-  className,
-}: Props) {
+export function FussballDeWidget({ dataId, type = 'team-matches', title, className }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const reactId = useId().replace(/:/g, '')
   const iframeTitle = title || `Fussball.de ${TYPE_LABEL[type] || 'Widget'}`
