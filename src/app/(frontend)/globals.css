@@ -143,6 +143,16 @@
     filter: brightness(0.94);
   }
 
+  /* Body copy in CMS text: a line of air between paragraphs, more before the next heading. */
+  .prose p + p,
+  .prose p + :is(ul, ol) {
+    margin-top: 1rem;
+  }
+
+  .prose p + :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 2.75rem;
+  }
+
   /* Default / Lexical horizontal rules */
   hr,
   .prose hr {
