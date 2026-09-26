@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeFussballDeMatch, pickNextMatch } from '../../src/lib/match-feed/dto'
+import {
+  normalizeFussballDeMatch,
+  pickNextMatch,
+  pickNextMatchForTeam,
+} from '../../src/lib/match-feed/dto'
 import { parseBerlinKickoff } from '../../src/lib/match-feed/kickoff'
 import {
   extractFussballDeTeamId,
@@ -66,6 +70,39 @@ describe('MatchFeed', () => {
     expect(next?.externalId).toBe('sooner')
     expect(next?.kickoff).toBeInstanceOf(Date)
     expect(next?.kickoff.toISOString()).toBe('2026-10-04T13:30:00.000Z')
+  })
+
+  it('picks the next fixture per Mannschaft', () => {
+    const now = new Date('2026-10-01T12:00:00.000Z')
+    const matches = [
+      {
+        externalId: 'first-later',
+        kickoff: '2026-10-10T13:30:00.000Z',
+        homeName: 'FC Karben',
+        awayName: 'Later',
+        status: 'scheduled' as const,
+        teamSlug: '1-mannschaft',
+      },
+      {
+        externalId: 'second-next',
+        kickoff: '2026-10-04T14:00:00.000Z',
+        homeName: 'FC Karben II',
+        awayName: 'Kreisliga',
+        status: 'scheduled' as const,
+        teamSlug: '2-mannschaft',
+      },
+      {
+        externalId: 'first-next',
+        kickoff: '2026-10-05T13:30:00.000Z',
+        homeName: 'FC Karben',
+        awayName: 'Sooner',
+        status: 'scheduled' as const,
+        teamSlug: '1-mannschaft',
+      },
+    ]
+    expect(pickNextMatchForTeam(matches, '1-mannschaft', now)?.externalId).toBe('first-next')
+    expect(pickNextMatchForTeam(matches, '2-mannschaft', now)?.externalId).toBe('second-next')
+    expect(pickNextMatchForTeam(matches, '3-mannschaft', now)).toBeNull()
   })
 
   it('parses Berlin kickoff from fussball.de labels', () => {

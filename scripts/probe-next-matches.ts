@@ -1,67 +1,42 @@
+import { clubTeams } from '../src/lib/club-paths'
+import { syncMatchFeed } from '../src/lib/match-feed'
 import { getPayloadClient } from '../src/lib/payload'
 
 const payload = await getPayloadClient()
 
-const teams = await payload.find({
+const found = await payload.find({
   collection: 'teams',
-  limit: 20,
+  where: { slug: { equals: clubTeams.second.slug } },
+  limit: 1,
   depth: 0,
   overrideAccess: true,
 })
+const team = found.docs[0]
+if (!team) {
+  console.error('2. Mannschaft missing')
+  process.exit(1)
+}
 
-console.log(
-  'teams',
-  JSON.stringify(
-    teams.docs.map((t) => ({
-      id: t.id,
-      slug: t.slug,
-      name: t.name,
-      syncMatches: t.syncMatches,
-      fussballDeId: t.fussballDeId,
-      status: '_status' in t ? t._status : undefined,
-    })),
-    null,
-    2,
-  ),
-)
-
-const matches = await payload.find({
-  collection: 'matches',
-  where: { status: { in: ['scheduled', 'live'] } },
-  sort: 'kickoff',
-  limit: 12,
-  depth: 1,
+await payload.update({
+  collection: 'teams',
+  id: team.id,
+  data: { syncMatches: true, _status: 'published' },
+  draft: false,
   overrideAccess: true,
+  context: { disableRevalidate: true },
 })
+console.log('enabled syncMatches', { id: team.id, slug: team.slug })
 
+const results = await syncMatchFeed(payload)
 console.log(
-  'upcoming',
   JSON.stringify(
-    matches.docs.map((m) => ({
-      home: m.homeName,
-      away: m.awayName,
-      kickoff: m.kickoff,
-      team:
-        m.team && typeof m.team === 'object'
-          ? { slug: m.team.slug, name: m.team.name }
-          : m.team,
+    results.map((row) => ({
+      teamId: row.teamId,
+      fetched: row.fetched,
+      created: row.created,
+      updated: row.updated,
+      nextExternalId: row.nextExternalId,
     })),
-    null,
-    2,
-  ),
-)
-
-const homepage = await payload.findGlobal({
-  slug: 'homepage',
-  depth: 0,
-  overrideAccess: true,
-})
-
-const layout = Array.isArray(homepage.layout) ? homepage.layout : []
-console.log(
-  'scoreboard blocks',
-  JSON.stringify(
-    layout.filter((b) => b && typeof b === 'object' && 'blockType' in b && b.blockType === 'scoreboard'),
     null,
     2,
   ),

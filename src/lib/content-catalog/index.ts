@@ -3,7 +3,11 @@ import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 
 import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/revalidate'
-import { getNextMatch as getNextMatchFromFeed, type MatchDto } from '../match-feed'
+import {
+  getNextMatch as getNextMatchFromFeed,
+  getScoreboardFixtures,
+  type MatchDto,
+} from '../match-feed'
 import type { RedirectRule } from '../redirects'
 import { resolveRedirect } from '../redirects'
 import { toNextMetadata } from '../seo'
@@ -235,18 +239,18 @@ export async function getNextMatch(): Promise<MatchDto | null> {
 
 /** Load shared block context once per page render. */
 export async function getRenderContextData() {
-  const [teams, sponsors, socialTiles, { posts }, nextMatch] = await Promise.all([
+  const [teams, sponsors, socialTiles, { posts }, nextFixtures] = await Promise.all([
     listMannschaften(),
     listSponsoren(),
     listSocialTiles(),
     listBeitrage({ limit: 6 }),
-    getNextMatch(),
+    getScoreboardFixtures(),
   ])
   return {
     teams,
     sponsors,
     socialTiles,
-    nextMatch,
+    nextFixtures,
     notices: posts.map((p) => ({
       title: p.title,
       publishedAt: p.publishedAt,

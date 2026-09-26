@@ -546,7 +546,7 @@ export interface Team {
    */
   reportCategorySlug?: string | null;
   /**
-   * Nur für die 1. Mannschaft aktivieren
+   * Nächstes Spiel auf der Startseite (1. und 2. Mannschaft).
    */
   syncMatches?: boolean | null;
   meta?: {

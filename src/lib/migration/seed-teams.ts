@@ -52,6 +52,7 @@ export const DEFAULT_TEAMS: SeedTeam[] = [
     widgetTabelleId: 'c49682d4-7ae6-4a19-883b-faf2ea8dd8bc',
     widgetSpielberichteId: '142f5fa1-52e8-45fc-95ba-745867b0cba9',
     reportCategorySlug: 'spielberichte-2-mannschaft',
+    syncMatches: true,
     path: '/2-mannschaft',
   }),
   teamFromUrl({

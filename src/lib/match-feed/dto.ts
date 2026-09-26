@@ -9,6 +9,8 @@ export type MatchDto = {
   awayScore?: number | null
   status: 'scheduled' | 'live' | 'finished' | 'cancelled'
   sourceUrl?: string
+  /** Mannschaft slug when the fixture was loaded from the CMS. */
+  teamSlug?: string
 }
 
 export type MatchFeedSource = {
@@ -37,6 +39,18 @@ export function pickNextMatch(
   const next = upcoming[0]
   if (!next) return null
   return { ...next.match, kickoff: new Date(next.time) }
+}
+
+/** Next upcoming fixture for one Mannschaft slug. */
+export function pickNextMatchForTeam(
+  matches: Array<Omit<MatchDto, 'kickoff'> & { kickoff: MatchKickoff }>,
+  teamSlug: string,
+  now = new Date(),
+): MatchDto | null {
+  return pickNextMatch(
+    matches.filter((match) => match.teamSlug === teamSlug),
+    now,
+  )
 }
 
 export function normalizeFussballDeMatch(raw: {
@@ -74,3 +88,6 @@ export const emptyMatchFeedSource: MatchFeedSource = {
 
 /** 1. Mannschaft FC Karben — season 26/27 team-id on fussball.de */
 export const FIRST_TEAM_FUSSBALL_DE_ID = '01OT7G9AUK000000VV0AG80NVT74RFIN'
+
+/** 2. Mannschaft FC Karben — season 26/27 team-id on fussball.de */
+export const SECOND_TEAM_FUSSBALL_DE_ID = '01OT7GCS8S000000VV0AG80NVT74RFIN'

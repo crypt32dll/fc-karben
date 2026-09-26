@@ -37,8 +37,8 @@ export function defaultHomepageLayout(homepage?: HomepageHeroSource | null): Pag
     {
       blockType: 'scoreboard',
       id: 'default-scoreboard',
-      label: 'Nächstes Spiel',
-      fallbackText: 'Spielplan wird aus Fussball.de synchronisiert (1. Mannschaft)',
+      label: 'Nächste Spiele',
+      fallbackText: 'Spielplan folgt',
     },
     {
       blockType: 'teamGrid',

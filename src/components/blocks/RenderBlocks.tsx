@@ -4,9 +4,9 @@ import type { ReactNode } from 'react'
 import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { LexicalContent } from '@/components/cms/LexicalContent'
 import { MotionPressable, Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
-import { clubAppRoutes, hrefForPage } from '@/lib/club-paths'
+import { clubAppRoutes, clubTeams, hrefForPage } from '@/lib/club-paths'
 import type { CatalogSponsor, CatalogTeam } from '@/lib/content-catalog'
-import type { MatchDto } from '@/lib/match-feed'
+import type { ScoreboardFixture } from '@/lib/match-feed'
 import type {
   BoardBlockView,
   CtaBlockView,
@@ -25,7 +25,7 @@ import type {
 import { instagramProfileUrl, type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
 
 export type RenderContext = {
-  nextMatch?: MatchDto | null
+  nextFixtures?: ScoreboardFixture[]
   socialTiles?: SocialTileDto[]
   notices?: Array<{
     title: string
@@ -69,7 +69,13 @@ export function RenderBlocks({
           case 'teamGrid':
             return <TeamGridFromBlock key={key} block={block} teams={context.teams || []} />
           case 'scoreboard':
-            return <ScoreboardFromBlock key={key} block={block} match={context.nextMatch ?? null} />
+            return (
+              <ScoreboardFromBlock
+                key={key}
+                block={block}
+                fixtures={context.nextFixtures}
+              />
+            )
           case 'socialGrid':
             return (
               <SocialGridFromBlock
@@ -216,40 +222,62 @@ function TeamGridFromBlock({ block, teams }: { block: TeamGridBlockView; teams: 
   )
 }
 
+const formatKickoff = (kickoff: Date): string =>
+  kickoff.toLocaleString('de-DE', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Berlin',
+  })
+
+const defaultScoreboardRows = (): ScoreboardFixture[] => [
+  { teamSlug: clubTeams.first.slug, teamLabel: clubTeams.first.label, match: null },
+  { teamSlug: clubTeams.second.slug, teamLabel: clubTeams.second.label, match: null },
+]
+
 function ScoreboardFromBlock({
   block,
-  match,
+  fixtures,
 }: {
   block: ScoreboardBlockView
-  match: MatchDto | null
+  fixtures?: ScoreboardFixture[]
 }) {
+  const rows = fixtures?.length ? fixtures : defaultScoreboardRows()
   return (
     <div className="border-t border-white/12 bg-navy-deep text-white">
-      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 px-8 py-5">
-        <span className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-[#cfd0e8]">
-          {block.label || 'Nächstes Spiel'}
+      <div className="mx-auto flex max-w-[1120px] flex-col gap-4 px-8 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+        <span className="shrink-0 font-display text-xs font-semibold uppercase tracking-[0.14em] text-[#cfd0e8]">
+          {block.label || 'Nächste Spiele'}
         </span>
-        {match ? (
-          <div className="flex flex-wrap items-center gap-5 font-semibold">
-            <span>{match.homeName}</span>
-            <span className="font-display text-xl text-[#cfd0e8]">VS</span>
-            <span>{match.awayName}</span>
-            <span className="text-[13px] font-normal text-[#cfd0e8]">
-              {match.kickoff.toLocaleString('de-DE', {
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-              {match.venue ? ` · ${match.venue}` : ''}
-            </span>
-          </div>
-        ) : (
-          <span className="text-[13px] text-[#cfd0e8]">
-            {block.fallbackText || 'Spielplan folgt'}
-          </span>
-        )}
+        <ul className="flex min-w-0 flex-1 flex-col divide-y divide-white/12 sm:max-w-[760px]">
+          {rows.map((row) => (
+            <li
+              key={row.teamSlug}
+              className="flex flex-wrap items-center gap-x-5 gap-y-1 py-3 first:pt-0 last:pb-0"
+            >
+              <span className="min-w-[7.5rem] font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#b9bade]">
+                {row.teamLabel}
+              </span>
+              {row.match ? (
+                <>
+                  <span className="font-semibold">{row.match.homeName}</span>
+                  <span className="font-display text-xl text-[#cfd0e8]">VS</span>
+                  <span className="font-semibold">{row.match.awayName}</span>
+                  <span className="text-[13px] font-normal text-[#cfd0e8]">
+                    {formatKickoff(row.match.kickoff)}
+                    {row.match.venue ? ` · ${row.match.venue}` : ''}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[13px] text-[#cfd0e8]">
+                  {block.fallbackText || 'Spielplan folgt'}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )
