@@ -8,7 +8,11 @@ import type { RedirectRule } from '../redirects'
 import { resolveRedirect } from '../redirects'
 import { toNextMetadata } from '../seo'
 import { getPublicSiteURL } from '../seo/generate'
-import type { SocialTileDto } from '../social-feed'
+import {
+  type SocialTileDto,
+  resolveSocialTiles,
+  SOCIAL_FEED_REVALIDATE_SECONDS,
+} from '../social-feed'
 import {
   findBeitragBySlug,
   findBeitrage,
@@ -167,10 +171,18 @@ export async function listSponsoren(): Promise<CatalogSponsor[]> {
 }
 
 export async function listSocialTiles(): Promise<SocialTileDto[]> {
-  return unstable_cache(() => findSocialTiles(), ['list-social-tiles'], {
-    revalidate: CATALOG_REVALIDATE,
-    tags: [CACHE_TAGS.socialTiles],
-  })()
+  return unstable_cache(
+    () =>
+      resolveSocialTiles({
+        limit: 12,
+        cmsTiles: findSocialTiles,
+      }),
+    ['list-social-tiles'],
+    {
+      revalidate: SOCIAL_FEED_REVALIDATE_SECONDS,
+      tags: [CACHE_TAGS.socialTiles],
+    },
+  )()
 }
 
 export async function getSiteSettings(): Promise<CatalogSiteSettings | null> {

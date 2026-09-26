@@ -15,13 +15,28 @@ export type MatchFeedSource = {
   fetchUpcoming: (teamId: string) => Promise<MatchDto[]>
 }
 
+/** `unstable_cache` JSON-round-trips Dates into ISO strings. */
+export type MatchKickoff = Date | string
+
+export const asKickoffDate = (kickoff: MatchKickoff): Date =>
+  kickoff instanceof Date ? kickoff : new Date(kickoff)
+
+const kickoffMs = (kickoff: MatchKickoff): number => asKickoffDate(kickoff).getTime()
+
 /** Pick the next upcoming match (kickoff >= now − 3h grace), or null */
-export function pickNextMatch(matches: MatchDto[], now = new Date()): MatchDto | null {
+export function pickNextMatch(
+  matches: Array<Omit<MatchDto, 'kickoff'> & { kickoff: MatchKickoff }>,
+  now = new Date(),
+): MatchDto | null {
+  const graceMs = 3 * 60 * 60 * 1000
   const upcoming = matches
     .filter((m) => m.status === 'scheduled' || m.status === 'live')
-    .filter((m) => m.kickoff.getTime() >= now.getTime() - 3 * 60 * 60 * 1000)
-    .sort((a, b) => a.kickoff.getTime() - b.kickoff.getTime())
-  return upcoming[0] ?? null
+    .map((m) => ({ match: m, time: kickoffMs(m.kickoff) }))
+    .filter((row) => !Number.isNaN(row.time) && row.time >= now.getTime() - graceMs)
+    .sort((a, b) => a.time - b.time)
+  const next = upcoming[0]
+  if (!next) return null
+  return { ...next.match, kickoff: new Date(next.time) }
 }
 
 export function normalizeFussballDeMatch(raw: {

@@ -5,7 +5,7 @@ import { revalidateCatalogPaths, revalidateCatalogTags } from '../cache/revalida
 import { CACHE_TAGS, CATALOG_REVALIDATE } from '../cache/tags'
 import { createLogger } from '../logger'
 import { getPayloadClient } from '../payload'
-import { FIRST_TEAM_FUSSBALL_DE_ID, type MatchDto, pickNextMatch } from './dto'
+import { asKickoffDate, FIRST_TEAM_FUSSBALL_DE_ID, type MatchDto, pickNextMatch } from './dto'
 import { fussballDeMatchFeedSource } from './fussball-de'
 import { extractFussballDeTeamId } from './parse-html'
 
@@ -127,12 +127,13 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
   return results
 }
 
-/** Upcoming fixtures from CMS (tag-cached). */
+/** Upcoming fixtures from CMS (tag-cached). Dates are revived after the JSON cache. */
 export async function listUpcomingMatches(): Promise<MatchDto[]> {
-  return unstable_cache(() => loadUpcomingMatches(), ['upcoming-matches'], {
+  const cached = await unstable_cache(() => loadUpcomingMatches(), ['upcoming-matches'], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.matches],
   })()
+  return cached.map((match) => ({ ...match, kickoff: asKickoffDate(match.kickoff) }))
 }
 
 /** Scoreboard: CMS list + wall-clock pick (no live fussball.de on pageview). */

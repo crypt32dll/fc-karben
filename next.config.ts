@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'fc-karben.de', pathname: '/wp-content/**' },
       { protocol: 'https', hostname: 'www.fc-karben.de', pathname: '/wp-content/**' },
       { protocol: 'https', hostname: 'media.fc-karben.de', pathname: '/**' },
+      // Instagram / Feedframer social tiles (Feedframer tiles also use unoptimized)
+      { protocol: 'https', hostname: '*.cdninstagram.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'cdninstagram.com', pathname: '/**' },
+      { protocol: 'https', hostname: '*.fbcdn.net', pathname: '/**' },
+      { protocol: 'https', hostname: 'feedframer.com', pathname: '/**' },
+      { protocol: 'https', hostname: '*.feedframer.com', pathname: '/**' },
     ],
     localPatterns: [
       { pathname: '/api/media/file/**' },

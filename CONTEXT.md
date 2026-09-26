@@ -16,7 +16,7 @@ Shared language for the codebase. Prefer these terms in code, ADRs, and reviews.
 | **ContentCatalog** | Read seam for the ClubSite (no Payload leaks into UI); maps Lexical → **CatalogBody**; Data Cache is **tag-only** via one draft+cache policy helper; respects Next **draftMode** for Preview / Live Preview |
 | **CatalogBody** | ClubSite-owned rich-text DTO validated at the ContentCatalog / Page Builder seam |
 | **SeoSurface** | Metadata, JSON-LD, sitemap, robots |
-| **SocialFeed** | Homepage social tiles; Phase 1 = manual CMS tiles |
+| **SocialFeed** | Homepage social tiles; **Feedframer** live Instagram when `FEEDFRAMER_API_KEY` is set, else manual CMS `social-tiles` |
 | **MigrationPipeline** | WXR extract → transform → load into Payload (Mannschaft seed lives here) |
 | **ClubSite** | Public Next.js App Router frontend |
 | **Page Builder** | Owns block meaning: LayoutView validation + searchable plain text; Payload `src/blocks` = CMS schema; `RenderBlocks` paints only (ADR-0002) |

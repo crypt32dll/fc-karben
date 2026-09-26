@@ -9,7 +9,11 @@ import {
   robotsFromFlags,
   toNextMetadata,
 } from '../../src/lib/seo/index'
-import { selectSocialTiles } from '../../src/lib/social-feed/index'
+import {
+  mapFeedframerPostToTile,
+  resolveSocialTiles,
+  selectSocialTiles,
+} from '../../src/lib/social-feed/index'
 
 describe('SeoSurface', () => {
   it('builds title template', () => {
@@ -71,6 +75,52 @@ describe('SocialFeed', () => {
       2,
     )
     expect(tiles.map((t) => t.id)).toEqual(['1', '2'])
+  })
+
+  it('maps Feedframer posts to tiles (prefers thumbnail for video)', () => {
+    const image = mapFeedframerPostToTile(
+      {
+        id: 'p1',
+        caption: 'Tor!',
+        mediaType: 'IMAGE',
+        mediaUrl: 'https://cdn.example/a.jpg',
+        thumbnailUrl: null,
+        permalink: 'https://instagram.com/p/1',
+        timestamp: '2026-01-01T00:00:00Z',
+        likeCount: 1,
+        commentsCount: 0,
+      },
+      0,
+    )
+    expect(image).toMatchObject({
+      id: 'ff-p1',
+      imageUrl: 'https://cdn.example/a.jpg',
+      url: 'https://instagram.com/p/1',
+      source: 'feedframer',
+    })
+
+    const video = mapFeedframerPostToTile(
+      {
+        id: 'p2',
+        caption: null,
+        mediaType: 'REELS',
+        mediaUrl: 'https://cdn.example/v.mp4',
+        thumbnailUrl: 'https://cdn.example/thumb.jpg',
+        permalink: 'https://instagram.com/p/2',
+        timestamp: '2026-01-01T00:00:00Z',
+        likeCount: null,
+        commentsCount: null,
+      },
+      1,
+    )
+    expect(video?.imageUrl).toBe('https://cdn.example/thumb.jpg')
+  })
+
+  it('resolveSocialTiles falls back to CMS when live feed empty', async () => {
+    const tiles = await resolveSocialTiles({
+      cmsTiles: async () => [{ id: 'cms-1', sortOrder: 0, imageUrl: 'cms.jpg', source: 'cms' }],
+    })
+    expect(tiles[0]?.id).toBe('cms-1')
   })
 })
 

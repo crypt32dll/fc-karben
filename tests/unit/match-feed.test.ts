@@ -43,6 +43,32 @@ describe('MatchFeed', () => {
     expect(next?.externalId).toBe('next')
   })
 
+  it('picks next match when kickoff was JSON-serialized to a string', () => {
+    const now = new Date('2026-10-01T12:00:00.000Z')
+    const next = pickNextMatch(
+      [
+        {
+          externalId: 'later',
+          kickoff: '2026-11-01T15:00:00.000Z',
+          homeName: 'FC Karben',
+          awayName: 'Later',
+          status: 'scheduled',
+        },
+        {
+          externalId: 'sooner',
+          kickoff: '2026-10-04T13:30:00.000Z',
+          homeName: 'FC Karben',
+          awayName: 'Sooner',
+          status: 'scheduled',
+        },
+      ],
+      now,
+    )
+    expect(next?.externalId).toBe('sooner')
+    expect(next?.kickoff).toBeInstanceOf(Date)
+    expect(next?.kickoff.toISOString()).toBe('2026-10-04T13:30:00.000Z')
+  })
+
   it('parses Berlin kickoff from fussball.de labels', () => {
     const kickoff = parseBerlinKickoff('So, 27.09.26', '15:30')
     expect(kickoff).not.toBeNull()

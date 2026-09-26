@@ -22,7 +22,7 @@ import type {
   SponsorsBlockView,
   TeamGridBlockView,
 } from '@/lib/page-builder'
-import { type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
+import { type SocialTileDto, instagramProfileUrl, selectSocialTiles } from '@/lib/social-feed'
 
 export type RenderContext = {
   nextMatch?: MatchDto | null
@@ -274,8 +274,10 @@ function SocialGridFromBlock({
           <h2 className="text-[38px] text-navy">{block.heading || 'Auf Social Media'}</h2>
         </div>
         <a
-          href="https://www.instagram.com/fckarben/"
+          href={instagramProfileUrl()}
           className="inline-flex min-h-11 items-center border-b border-navy pb-0.5 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-70"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           Mehr auf Instagram →
         </a>
@@ -294,8 +296,10 @@ function SocialGridFromBlock({
           tile.imageUrl ? (
             <a
               key={tile.id}
-              href={tile.url || 'https://www.instagram.com/fckarben/'}
+              href={tile.url || instagramProfileUrl()}
               className="relative aspect-square overflow-hidden bg-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
+              rel="noopener noreferrer"
+              target="_blank"
             >
               <Image
                 src={tile.imageUrl}
@@ -304,6 +308,7 @@ function SocialGridFromBlock({
                 className="object-cover"
                 loading="lazy"
                 sizes="(max-width: 768px) 50vw, 33vw"
+                unoptimized={tile.source === 'feedframer'}
               />
             </a>
           ) : (
