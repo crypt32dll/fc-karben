@@ -60,7 +60,7 @@ const HTML = `
 <p>Systemnachrichten des Redaktionssystems, etwa zum Zurücksetzen eines Passworts, können über Resend, Inc. (USA) versendet werden. Das wird nicht durch den normalen Besuch der Website ausgelöst. Datenschutzerklärung: <a href="https://resend.com/legal/privacy-policy">resend.com/legal/privacy-policy</a>.</p>
 
 <h2>Fehleranalyse</h2>
-<p>Der Server kann technische Fehlermeldungen an Sentry (Functional Software, Inc., USA) senden, etwa die aufgerufene Adresse, den Zeitpunkt und Diagnosedaten. Im Browser der Besucher wird dafür kein Skript geladen. Es findet kein Werbe-Tracking statt. Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Datenschutzerklärung: <a href="https://sentry.io/privacy/">sentry.io/privacy</a>.</p>
+<p>Technische Fehlermeldungen können an Sentry (Functional Software, Inc., USA) gesendet werden, etwa die aufgerufene Adresse, den Zeitpunkt und Diagnosedaten (Server und, sofern aktiviert, Browser). Es findet kein Werbe-Tracking und kein Session-Recording statt. Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Datenschutzerklärung: <a href="https://sentry.io/privacy/">sentry.io/privacy</a>.</p>
 
 <h2>Veröffentlichte Kontaktdaten</h2>
 <p>Namen und Kontaktdaten von Vorstand sowie Trainerinnen und Trainern veröffentlichen wir, weil diese Personen den Verein nach außen vertreten. Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Wer nicht mehr genannt werden möchte, schreibt an <a href="mailto:info@fc-karben.de">info@fc-karben.de</a>.</p>

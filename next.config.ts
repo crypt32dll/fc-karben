@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next'
 import { withPayload } from '@payloadcms/next/withPayload'
+import { withSentryConfig } from '@sentry/nextjs/config'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -42,4 +43,23 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+const withPayloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })
+
+export default withSentryConfig(withPayloadConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  // Avoid ad-blockers blocking the Sentry ingest host
+  tunnelRoute: '/monitoring',
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+  sourcemaps: {
+    // Skip upload when no auth token (local / preview without secrets)
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+})

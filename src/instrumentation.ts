@@ -1,13 +1,13 @@
 import * as Sentry from '@sentry/nextjs'
 
-const dsn = process.env.SENTRY_DSN
-
-export function register() {
-  if (!dsn) return
-
-  Sentry.init({
-    dsn,
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
-    enabled: Boolean(dsn),
-  })
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config')
+  }
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config')
+  }
 }
+
+/** Capture errors from Server Components, proxy, and route handlers. */
+export const onRequestError = Sentry.captureRequestError
