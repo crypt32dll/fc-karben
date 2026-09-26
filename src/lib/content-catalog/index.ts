@@ -174,7 +174,8 @@ export async function listSocialTiles(): Promise<SocialTileDto[]> {
   return unstable_cache(
     () =>
       resolveSocialTiles({
-        limit: 12,
+        // Feedframer Free tier: max 6 posts per request
+        limit: 6,
         cmsTiles: findSocialTiles,
       }),
     ['list-social-tiles'],

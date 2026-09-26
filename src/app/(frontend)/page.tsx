@@ -2,7 +2,9 @@ import { RenderBlocks } from '@/components/blocks/RenderBlocks'
 import { getHomepage, getRenderContextData } from '@/lib/content-catalog'
 import { defaultHomepageLayout } from '@/lib/page-builder/default-homepage-layout'
 
-export const revalidate = false
+/** Hourly ISR so Instagram / next-match stay fresh without full Cache Components / PPR.
+ * Must be a numeric literal — Next requires `revalidate` to be statically analyzable. */
+export const revalidate = 3600
 
 export default async function HomePage() {
   const [homepage, context] = await Promise.all([getHomepage(), getRenderContextData()])
