@@ -38,11 +38,16 @@ const nextConfig: NextConfig = {
       { pathname: '/favicon.ico' },
     ],
   },
-  webpack: (webpackConfig) => {
+  webpack: (webpackConfig, { dev }) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
       '.mjs': ['.mts', '.mjs'],
+    }
+    // Emit .map files for Sentry upload without public sourceMappingURL
+    // (Sentry webpack plugin is disabled — see withSentryConfig below)
+    if (!dev) {
+      webpackConfig.devtool = 'hidden-source-map'
     }
     return webpackConfig
   },
@@ -86,6 +91,7 @@ export default withSentryConfig(withPayloadConfig, {
   },
   sourcemaps: {
     disable: !process.env.SENTRY_AUTH_TOKEN,
+    deleteSourcemapsAfterUpload: true,
   },
   useRunAfterProductionCompileHook: true,
   errorHandler: (err) => {
