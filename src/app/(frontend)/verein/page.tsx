@@ -24,6 +24,7 @@ const FALLBACK_LINKS: Array<{ key: ClubPageKey; label: string }> = [
   { key: 'mitgliedWerden', label: 'Mitglied werden' },
   { key: 'beitragsstruktur', label: 'Beitragsstruktur' },
   { key: 'platzbelegung', label: 'Platzbelegung' },
+  { key: 'formulare', label: 'Formulare' },
   { key: 'gremien', label: 'Gremien' },
 ]
 

@@ -34,15 +34,12 @@ export function defaultPrimaryNav(): NavItem[] {
         { label: 'Mitglied werden', href: hrefForPage('mitgliedWerden') },
         { label: 'Beitragsstruktur', href: hrefForPage('beitragsstruktur') },
         { label: 'Platzbelegung', href: hrefForPage('platzbelegung') },
+        { label: 'Formulare', href: hrefForPage('formulare') },
       ],
     },
     {
       label: 'Presse',
       href: hrefForPage('presse'),
-      children: [
-        { label: 'Alle Beiträge', href: hrefForPage('presse') },
-        { label: 'Spielberichte', href: hrefForPage('spielberichte') },
-      ],
     },
     { label: 'Sponsoren', href: hrefForPage('sponsoren') },
     { label: 'Anfahrt', href: hrefForPage('anfahrt') },
@@ -60,6 +57,7 @@ export function defaultFooterNav(): Array<{ heading: string; items: NavChild[] }
         { label: 'Mitglied werden', href: hrefForPage('mitgliedWerden') },
         { label: 'Beitragsstruktur', href: hrefForPage('beitragsstruktur') },
         { label: 'Platzbelegung', href: hrefForPage('platzbelegung') },
+        { label: 'Formulare', href: hrefForPage('formulare') },
       ],
     },
     {
@@ -73,7 +71,6 @@ export function defaultFooterNav(): Array<{ heading: string; items: NavChild[] }
       heading: 'Kontakt',
       items: [
         { label: 'Anfahrt', href: hrefForPage('anfahrt') },
-        { label: 'Formulare', href: hrefForPage('formulare') },
         { label: 'Suche', href: clubAppRoutes.search },
       ],
     },

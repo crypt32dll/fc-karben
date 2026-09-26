@@ -21,6 +21,9 @@ describe('navigation defaults', () => {
   it('marks verein child paths active on parent', () => {
     const verein = defaultPrimaryNav().find((i) => i.label === 'Verein')!
     expect(verein.children?.some((c) => c.href === '/verein/platzbelegung')).toBe(true)
+    expect(verein.children?.some((c) => c.label === 'Formulare' && c.href === '/formulare')).toBe(
+      true,
+    )
     expect(navItemIsActive(verein, '/verein/vorstand')).toBe(true)
     expect(navItemIsActive(verein, '/verein/platzbelegung')).toBe(true)
     expect(navItemIsActive(verein, '/presse')).toBe(false)
