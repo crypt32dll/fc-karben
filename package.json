@@ -42,6 +42,7 @@
     "@payloadcms/ui": "3.82.1",
     "@radix-ui/react-slot": "^1.3.3",
     "@sentry/nextjs": "^11.0.0",
+    "@sentry/profiling-node": "11.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cross-env": "10.1.0",
@@ -90,7 +91,8 @@
       "esbuild",
       "unrs-resolver",
       "ssh2",
-      "cpu-features"
+      "cpu-features",
+      "@sentry/node-cpu-profiler"
     ]
   }
 }

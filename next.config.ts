@@ -38,9 +38,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
-  // ssh2 loads a native .node addon (sshcrypto.node). Turbopack cannot place that
-  // binary in an ESM chunk, so the SFTP client must stay a Node require.
-  serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
+  // Native .node addons must stay external (Turbopack/webpack cannot embed them).
+  serverExternalPackages: ['ssh2', 'ssh2-sftp-client', '@sentry/profiling-node'],
+  // Required for Browser Profiling (JS Self-Profiling API)
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [{ key: 'Document-Policy', value: 'js-profiling' }],
+      },
+    ]
+  },
 }
 
 const withPayloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })

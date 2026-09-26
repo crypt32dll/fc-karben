@@ -12,7 +12,7 @@ export function sentryInitOptions(): Parameters<typeof Sentry.init>[0] {
     enabled: Boolean(dsn),
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
-    // Error monitoring + structured Logs — no session replay / marketing tracking
+    // Error monitoring + structured Logs (Session Replay is client-only in instrumentation-client)
     sendDefaultPii: false,
     // Capture console.warn/error as Sentry Logs (info/debug stay local)
     integrations: (defaults) => [
