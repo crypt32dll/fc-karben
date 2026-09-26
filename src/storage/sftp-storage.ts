@@ -12,8 +12,11 @@ import SftpClient from 'ssh2-sftp-client'
 export type SftpStorageOptions = {
   /**
    * Collections that use SFTP. Pass `true` or `{ prefix?: string }`.
+   * Includes plugin collections (e.g. import-export `exports` / `imports`).
    */
-  collections: Partial<Record<UploadCollectionSlug, Omit<CollectionOptions, 'adapter'> | true>>
+  collections: Partial<
+    Record<UploadCollectionSlug | (string & {}), Omit<CollectionOptions, 'adapter'> | true>
+  >
   /**
    * @default true when SFTP_* env is set
    */

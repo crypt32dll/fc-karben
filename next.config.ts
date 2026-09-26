@@ -79,7 +79,8 @@ export default withSentryConfig(withPayloadConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   sentryUrl: process.env.SENTRY_URL || 'https://de.sentry.io',
   silent: false,
-  widenClientFileUpload: false,
+  // App Router has no `.next/static/chunks/pages` — widen uploads `static/chunks` instead
+  widenClientFileUpload: true,
   tunnelRoute: '/monitoring',
   // Skip build-time module rewriting (this is what hung Vercel for 40+ min)
   buildTimeInstrumentation: false,
@@ -95,6 +96,8 @@ export default withSentryConfig(withPayloadConfig, {
   },
   useRunAfterProductionCompileHook: true,
   errorHandler: (err) => {
+    // App-Router-only apps have no pages/ chunks; Sentry still probes that path sometimes
+    if (/chunks\/pages.*does not exist/i.test(err.message)) return
     console.warn('[sentry] build plugin error (continuing):', err.message)
   },
 })

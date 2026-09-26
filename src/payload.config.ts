@@ -91,6 +91,9 @@ export default buildConfig({
           sftpStorage({
             collections: {
               media: true,
+              // import-export plugin upload collections (required on Vercel)
+              exports: { prefix: 'payload-exports' },
+              imports: { prefix: 'payload-imports' },
             },
           }),
         ]
