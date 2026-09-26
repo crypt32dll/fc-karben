@@ -53,28 +53,30 @@ const nextConfig: NextConfig = {
 
 const withPayloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })
 
+// Runtime Sentry (instrumentation*.ts) stays fully active.
+// withSentryConfig's webpack instrumentation hangs this project's build on
+// "Creating an optimized production build" — keep tunnel + optional sourcemaps,
+// but disable the webpack rewrite/instrumentation plugins that cause the hang.
 export default withSentryConfig(withPayloadConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  // EU region (DSN host is ingest.de.sentry.io)
   sentryUrl: process.env.SENTRY_URL || 'https://de.sentry.io',
-  // Show upload progress on Vercel so hangs are visible in logs
   silent: false,
-  // false = much faster builds; app source maps still upload
   widenClientFileUpload: false,
-  // Avoid ad-blockers blocking the Sentry ingest host
   tunnelRoute: '/monitoring',
+  // Skip build-time module rewriting (this is what hung Vercel for 40+ min)
+  buildTimeInstrumentation: false,
   webpack: {
+    disableSentryConfig: true,
     treeshake: {
       removeDebugLogging: true,
     },
   },
   sourcemaps: {
-    // Skip upload when no auth token (local / preview without secrets)
     disable: !process.env.SENTRY_AUTH_TOKEN,
   },
-  // Don't fail/hang the Vercel build if Sentry is unreachable
+  useRunAfterProductionCompileHook: true,
   errorHandler: (err) => {
     console.warn('[sentry] build plugin error (continuing):', err.message)
   },
