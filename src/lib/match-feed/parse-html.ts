@@ -10,8 +10,7 @@ export function parseFussballDeMatchplanHtml(html: string): MatchDto[] {
   const rowRe =
     /column-date[\s\S]*?(\w{2}, \d{2}\.\d{2}\.\d{2})[\s\S]*?(\d{2}:\d{2})[\s\S]*?column-team[\s\S]*?<a[^>]*>\s*([^<]+?)\s*<\/a>[\s\S]*?<\/tr>\s*<tr[^>]*>[\s\S]*?club-name">\s*([^<]+?)\s*<[\s\S]*?club-name">\s*([^<]+?)\s*<[\s\S]*?\/spiel\/[^"'/]+\/-\/spiel\/([A-Z0-9]+)/g
 
-  let m: RegExpExecArray | null
-  while ((m = rowRe.exec(html))) {
+  for (const m of html.matchAll(rowRe)) {
     const [, dateLabel, time, competition, home, away, spielId] = m
     const kickoff = parseBerlinKickoff(dateLabel, time)
     if (!kickoff || Number.isNaN(kickoff.getTime())) continue

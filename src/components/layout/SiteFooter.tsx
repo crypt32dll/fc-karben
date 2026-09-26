@@ -1,6 +1,6 @@
 import { ClubLink } from '@/components/ui/ClubLink'
-import { defaultFooterNav, type NavChild } from '@/lib/navigation/defaults'
 import { hrefForPage } from '@/lib/club-paths'
+import { defaultFooterNav, type NavChild } from '@/lib/navigation/defaults'
 
 const footerLinkClass =
   'block min-h-11 py-2.5 text-ink-soft transition-colors motion-reduce:transition-none hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy'
@@ -26,8 +26,7 @@ export function SiteFooter({ columns, email, addressLine }: Props) {
               FC Karben e.V.
             </div>
             <p className="mt-2 max-w-s text-sm leading-relaxed text-ink-soft">
-              {addressLine ||
-                'Günter-Reutzel-Sportfeld · Karl-Liebknecht-Str. 48 · 61184 Karben'}
+              {addressLine || 'Günter-Reutzel-Sportfeld · Karl-Liebknecht-Str. 48 · 61184 Karben'}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-3">
@@ -41,7 +40,11 @@ export function SiteFooter({ columns, email, addressLine }: Props) {
                     </a>
                   ) : null}
                   {col.items.map((item) => (
-                    <ClubLink key={item.href + item.label} href={item.href} className={footerLinkClass}>
+                    <ClubLink
+                      key={item.href + item.label}
+                      href={item.href}
+                      className={footerLinkClass}
+                    >
                       {item.label}
                     </ClubLink>
                   ))}

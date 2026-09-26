@@ -2,8 +2,9 @@
  * Smoke-test: upload a tiny PNG via the SFTP adapter helpers.
  * Usage: pnpm exec tsx scripts/smoke-sftp-upload.ts
  */
-import { loadEnvFile } from 'node:process'
+
 import path from 'node:path'
+import { loadEnvFile } from 'node:process'
 
 import SftpClient from 'ssh2-sftp-client'
 

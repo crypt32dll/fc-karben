@@ -9,9 +9,9 @@ import { resolveRedirect } from '../redirects'
 import { toNextMetadata } from '../seo'
 import { getPublicSiteURL } from '../seo/generate'
 import {
-  type SocialTileDto,
   resolveSocialTiles,
   SOCIAL_FEED_REVALIDATE_SECONDS,
+  type SocialTileDto,
 } from '../social-feed'
 import {
   findBeitragBySlug,

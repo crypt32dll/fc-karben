@@ -186,9 +186,7 @@ export function auditSeoContent(input: {
     issues.push('multiple-h1-in-body')
   }
 
-  const bodyTags = headings
-    .filter((h) => h.source === 'lexical')
-    .map((h) => h.tag)
+  const bodyTags = headings.filter((h) => h.source === 'lexical').map((h) => h.tag)
   if (detectHeadingSkips(bodyTags)) {
     issues.push('heading-level-skip')
     suggestions.push('Überschriften-Hierarchie prüfen (kein Sprung z. B. h2 → h4).')

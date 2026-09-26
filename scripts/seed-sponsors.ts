@@ -45,7 +45,8 @@ const SEED: SeedSponsor[] = [
   {
     name: 'REWE Fuchs Karben',
     group: 'hauptsponsoren',
-    logoUrl: 'https://fc-karben.de/wp-content/uploads/2022/06/2018_04_10-LOGO-REWE-Fuchs-Karben.jpeg',
+    logoUrl:
+      'https://fc-karben.de/wp-content/uploads/2022/06/2018_04_10-LOGO-REWE-Fuchs-Karben.jpeg',
     url: 'https://www.rewe-karben.de/',
     sortOrder: 30,
   },
@@ -122,7 +123,8 @@ const SEED: SeedSponsor[] = [
   {
     name: 'Frank Lindner Zürich',
     group: 'hauptsponsoren',
-    logoUrl: 'https://fc-karben.de/wp-content/uploads/2025/05/20250507_Logo_Frank-Lindner_FC_Karben.jpg',
+    logoUrl:
+      'https://fc-karben.de/wp-content/uploads/2025/05/20250507_Logo_Frank-Lindner_FC_Karben.jpg',
     url: 'https://www.zurich.de/de-de/vor-ort/frank-lindner',
     sortOrder: 140,
   },

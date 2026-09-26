@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { ClubLink } from '@/components/ui/ClubLink'
 import { type NavItem, navItemIsActive } from '@/lib/navigation/defaults'
@@ -78,6 +78,7 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
   useEffect(() => () => clearClose(), [])
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: hover bridge between trigger and menu
     <div
       ref={rootRef}
       className="relative"

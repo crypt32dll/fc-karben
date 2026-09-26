@@ -65,7 +65,7 @@ export function externalMediaStub(url: string): DownloadedFile {
   return {
     data: PNG_1X1,
     mimetype: 'image/png',
-    name: name.replace(/\.[^.]+$/, '') + '.png',
+    name: `${name.replace(/\.[^.]+$/, '')}.png`,
     size: PNG_1X1.length,
   }
 }

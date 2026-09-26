@@ -22,7 +22,7 @@ import type {
   SponsorsBlockView,
   TeamGridBlockView,
 } from '@/lib/page-builder'
-import { type SocialTileDto, instagramProfileUrl, selectSocialTiles } from '@/lib/social-feed'
+import { instagramProfileUrl, type SocialTileDto, selectSocialTiles } from '@/lib/social-feed'
 
 export type RenderContext = {
   nextMatch?: MatchDto | null
@@ -285,13 +285,16 @@ function SocialGridFromBlock({
       <div className="mb-10 grid grid-cols-3 gap-0.5 md:grid-cols-6">
         {(tiles.length
           ? tiles
-          : Array.from({ length: block.maxTiles ?? 6 }, (_, i): SocialTileDto => ({
-              id: `ph-${i}`,
-              imageUrl: null,
-              url: null,
-              caption: null,
-              sortOrder: i,
-            }))
+          : Array.from(
+              { length: block.maxTiles ?? 6 },
+              (_, i): SocialTileDto => ({
+                id: `ph-${i}`,
+                imageUrl: null,
+                url: null,
+                caption: null,
+                sortOrder: i,
+              }),
+            )
         ).map((tile) =>
           tile.imageUrl ? (
             <a

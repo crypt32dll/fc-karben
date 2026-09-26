@@ -18,6 +18,7 @@ import { pathToFileURL } from 'node:url'
 import { getPayload, type Payload } from 'payload'
 
 import { createLogger } from '../src/lib/logger'
+import { normalizePageTitle } from '../src/lib/seo'
 import { META_DESCRIPTION_SOFT_MIN } from '../src/lib/seo/audit-content'
 import {
   generateSeoDescription,
@@ -27,7 +28,6 @@ import {
   truncateSeoDescription,
   truncateSeoTitle,
 } from '../src/lib/seo/generate'
-import { normalizePageTitle } from '../src/lib/seo'
 
 if (existsSync('.env')) {
   loadEnvFile('.env')

@@ -84,8 +84,8 @@ async function main() {
           contactContent,
           // Drop incomplete placeholder rows that block CMS saves (empty role/name).
           contacts: (
-            ((doc as { contacts?: Array<{ role?: string | null; name?: string | null }> | null })
-              .contacts || [])
+            (doc as { contacts?: Array<{ role?: string | null; name?: string | null }> | null })
+              .contacts || []
           ).filter((c) => Boolean(c?.role?.trim() && c?.name?.trim())),
           _status: 'published',
         },

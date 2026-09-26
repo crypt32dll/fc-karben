@@ -139,12 +139,10 @@ function tableCellHtmlRows(html: string): string[][] | null {
   if (!tableMatch) return null
   const rows: string[][] = []
   const trRe = /<tr[\s\S]*?<\/tr>/gi
-  let tr: RegExpExecArray | null
-  while ((tr = trRe.exec(tableMatch[0]))) {
+  for (const tr of tableMatch[0].matchAll(trRe)) {
     const cells: string[] = []
     const cellRe = /<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi
-    let c: RegExpExecArray | null
-    while ((c = cellRe.exec(tr[0]))) {
+    for (const c of tr[0].matchAll(cellRe)) {
       cells.push(c[1])
     }
     if (cells.length) rows.push(cells)

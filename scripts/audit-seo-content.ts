@@ -19,7 +19,11 @@ import { pathToFileURL } from 'node:url'
 import { getPayload, type Payload } from 'payload'
 
 import { createLogger } from '../src/lib/logger'
-import { auditSeoContent, type SeoContentAudit, type SeoIssueCode } from '../src/lib/seo/audit-content'
+import {
+  auditSeoContent,
+  type SeoContentAudit,
+  type SeoIssueCode,
+} from '../src/lib/seo/audit-content'
 
 if (existsSync('.env')) {
   loadEnvFile('.env')
@@ -122,9 +126,7 @@ function printHuman(reports: DocReport[]) {
   for (const r of withIssues) {
     const { audit } = r
     const location = r.path || r.slug || String(r.id)
-    console.log(
-      `\n[${r.collection}] ${location} — "${audit.title || '(ohne Titel)'}"`,
-    )
+    console.log(`\n[${r.collection}] ${location} — "${audit.title || '(ohne Titel)'}"`)
     console.log(
       `  headings: h1=${audit.headingCounts.h1} h2=${audit.headingCounts.h2} h3=${audit.headingCounts.h3} h4=${audit.headingCounts.h4} h5=${audit.headingCounts.h5} | paragraphs=${audit.paragraphCount} | bodyChars=${audit.plainTextLength}`,
     )

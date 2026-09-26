@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
-
-import { parseSponsorLogoSections } from '../../src/lib/content-catalog/sponsor-logos'
 import type { CatalogBody } from '../../src/lib/content-catalog'
+import { parseSponsorLogoSections } from '../../src/lib/content-catalog/sponsor-logos'
 
 describe('parseSponsorLogoSections', () => {
   it('groups logos under headings into sections', () => {

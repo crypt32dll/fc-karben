@@ -297,9 +297,7 @@ export async function findMannschaftBySlug(
       ? {
           ...mapped,
           content: mapCatalogBody(doc.content),
-          contactContent: mapCatalogBody(
-            (doc as { contactContent?: unknown }).contactContent,
-          ),
+          contactContent: mapCatalogBody((doc as { contactContent?: unknown }).contactContent),
           summary: doc.summary || mapped.summary,
           seo: docMeta(doc),
         }

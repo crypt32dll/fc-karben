@@ -1,8 +1,8 @@
 'use client'
 
 import { Menu, X } from 'lucide-react'
-import { useEffect, useId, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { ClubLink } from '@/components/ui/ClubLink'
 import { hrefForPage } from '@/lib/club-paths'

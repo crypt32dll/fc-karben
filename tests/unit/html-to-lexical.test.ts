@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { imgsToLinks, prepareHtmlForLexical, rewriteImgSrcs } from '../../src/lib/migration/html-to-lexical'
+import {
+  imgsToLinks,
+  prepareHtmlForLexical,
+  rewriteImgSrcs,
+} from '../../src/lib/migration/html-to-lexical'
 
 describe('html-to-lexical image rewrite', () => {
   it('converts bare imgs to links', () => {
-    const out = imgsToLinks('<p>Hi <img src="https://fc-karben.de/wp-content/uploads/a.jpg" alt="x"></p>')
+    const out = imgsToLinks(
+      '<p>Hi <img src="https://fc-karben.de/wp-content/uploads/a.jpg" alt="x"></p>',
+    )
     expect(out).not.toMatch(/<img/i)
     expect(out).toContain('<a href="https://fc-karben.de/wp-content/uploads/a.jpg">a.jpg</a>')
   })
@@ -25,10 +31,7 @@ describe('html-to-lexical image rewrite', () => {
         'https://fc-karben.de/wp-content/uploads/a.jpg',
       ],
     ])
-    const out = rewriteImgSrcs(
-      '<img src="https://fc-karben.de/wp-content/uploads/a.jpg">',
-      map,
-    )
+    const out = rewriteImgSrcs('<img src="https://fc-karben.de/wp-content/uploads/a.jpg">', map)
     expect(out).not.toMatch(/<img/i)
     expect(out).toContain('href="https://fc-karben.de/wp-content/uploads/a.jpg"')
   })

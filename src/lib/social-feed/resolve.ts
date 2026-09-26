@@ -1,5 +1,5 @@
-import type { SocialTileDto } from './types'
 import { fetchFeedframerTiles } from './feedframer'
+import type { SocialTileDto } from './types'
 
 export function selectSocialTiles(tiles: SocialTileDto[], max = 6): SocialTileDto[] {
   return [...tiles]

@@ -10,10 +10,7 @@ import { writeFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { createLogger } from '../src/lib/logger'
-import {
-  META_DESCRIPTION_SOFT_MIN,
-  META_TITLE_SOFT_MIN,
-} from '../src/lib/seo/audit-content'
+import { META_DESCRIPTION_SOFT_MIN, META_TITLE_SOFT_MIN } from '../src/lib/seo/audit-content'
 import { SEO_DESCRIPTION_MAX, SEO_TITLE_MAX } from '../src/lib/seo/generate'
 
 const log = createLogger('crawl:seo')
@@ -89,9 +86,13 @@ function titleText(html: string): string | null {
 function h1s(html: string): string[] {
   const out: string[] = []
   const re = /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi
-  let m: RegExpExecArray | null
-  while ((m = re.exec(html))) {
-    out.push(m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim())
+  for (const m of html.matchAll(re)) {
+    out.push(
+      m[1]
+        .replace(/<[^>]+>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    )
   }
   return out
 }
@@ -193,7 +194,7 @@ async function fetchPage(url: string): Promise<PageAudit> {
     })
     const html = await res.text()
     return auditHtml(url, res.status, html)
-  } catch (err) {
+  } catch {
     return {
       url,
       status: 0,
@@ -253,7 +254,9 @@ async function main() {
   const byIssue: Record<string, string[]> = {}
   for (const r of results) {
     for (const code of r.issues) {
-      ;(byIssue[code] ||= []).push(r.url)
+      const list = byIssue[code]
+      if (list) list.push(r.url)
+      else byIssue[code] = [r.url]
     }
   }
 
@@ -268,9 +271,7 @@ async function main() {
         .map(([k, v]) => [k, v.length])
         .sort((a, b) => (b[1] as number) - (a[1] as number)),
     ),
-    byIssue: Object.fromEntries(
-      Object.entries(byIssue).map(([k, v]) => [k, v.slice(0, 40)]),
-    ),
+    byIssue: Object.fromEntries(Object.entries(byIssue).map(([k, v]) => [k, v.slice(0, 40)])),
     samples: withIssues.slice(0, 25).map((r) => ({
       url: r.url,
       status: r.status,

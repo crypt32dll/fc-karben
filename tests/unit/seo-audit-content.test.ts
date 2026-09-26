@@ -6,9 +6,9 @@ import {
   LONG_BODY_PLAIN_MIN,
 } from '../../src/lib/seo/audit-content'
 
-function lexicalDoc(
-  children: Array<Record<string, unknown>>,
-): { root: { type: 'root'; children: unknown[] } } {
+function lexicalDoc(children: Array<Record<string, unknown>>): {
+  root: { type: 'root'; children: unknown[] }
+} {
   return { root: { type: 'root', children } }
 }
 
@@ -53,12 +53,7 @@ describe('seo audit-content', () => {
     const audit = auditSeoContent({
       title: 'Lang',
       meta: { title: 'Lang genug für SEO Titel', description: 'y'.repeat(80) },
-      content: lexicalDoc([
-        paragraph(body),
-        paragraph(body),
-        paragraph(body),
-        paragraph(body),
-      ]),
+      content: lexicalDoc([paragraph(body), paragraph(body), paragraph(body), paragraph(body)]),
     })
     expect(audit.issues).toContain('no-subheadings-long-body')
     expect(audit.suggestions.some((s) => s.includes('h2'))).toBe(true)

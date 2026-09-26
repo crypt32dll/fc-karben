@@ -3,11 +3,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
-export default function GlobalError({
-  error,
-}: {
-  error: Error & { digest?: string }
-}) {
+export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
     Sentry.captureException(error)
   }, [error])
@@ -22,7 +18,10 @@ export default function GlobalError({
           <h1 className="text-3xl text-navy">Etwas ist schiefgelaufen</h1>
           <p className="mt-3 text-ink-soft">
             Bitte laden Sie die Seite neu. Wenn das Problem bleibt, melden Sie sich unter{' '}
-            <a className="font-semibold text-navy underline underline-offset-2" href="mailto:info@fc-karben.de">
+            <a
+              className="font-semibold text-navy underline underline-offset-2"
+              href="mailto:info@fc-karben.de"
+            >
               info@fc-karben.de
             </a>
             .

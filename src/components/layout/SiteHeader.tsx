@@ -20,10 +20,7 @@ export function SiteHeader({ nav }: Props) {
   const items = nav?.length ? nav : defaultPrimaryNav()
 
   return (
-    <header
-      id={SITE_HEADER_ID}
-      className="sticky top-0 z-50 border-b border-line bg-white"
-    >
+    <header id={SITE_HEADER_ID} className="sticky top-0 z-50 border-b border-line bg-white">
       <HeaderHeightSync headerId={SITE_HEADER_ID} />
       <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-8 sm:py-3.5">
         <ClubLink

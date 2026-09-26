@@ -109,37 +109,41 @@ export function SearchHero({ initialQuery }: { initialQuery: string }) {
             Presse, Seiten und Inhalte auf fc-karben.de durchsuchen.
           </p>
 
-          <form method="get" action={clubAppRoutes.search} className="mt-10" role="search">
-            <label htmlFor="site-search-q" className="mb-2 block text-sm font-medium text-paper/70">
-              Suchbegriff
-            </label>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-              <div className="relative min-w-0 flex-1">
-                <Search
-                  className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-navy/45"
-                  aria-hidden="true"
-                />
-                <input
-                  id="site-search-q"
-                  type="search"
-                  name="q"
-                  defaultValue={initialQuery}
-                  placeholder="z. B. Mitgliedschaft, Spielbericht…"
-                  autoFocus={!hasQuery}
-                  autoComplete="off"
-                  enterKeyHint="search"
-                  aria-controls="search-results"
-                  className="w-full min-h-11 rounded-[2px] border-2 border-transparent bg-white py-3.5 pl-12 pr-4 text-base text-ink transition-colors motion-reduce:transition-none placeholder:text-ink-soft/70 focus-visible:border-pitch focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pitch"
-                />
-              </div>
-              <button
-                type="submit"
-                className="inline-flex min-h-11 items-center justify-center rounded-[2px] bg-pitch px-6 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-pitch/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-pitch/80"
+          <search className="mt-10">
+            <form method="get" action={clubAppRoutes.search}>
+              <label
+                htmlFor="site-search-q"
+                className="mb-2 block text-sm font-medium text-paper/70"
               >
-                Suchen
-              </button>
-            </div>
-          </form>
+                Suchbegriff
+              </label>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                <div className="relative min-w-0 flex-1">
+                  <Search
+                    className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-navy/45"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="site-search-q"
+                    type="search"
+                    name="q"
+                    defaultValue={initialQuery}
+                    placeholder="z. B. Mitgliedschaft, Spielbericht…"
+                    autoComplete="off"
+                    enterKeyHint="search"
+                    aria-controls="search-results"
+                    className="w-full min-h-11 rounded-[2px] border-2 border-transparent bg-white py-3.5 pl-12 pr-4 text-base text-ink transition-colors motion-reduce:transition-none placeholder:text-ink-soft/70 focus-visible:border-pitch focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pitch"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center justify-center rounded-[2px] bg-pitch px-6 text-sm font-semibold text-white transition-colors motion-reduce:transition-none hover:bg-pitch/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-pitch/80"
+                >
+                  Suchen
+                </button>
+              </div>
+            </form>
+          </search>
         </Reveal>
       </section>
     </>

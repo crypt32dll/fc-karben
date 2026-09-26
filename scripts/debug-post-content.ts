@@ -9,7 +9,12 @@ import { JSDOM } from 'jsdom'
 import { getPayload } from 'payload'
 
 import { prepareHtmlForLexical } from '../src/lib/migration/html-to-lexical'
-import { attachments, parseWxr, publishedPosts, referencedAttachmentUrls } from '../src/lib/migration/wxr'
+import {
+  attachments,
+  parseWxr,
+  publishedPosts,
+  referencedAttachmentUrls,
+} from '../src/lib/migration/wxr'
 
 const slug = process.argv[2] || 'neuzugaenge-2020'
 const xml = readFileSync('content/wxr/export.xml', 'utf8')
