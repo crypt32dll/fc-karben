@@ -226,15 +226,15 @@ function ScoreboardFromBlock({
   return (
     <div className="border-t border-white/12 bg-navy-deep text-white">
       <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 px-8 py-5">
-        <span className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-[#8f90c0]">
+        <span className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-[#cfd0e8]">
           {block.label || 'Nächstes Spiel'}
         </span>
         {match ? (
           <div className="flex flex-wrap items-center gap-5 font-semibold">
             <span>{match.homeName}</span>
-            <span className="font-display text-xl text-[#8f90c0]">VS</span>
+            <span className="font-display text-xl text-[#cfd0e8]">VS</span>
             <span>{match.awayName}</span>
-            <span className="text-[13px] font-normal text-[#b9bade]">
+            <span className="text-[13px] font-normal text-[#cfd0e8]">
               {match.kickoff.toLocaleString('de-DE', {
                 weekday: 'short',
                 day: '2-digit',
@@ -246,7 +246,7 @@ function ScoreboardFromBlock({
             </span>
           </div>
         ) : (
-          <span className="text-[13px] text-[#b9bade]">
+          <span className="text-[13px] text-[#cfd0e8]">
             {block.fallbackText || 'Spielplan folgt'}
           </span>
         )}
@@ -299,6 +299,7 @@ function SocialGridFromBlock({
             target="_blank"
           >
             Mehr auf Instagram →
+            <span className="sr-only"> (öffnet in neuem Tab)</span>
           </a>
         </MotionPressable>
       </div>
@@ -313,25 +314,29 @@ function SocialGridFromBlock({
         {displayTiles.map((tile) => (
           <StaggerItem key={tile.id} className="origin-bottom">
             {tile.imageUrl ? (
-              <MotionPressable intensity="lift">
-                <a
-                  href={tile.url || instagramProfileUrl()}
-                  className="relative block aspect-[4/5] overflow-hidden rounded-[2px] border border-line bg-white shadow-sm transition-shadow motion-reduce:transition-none hover:border-navy/35 hover:shadow-[0_12px_28px_rgba(34,34,58,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-90"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  aria-label={tile.caption?.slice(0, 80) || 'Instagram-Beitrag öffnen'}
-                >
-                  <Image
-                    src={tile.imageUrl}
-                    alt={tile.caption || ''}
-                    fill
-                    className="object-contain"
-                    loading="lazy"
-                    sizes="(max-width: 768px) 33vw, 16vw"
-                    unoptimized={tile.source === 'feedframer'}
-                  />
-                </a>
-              </MotionPressable>
+                  <MotionPressable intensity="lift">
+                    <a
+                      href={tile.url || instagramProfileUrl()}
+                      className="relative block aspect-[4/5] overflow-hidden rounded-[2px] border border-line bg-white shadow-sm transition-shadow motion-reduce:transition-none hover:border-navy/35 hover:shadow-[0_12px_28px_rgba(34,34,58,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-90"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      aria-label={
+                        tile.caption
+                          ? `${tile.caption.slice(0, 80)} (öffnet in neuem Tab)`
+                          : 'Instagram-Beitrag öffnen (neuer Tab)'
+                      }
+                    >
+                      <Image
+                        src={tile.imageUrl}
+                        alt=""
+                        fill
+                        className="object-contain"
+                        loading="lazy"
+                        sizes="(max-width: 768px) 33vw, 16vw"
+                        unoptimized={tile.source === 'feedframer'}
+                      />
+                    </a>
+                  </MotionPressable>
             ) : (
               <div
                 className="aspect-[4/5] rounded-[2px] border border-line bg-white odd:bg-line/40"
@@ -522,7 +527,7 @@ function PostListFromBlock({
           >
             <FeaturedMedia
               src={n.featuredImageUrl}
-              alt={n.featuredImageAlt || n.title}
+              alt=""
               aspectClassName="h-[170px] aspect-auto"
               sizes="(max-width: 768px) 100vw, 33vw"
             />

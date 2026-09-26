@@ -22,9 +22,11 @@ import './globals.css'
 
 const barlow = Barlow_Condensed({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  weight: ['600', '700'],
   variable: '--font-display',
   display: 'swap',
+  // LCP is the hero h1 (font-display) — keep this preload only.
+  preload: true,
 })
 
 const archivo = Archivo_Black({
@@ -32,13 +34,16 @@ const archivo = Archivo_Black({
   weight: '400',
   variable: '--font-accent',
   display: 'swap',
+  // Rare accent use (team chips) — don't compete with LCP CSS/font.
+  preload: false,
 })
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600'],
   variable: '--font-body',
   display: 'swap',
+  preload: false,
 })
 
 const siteUrl = getPublicSiteURL()

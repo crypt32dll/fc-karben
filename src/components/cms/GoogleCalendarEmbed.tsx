@@ -24,7 +24,7 @@ export function GoogleCalendarEmbed({ title = 'Wochenplan' }: Props) {
       <div className="overflow-hidden border border-line bg-paper">
         <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line bg-navy px-5 py-4 text-white">
           <div>
-            <p className="font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8f90c0]">
+            <p className="font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#cfd0e8]">
               Günter-Reutzel-Sportfeld
             </p>
             <h2 className="mt-1 text-2xl text-white normal-case tracking-normal">{title}</h2>

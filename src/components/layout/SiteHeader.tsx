@@ -30,7 +30,7 @@ export function SiteHeader({ nav }: Props) {
         >
           <Image
             src={logo}
-            alt="FC Karben"
+            alt=""
             width={44}
             height={55}
             className="h-9 w-auto sm:h-11"

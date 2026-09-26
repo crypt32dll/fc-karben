@@ -67,12 +67,13 @@ function groupSponsors(sponsors: CatalogSponsor[]) {
 }
 
 function LogoTile({ sponsor }: { sponsor: CatalogSponsor }) {
+  const linked = Boolean(sponsor.url)
   const inner = (
     <span className="relative block h-12 w-full sm:h-14">
       {sponsor.logoUrl ? (
         <Image
           src={sponsor.logoUrl}
-          alt={sponsor.name}
+          alt={linked ? '' : sponsor.name}
           fill
           className="object-contain object-center"
           sizes="(max-width: 640px) 42vw, (max-width: 1024px) 22vw, 160px"
@@ -96,7 +97,7 @@ function LogoTile({ sponsor }: { sponsor: CatalogSponsor }) {
         target="_blank"
         rel="noopener noreferrer"
         className={`club-interactive ${frameClass} hover:border-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy`}
-        aria-label={`${sponsor.name} — Website öffnen`}
+        aria-label={`${sponsor.name} — Website öffnen (neuer Tab)`}
       >
         {inner}
       </a>

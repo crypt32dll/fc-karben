@@ -6,7 +6,15 @@ type Props = {
   dataId: string
   /** Fussball.de widget type, e.g. team-matches | table */
   type?: string
+  /** Accessible iframe name — must be unique when several widgets share a page. */
+  title?: string
   className?: string
+}
+
+const TYPE_LABEL: Record<string, string> = {
+  'team-matches': 'Spielplan',
+  table: 'Tabelle',
+  news: 'Berichte',
 }
 
 /**
@@ -16,9 +24,15 @@ type Props = {
  * We mount the iframe ourselves because widgets.js only scans once on
  * script load — that breaks React Strict Mode and tab remounts.
  */
-export function FussballDeWidget({ dataId, type = 'team-matches', className }: Props) {
+export function FussballDeWidget({
+  dataId,
+  type = 'team-matches',
+  title,
+  className,
+}: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const reactId = useId().replace(/:/g, '')
+  const iframeTitle = title || `Fussball.de ${TYPE_LABEL[type] || 'Widget'}`
 
   useEffect(() => {
     const host = hostRef.current
@@ -30,7 +44,7 @@ export function FussballDeWidget({ dataId, type = 'team-matches', className }: P
     const iframe = document.createElement('iframe')
     iframe.src = `https://next.fussball.de/widget/${type}/${dataId}`
     iframe.name = iframeName
-    iframe.title = 'Fussball.de Widget'
+    iframe.title = iframeTitle
     iframe.style.width = '100%'
     iframe.style.border = 'none'
     iframe.setAttribute('frameborder', '0')
@@ -49,7 +63,7 @@ export function FussballDeWidget({ dataId, type = 'team-matches', className }: P
       window.removeEventListener('message', onMessage)
       host.replaceChildren()
     }
-  }, [dataId, type, reactId])
+  }, [dataId, type, reactId, iframeTitle])
 
   if (!dataId) return null
 

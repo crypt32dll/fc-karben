@@ -42,7 +42,7 @@ export default async function PressePage() {
             >
               <FeaturedMedia
                 src={post.featuredImageUrl}
-                alt={post.featuredImageAlt || post.title}
+                alt=""
                 className="w-[7.5rem] shrink-0 sm:w-36"
                 aspectClassName="aspect-[4/3]"
                 sizes="144px"

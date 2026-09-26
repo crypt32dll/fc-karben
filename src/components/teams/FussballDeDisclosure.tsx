@@ -38,7 +38,7 @@ export function FussballDeDisclosure({
     <div className="overflow-hidden border border-line bg-paper">
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line bg-navy px-5 py-4 text-white">
         <div>
-          <p className="font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8f90c0]">
+          <p className="font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-[#cfd0e8]">
             fussball.de
           </p>
           <h2 id={headingId} className="mt-1 text-2xl text-white normal-case tracking-normal">
@@ -70,6 +70,7 @@ export function FussballDeDisclosure({
               target="_blank"
             >
               Auf Fussball.de öffnen
+              <span className="sr-only"> (öffnet in neuem Tab)</span>
             </a>
           ) : null}
         </div>
@@ -103,13 +104,14 @@ export function FussballDeDisclosure({
                 target="_blank"
               >
                 Auf Fussball.de öffnen
+                <span className="sr-only"> (öffnet in neuem Tab)</span>
               </a>
             ) : null}
           </div>
         </div>
       ) : (
         <div className="overflow-x-auto bg-white p-2 sm:p-3">
-          <FussballDeWidget dataId={dataId!} type={type} />
+          <FussballDeWidget dataId={dataId!} type={type} title={`${label} von fussball.de`} />
           {fussballDeUrl ? (
             <p className="mt-3 px-1 pb-2">
               <a
@@ -119,6 +121,7 @@ export function FussballDeDisclosure({
                 target="_blank"
               >
                 Auf Fussball.de öffnen →
+                <span className="sr-only"> (öffnet in neuem Tab)</span>
               </a>
             </p>
           ) : null}

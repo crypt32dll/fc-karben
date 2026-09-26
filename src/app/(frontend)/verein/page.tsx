@@ -38,7 +38,7 @@ export default async function VereinIndexPage() {
     return (
       <>
         <CmsPageBody page={page} />
-        <nav className="mx-auto max-w-[800px] px-8 pb-16">
+        <nav className="mx-auto max-w-[800px] px-8 pb-16" aria-label="Verein Seiten">
           <ul className="divide-y divide-line border border-line">
             {FALLBACK_LINKS.map((l) => (
               <li key={l.key}>

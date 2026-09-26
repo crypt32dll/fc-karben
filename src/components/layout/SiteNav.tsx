@@ -92,7 +92,7 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         type="button"
         className={topLinkClass(active)}
         aria-expanded={open}
-        aria-haspopup="menu"
+        aria-haspopup="true"
         aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
         onFocus={() => {
@@ -107,7 +107,6 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
       </button>
       <div
         id={menuId}
-        role="menu"
         hidden={!open}
         className="absolute left-0 top-full z-50 min-w-[12rem] border border-line bg-white py-1 shadow-sm"
       >
@@ -115,9 +114,8 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
           <ClubLink
             key={child.href}
             href={child.href}
-            role="menuitem"
             aria-current={pathname === child.href ? 'page' : undefined}
-            className={`block min-h-11 px-3 py-2.5 text-sm font-semibold hover:bg-paper hover:text-navy focus-visible:bg-paper focus-visible:outline-none ${
+            className={`block min-h-11 px-3 py-2.5 text-sm font-semibold hover:bg-paper hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy focus-visible:bg-paper ${
               pathname === child.href ? 'bg-paper text-navy' : 'text-ink'
             }`}
             onClick={() => setOpen(false)}

@@ -12,12 +12,16 @@ type Props = {
   items: NavItem[]
 }
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+
 export function MobileNav({ items }: Props) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
   const panelId = useId()
   const closeRef = useRef<HTMLButtonElement>(null)
   const openRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setOpen(false)
@@ -25,16 +29,42 @@ export function MobileNav({ items }: Props) {
 
   useEffect(() => {
     if (!open) return
-    const prev = document.body.style.overflow
+    const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     closeRef.current?.focus()
+
+    const inertTargets = [
+      document.getElementById('main-content'),
+      document.querySelector('footer'),
+    ].filter((el): el is HTMLElement => Boolean(el))
+    for (const el of inertTargets) el.inert = true
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        return
+      }
+      if (e.key !== 'Tab' || !panelRef.current) return
+      const nodes = [
+        ...panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
+      ].filter((n) => !n.hasAttribute('disabled') && n.tabIndex !== -1)
+      if (!nodes.length) return
+      const first = nodes[0]!
+      const last = nodes[nodes.length - 1]!
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+
     document.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev
+      document.body.style.overflow = prevOverflow
       document.removeEventListener('keydown', onKey)
+      for (const el of inertTargets) el.inert = false
       openRef.current?.focus()
     }
   }, [open])
@@ -55,6 +85,7 @@ export function MobileNav({ items }: Props) {
 
       {open ? (
         <div
+          ref={panelRef}
           className="fixed inset-x-0 top-0 z-[60] flex h-dvh flex-col bg-white"
           id={panelId}
           role="dialog"
@@ -96,6 +127,7 @@ export function MobileNav({ items }: Props) {
                         <li key={child.href}>
                           <ClubLink
                             href={child.href}
+                            aria-current={pathname === child.href ? 'page' : undefined}
                             className={`flex min-h-11 items-center text-sm font-semibold ${
                               pathname === child.href ? 'text-navy' : 'text-ink-soft'
                             }`}

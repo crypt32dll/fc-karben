@@ -55,6 +55,7 @@ export function TeamJumpNav({ teamName }: { teamName: string }) {
             <a
               key={s.id}
               href={`#${s.id}`}
+              aria-current={isActive ? 'true' : undefined}
               className={`inline-flex shrink-0 items-center min-h-11 rounded-[2px] px-3.5 text-sm font-semibold transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
                 isActive
                   ? 'bg-navy text-white'

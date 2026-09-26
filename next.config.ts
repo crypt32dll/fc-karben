@@ -8,6 +8,11 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // Tailwind (~10 KiB) — inline into HTML to drop the render-blocking CSS round-trip (PSI LCP).
+  experimental: {
+    inlineCss: true,
+    optimizePackageImports: ['lucide-react', 'motion'],
+  },
   images: {
     remotePatterns: [
       // Club media on 1&1 webspace (legacy WP + Payload SFTP uploads)
