@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-
 import { hrefForPage } from '@/lib/club-paths'
+import { grantFussballDeConsent } from '@/lib/consent/storage'
+import { useConsent } from '@/lib/consent/use-consent'
 
 import { FussballDeWidget } from './FussballDeWidget'
 
@@ -19,8 +19,8 @@ type Props = {
 }
 
 /**
- * Progressive disclosure for fussball.de iframes — mount only after explicit click
- * (privacy + viewport). Club chrome matches Platzbelegung calendar pattern.
+ * Progressive disclosure for fussball.de iframes.
+ * Consent is stored in localStorage so visitors are not asked on every visit/widget.
  */
 export function FussballDeDisclosure({
   title,
@@ -30,7 +30,8 @@ export function FussballDeDisclosure({
   type,
   fussballDeUrl,
 }: Props) {
-  const [active, setActive] = useState(false)
+  const { consent } = useConsent()
+  const active = consent.fussballDe
   const hasWidget = Boolean(dataId)
 
   return (
@@ -48,7 +49,7 @@ export function FussballDeDisclosure({
           <button
             type="button"
             className="inline-flex min-h-11 items-center rounded-[2px] bg-white px-4 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:opacity-80"
-            onClick={() => setActive(true)}
+            onClick={() => grantFussballDeConsent()}
           >
             {label} laden
           </button>
@@ -76,7 +77,8 @@ export function FussballDeDisclosure({
         <div className="flex min-h-[14rem] flex-col items-start justify-center gap-4 px-6 py-10 sm:px-8">
           <p className="max-w-xl text-[15px] leading-relaxed text-ink">
             „{label}“ wird von fussball.de geladen. Beim Öffnen werden Verbindungsdaten an den DFB
-            übertragen. Details stehen in der{' '}
+            übertragen. Ihre Wahl speichern wir lokal im Browser, damit Spielplan, Tabelle und
+            Berichte danach ohne erneutes Klicken laden. Details stehen in der{' '}
             <a
               href={hrefForPage('datenschutz')}
               className="font-semibold text-navy underline underline-offset-2 decoration-navy/35 hover:decoration-navy"
@@ -89,9 +91,9 @@ export function FussballDeDisclosure({
             <button
               type="button"
               className="inline-flex min-h-11 items-center rounded-[2px] bg-navy px-5 text-sm font-semibold text-white transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
-              onClick={() => setActive(true)}
+              onClick={() => grantFussballDeConsent()}
             >
-              {label} anzeigen
+              Alle fussball.de-Inhalte erlauben
             </button>
             {fussballDeUrl ? (
               <a

@@ -1,3 +1,4 @@
+import { CookieSettingsButton } from '@/components/consent/CookieBanner'
 import { ClubLink } from '@/components/ui/ClubLink'
 import { hrefForPage } from '@/lib/club-paths'
 import { defaultFooterNav, type NavChild } from '@/lib/navigation/defaults'
@@ -69,6 +70,8 @@ export function SiteFooter({ columns, email, addressLine }: Props) {
             >
               Datenschutz
             </ClubLink>
+            <span aria-hidden="true">·</span>
+            <CookieSettingsButton className="inline-flex min-h-11 items-center transition-colors hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:text-navy" />
           </span>
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Archivo_Black, Barlow_Condensed, Inter } from 'next/font/google'
 import { Suspense } from 'react'
 
+import { CookieBanner } from '@/components/consent/CookieBanner'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { DraftModeGate } from '@/components/preview/DraftModeGate'
@@ -105,6 +106,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
         <SiteHeader nav={nav} />
         <main id="main-content">{children}</main>
         <SiteFooter columns={footerNav} email={settings?.email} addressLine={addressLine || null} />
+        <CookieBanner />
       </body>
     </html>
   )

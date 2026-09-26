@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-
 import { hrefForPage } from '@/lib/club-paths'
+import { grantGoogleCalendarConsent } from '@/lib/consent/storage'
+import { useConsent } from '@/lib/consent/use-consent'
 import { platzbelegungCalendarEmbedUrl } from '@/lib/platzbelegung-calendar'
 
 type Props = {
@@ -11,11 +11,11 @@ type Props = {
 
 /**
  * Google Calendar for Platzbelegung.
- * The grid itself is an iframe (Google UI). We only style the surrounding club chrome
- * and pass bgcolor/color query params — full visual theming is not possible.
+ * Consent is shared with the site cookie banner (localStorage).
  */
 export function GoogleCalendarEmbed({ title = 'Wochenplan' }: Props) {
-  const [active, setActive] = useState(false)
+  const { consent } = useConsent()
+  const active = consent.googleCalendar
   const height = 720
   const src = platzbelegungCalendarEmbedUrl({ height })
 
@@ -33,7 +33,7 @@ export function GoogleCalendarEmbed({ title = 'Wochenplan' }: Props) {
             <button
               type="button"
               className="inline-flex min-h-11 items-center rounded-[2px] bg-white px-4 text-sm font-semibold text-navy transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:opacity-80"
-              onClick={() => setActive(true)}
+              onClick={() => grantGoogleCalendarConsent()}
             >
               Kalender laden
             </button>
@@ -44,7 +44,8 @@ export function GoogleCalendarEmbed({ title = 'Wochenplan' }: Props) {
           <div className="flex min-h-[22rem] flex-col items-start justify-center gap-4 px-6 py-10 sm:px-8">
             <p className="max-w-xl text-[15px] leading-relaxed text-ink">
               Der Belegungsplan wird von Google Calendar geladen. Beim Öffnen werden
-              Verbindungsdaten an Google übertragen. Details stehen in der{' '}
+              Verbindungsdaten an Google übertragen. Ihre Wahl speichern wir lokal im Browser.
+              Details stehen in der{' '}
               <a
                 href={hrefForPage('datenschutz')}
                 className="font-semibold text-navy underline underline-offset-2 decoration-navy/35 hover:decoration-navy"
@@ -56,7 +57,7 @@ export function GoogleCalendarEmbed({ title = 'Wochenplan' }: Props) {
             <button
               type="button"
               className="inline-flex min-h-11 items-center rounded-[2px] bg-navy px-5 text-sm font-semibold text-white transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:opacity-80"
-              onClick={() => setActive(true)}
+              onClick={() => grantGoogleCalendarConsent()}
             >
               Kalender anzeigen
             </button>

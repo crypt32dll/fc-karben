@@ -38,16 +38,17 @@ const HTML = `
 
 <h2>Schriften, Reichweite, Cookies</h2>
 <p>Die Schriften werden von unserer eigenen Website ausgeliefert. Es gibt keine Verbindung zu Google Fonts. Wir setzen kein Google Analytics, kein Facebook-Pixel, keine Werbenetzwerke und keine Kartendienste ein. Eine Reichweitenmessung der Besuche findet nicht statt.</p>
-<p>Beim normalen Besuch setzen wir keine Cookies. Cookies entstehen nur, wenn jemand aus dem Verein im Redaktionssystem unter /admin angemeldet ist oder eine Entwurfsvorschau öffnet. Das betrifft die Redaktion, nicht die öffentliche Website.</p>
+<p>Beim normalen Besuch setzen wir keine Tracking-Cookies. Ihre Entscheidung zu optionalen Inhalten (fussball.de, Google Kalender) speichern wir nur lokal in Ihrem Browser (localStorage), damit wir Sie nicht bei jedem Besuch erneut fragen müssen. Sie können die Auswahl jederzeit über „Cookie-Einstellungen“ im Fuß der Seite ändern.</p>
+<p>Cookies entstehen außerdem, wenn jemand aus dem Verein im Redaktionssystem unter /admin angemeldet ist oder eine Entwurfsvorschau öffnet. Das betrifft die Redaktion, nicht die öffentliche Website.</p>
 <p>Zur Bestätigung der Inhaberschaft in der Google Search Console kann ein Meta-Tag im Seitenkopf stehen. Damit werden keine Besucher erfasst.</p>
 
 <h2>Spielplan und Tabelle (fussball.de)</h2>
-<p>Auf den Mannschaftsseiten laden Spielplan und Tabelle erst, wenn Sie den jeweiligen Reiter öffnen. Dann wird ein Fenster von next.fussball.de eingeblendet. Der Betreiber von fussball.de (DFB GmbH &amp; Co. KG) erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
-<p>Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Das Speichern von Informationen in Ihrem Browser erfolgt, weil Sie den Spielplan oder die Tabelle selbst abrufen (§ 25 Absatz 2 Nummer 2 TDDDG). Informationen des Anbieters: <a href="https://www.fussball.de/privacy">fussball.de/privacy</a>.</p>
+<p>Auf den Mannschaftsseiten laden Spielplan, Tabelle und Spielberichte erst nach Ihrer Einwilligung — über den Cookie-Hinweis („Alle erlauben“ bzw. Auswahl) oder über „Alle fussball.de-Inhalte erlauben“ auf der Mannschaftsseite. Dann wird ein Fenster von next.fussball.de eingeblendet. Der Betreiber von fussball.de (DFB GmbH &amp; Co. KG) erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
+<p>Rechtsgrundlage ist Ihre Einwilligung (Artikel 6 Absatz 1 Buchstabe a DSGVO) sowie § 25 Absatz 1 TDDDG. Informationen des Anbieters: <a href="https://www.fussball.de/privacy">fussball.de/privacy</a>.</p>
 
 <h2>Platzbelegung (Google Calendar)</h2>
-<p>Auf der Seite Platzbelegung können Sie den Belegungsplan des Sportfelds laden. Der Plan wird erst angezeigt, wenn Sie den Button „Kalender anzeigen“ bzw. „Kalender laden“ betätigen. Dann wird ein Fenster von Google Calendar (Google Ireland Limited / Google LLC) eingeblendet. Google erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
-<p>Rechtsgrundlage ist Ihre Einwilligung über den Klick (Artikel 6 Absatz 1 Buchstabe a DSGVO) sowie § 25 Absatz 1 TDDDG. Datenschutzerklärung von Google: <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
+<p>Auf der Seite Platzbelegung können Sie den Belegungsplan des Sportfelds laden. Der Plan wird erst angezeigt, wenn Sie im Cookie-Hinweis oder auf der Seite einwilligen („Kalender anzeigen“ / „Alle erlauben“). Dann wird ein Fenster von Google Calendar (Google Ireland Limited / Google LLC) eingeblendet. Google erhält dabei Ihre IP-Adresse und Browserdaten und kann in diesem Fenster eigene Cookies setzen.</p>
+<p>Rechtsgrundlage ist Ihre Einwilligung (Artikel 6 Absatz 1 Buchstabe a DSGVO) sowie § 25 Absatz 1 TDDDG. Datenschutzerklärung von Google: <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
 
 <h2>Links zu anderen Websites</h2>
 <p>Links zu Sponsoren, zu <a href="https://www.instagram.com/fckarben/">Instagram</a>, zu <a href="https://www.facebook.com/FCKarben">Facebook</a> und zu fussball.de sind gewöhnliche Verweise. Erst wenn Sie einen Link anklicken, gilt die Datenschutzerklärung der Zielseite. Wir binden keine Social-Media-Plugins ein, die schon beim Öffnen unserer Seite Daten an Meta senden. Instagram-Bilder werden auf der Startseite derzeit nicht automatisch von Instagram geladen.</p>
