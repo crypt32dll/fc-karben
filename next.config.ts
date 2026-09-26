@@ -57,8 +57,12 @@ export default withSentryConfig(withPayloadConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
+  // EU region (DSN host is ingest.de.sentry.io)
+  sentryUrl: process.env.SENTRY_URL || 'https://de.sentry.io',
+  // Show upload progress on Vercel so hangs are visible in logs
+  silent: false,
+  // false = much faster builds; app source maps still upload
+  widenClientFileUpload: false,
   // Avoid ad-blockers blocking the Sentry ingest host
   tunnelRoute: '/monitoring',
   webpack: {
@@ -69,5 +73,9 @@ export default withSentryConfig(withPayloadConfig, {
   sourcemaps: {
     // Skip upload when no auth token (local / preview without secrets)
     disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+  // Don't fail/hang the Vercel build if Sentry is unreachable
+  errorHandler: (err) => {
+    console.warn('[sentry] build plugin error (continuing):', err.message)
   },
 })
