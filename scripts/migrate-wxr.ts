@@ -10,9 +10,10 @@
  *   pnpm migrate:wxr -- --file content/wxr/export.xml --apply --limit 10
  *   pnpm migrate:wxr -- --file content/wxr/export.xml --apply --skip-media
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import './load-env.ts'
+
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { loadEnvFile } from 'node:process'
 import { pathToFileURL } from 'node:url'
 
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
@@ -33,11 +34,6 @@ import {
   referencedAttachmentUrls,
 } from '../src/lib/migration/wxr'
 import { normalizePath } from '../src/lib/redirects'
-
-// tsx does not load .env (unlike `next` / Payload CLI) — needed for POSTGRES_URL etc.
-if (existsSync('.env')) {
-  loadEnvFile('.env')
-}
 
 const log = createLogger('migrate:wxr')
 

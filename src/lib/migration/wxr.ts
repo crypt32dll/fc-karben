@@ -164,6 +164,14 @@ export function referencedAttachmentUrls(items: WxrItem[]): Set<string> {
   const published = [...publishedPosts(items), ...publishedPages(items)]
   const html = published.map((p) => p.content).join('\n')
   const urls = new Set<string>()
+  const attById = new Map(attachments(items).map((a) => [a.id, a]))
+
+  // Featured images (_thumbnail_id) — even if not inlined in HTML / not parented
+  for (const post of published) {
+    if (!post.thumbnailId) continue
+    const att = attById.get(post.thumbnailId)
+    if (att?.attachmentUrl) urls.add(att.attachmentUrl)
+  }
 
   for (const att of attachments(items)) {
     if (!att.attachmentUrl) continue

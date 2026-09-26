@@ -48,16 +48,25 @@ export function filenameFromUrl(url: string): string {
 }
 
 /**
- * Zero-byte stub so Payload can create a media doc that only references an
- * existing public URL (SFTP adapter skips remote write when size === 0 + wpSourceUrl).
+ * Tiny valid PNG so Payload's image-size check passes.
+ * SFTP adapter skips remote write when `wpSourceUrl` is set (external register).
+ */
+const PNG_1X1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64',
+)
+
+/**
+ * Stub file for registering an existing public URL without re-uploading bytes.
  */
 export function externalMediaStub(url: string): DownloadedFile {
   const name = filenameFromUrl(url)
+  // Keep original extension in the filename for admin display; bytes are always PNG stub.
   return {
-    data: Buffer.alloc(0),
-    mimetype: mimeFromUrl(url),
-    name,
-    size: 0,
+    data: PNG_1X1,
+    mimetype: 'image/png',
+    name: name.replace(/\.[^.]+$/, '') + '.png',
+    size: PNG_1X1.length,
   }
 }
 

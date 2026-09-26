@@ -96,7 +96,7 @@ const createAdapter =
       },
       handleUpload: async ({ data, file }) => {
         // Migration / external register: keep existing public URL, no remote write
-        if (typeof data.wpSourceUrl === 'string' && data.wpSourceUrl && file.filesize === 0) {
+        if (typeof data.wpSourceUrl === 'string' && data.wpSourceUrl.length > 0) {
           return data
         }
 
@@ -115,12 +115,8 @@ const createAdapter =
         return data
       },
       handleDelete: async ({ doc, filename }) => {
-        const external = doc as { wpSourceUrl?: string | null; filesize?: number | null }
-        if (
-          typeof external.wpSourceUrl === 'string' &&
-          external.wpSourceUrl &&
-          !external.filesize
-        ) {
+        const external = doc as { wpSourceUrl?: string | null }
+        if (typeof external.wpSourceUrl === 'string' && external.wpSourceUrl.length > 0) {
           return
         }
         const prefixToUse = (typeof doc.prefix === 'string' && doc.prefix) || collectionPrefix || ''
