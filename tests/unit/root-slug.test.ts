@@ -39,17 +39,38 @@ describe('decideRootSlug', () => {
       team: team('1-mannschaft'),
       redirect: null,
     })
-    expect(hit.kind).toBe('mannschaft')
+    expect(hit).toEqual({
+      kind: 'mannschaft',
+      team: team('1-mannschaft'),
+      page: null,
+    })
   })
 
-  it('prefers Seite when it has layout', () => {
+  it('prefers Mannschaft over Seite with body (widgets own the slug)', () => {
+    const seite = page({
+      slug: '1-mannschaft',
+      content: { root: { type: 'root', children: [] } },
+    })
+    const hit = decideRootSlug({
+      slug: '1-mannschaft',
+      page: seite,
+      team: team('1-mannschaft'),
+      redirect: null,
+    })
+    expect(hit.kind).toBe('mannschaft')
+    if (hit.kind === 'mannschaft') {
+      expect(hit.page).toBe(seite)
+    }
+  })
+
+  it('uses Seite when no Mannschaft exists', () => {
     const hit = decideRootSlug({
       slug: 'info',
       page: page({
         slug: 'info',
         layout: [{ blockType: 'spacer', id: '1', size: 'md' }],
       }),
-      team: team('info'),
+      team: null,
       redirect: null,
     })
     expect(hit.kind).toBe('seite')

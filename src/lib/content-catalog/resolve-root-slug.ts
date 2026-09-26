@@ -2,7 +2,7 @@ import type { CatalogPage, CatalogTeam } from './types'
 
 export type RootSlugResolution =
   | { kind: 'seite'; page: CatalogPage; team: CatalogTeam | null }
-  | { kind: 'mannschaft'; team: CatalogTeam }
+  | { kind: 'mannschaft'; team: CatalogTeam; page: CatalogPage | null }
   | { kind: 'redirect'; to: string; permanent: boolean }
   | { kind: 'not_found' }
 
@@ -14,8 +14,8 @@ function pageHasBody(page: CatalogPage | null | undefined): boolean {
 
 /**
  * Collision policy for /:slug —
- * empty Seite + Mannschaft → Mannschaft; Seite with body wins (optional team chrome);
- * Verein canonical path → redirect; else CMS/built-in Redirect map.
+ * Mannschaft owns the slug when present (TeamTabs + widgets); companion Seite
+ * body is passed through for the Team tab. Else Seite / Verein redirect / Redirect map.
  */
 export function decideRootSlug(input: {
   slug: string
@@ -25,15 +25,19 @@ export function decideRootSlug(input: {
 }): RootSlugResolution {
   const { slug, page, team, redirect } = input
 
-  if (team && !pageHasBody(page)) {
-    return { kind: 'mannschaft', team }
+  if (team) {
+    return {
+      kind: 'mannschaft',
+      team,
+      page: pageHasBody(page) ? page : null,
+    }
   }
 
   if (page) {
     if (page.path && page.path !== `/${slug}` && page.path.startsWith('/verein/')) {
       return { kind: 'redirect', to: page.path, permanent: true }
     }
-    return { kind: 'seite', page, team }
+    return { kind: 'seite', page, team: null }
   }
 
   if (redirect) {

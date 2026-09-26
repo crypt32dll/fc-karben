@@ -45,7 +45,12 @@ export default async function SlugPage({ params }: Props) {
   }
 
   if (hit.kind === 'mannschaft') {
-    const { team } = hit
+    const { team, page } = hit
+    const teamView = {
+      ...team,
+      content: team.content || page?.content || null,
+      seo: team.seo || page?.seo,
+    }
     const reports = team.reportCategorySlug
       ? (await listBeitrage({ limit: 12, categorySlug: team.reportCategorySlug })).posts
       : []
@@ -57,26 +62,13 @@ export default async function SlugPage({ params }: Props) {
         </p>
         <h1 className="text-5xl text-navy">{team.name}</h1>
         {team.league ? <p className="mt-3 text-ink-soft">{team.league}</p> : null}
-        <TeamTabs team={team} reports={reports} />
+        <TeamTabs team={teamView} reports={reports} />
       </article>
     )
   }
 
   if (hit.kind === 'seite') {
-    const { page, team } = hit
-    return (
-      <>
-        {team ? (
-          <div className="mx-auto max-w-[800px] px-8 pt-12">
-            <p className="font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-pitch">
-              Mannschaft
-            </p>
-            {team.league ? <p className="mt-1 text-sm text-ink-soft">{team.league}</p> : null}
-          </div>
-        ) : null}
-        <CmsPageBody page={page} />
-      </>
-    )
+    return <CmsPageBody page={hit.page} />
   }
 
   notFound()
