@@ -14,6 +14,7 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "biome check .",
     "migrate:wxr": "tsx --env-file=.env scripts/migrate-wxr.ts",
+    "migrate:featured": "tsx --env-file=.env scripts/backfill-featured-images.ts",
     "migrate:seo": "tsx --env-file=.env scripts/generate-seo-meta.ts",
     "audit:seo": "tsx --env-file=.env scripts/audit-seo-content.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

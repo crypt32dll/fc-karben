@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { FeaturedMedia } from '@/components/cms/FeaturedMedia'
 import { Reveal, Stagger, StaggerItem } from '@/components/motion/Reveal'
 import { ClubLink } from '@/components/ui/ClubLink'
 import { clubPages, hrefForPage } from '@/lib/club-paths'
@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PressePage() {
-  const { posts, totalDocs } = await listBeitrage({ limit: 50 })
+  const { posts, totalDocs } = await listBeitrage({ limit: 100 })
 
   return (
     <div className="mx-auto max-w-[1120px] px-8 py-16">
@@ -37,24 +38,35 @@ export default async function PressePage() {
           <StaggerItem key={post.id} as="li">
             <ClubLink
               href={post.path}
-              className="club-interactive group flex flex-col gap-1 py-5 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:px-2"
+              className="club-interactive group flex gap-4 py-5 hover:bg-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy active:bg-paper sm:gap-6 sm:px-2"
             >
-              <span className="text-lg font-semibold text-navy group-hover:underline">
-                {post.title}
+              <FeaturedMedia
+                src={post.featuredImageUrl}
+                alt={post.featuredImageAlt || post.title}
+                className="w-[7.5rem] shrink-0 sm:w-36"
+                aspectClassName="aspect-[4/3]"
+                sizes="144px"
+              />
+              <span className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+                <span className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+                  <span className="text-lg font-semibold text-navy group-hover:underline">
+                    {post.title}
+                  </span>
+                  {post.publishedAt ? (
+                    <time dateTime={post.publishedAt} className="shrink-0 text-sm text-ink-soft">
+                      {new Date(post.publishedAt).toLocaleDateString('de-DE', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </time>
+                  ) : null}
+                </span>
+                {post.excerpt ? (
+                  <span className="line-clamp-2 text-sm text-ink-soft">{post.excerpt}</span>
+                ) : null}
               </span>
-              {post.publishedAt ? (
-                <time dateTime={post.publishedAt} className="shrink-0 text-sm text-ink-soft">
-                  {new Date(post.publishedAt).toLocaleDateString('de-DE', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </time>
-              ) : null}
             </ClubLink>
-            {post.excerpt ? (
-              <p className="pb-5 text-sm text-ink-soft sm:px-2">{post.excerpt}</p>
-            ) : null}
           </StaggerItem>
         ))}
       </Stagger>

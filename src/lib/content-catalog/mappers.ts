@@ -29,10 +29,12 @@ export function mapFeaturedImage(media: unknown): {
     return { featuredImageUrl: null, featuredImageAlt: null }
   }
   const m = media as { url?: string | null; alt?: string | null; wpSourceUrl?: string | null }
-  const url =
+  const raw =
     (typeof m.url === 'string' && m.url.length > 0 && m.url) ||
     (typeof m.wpSourceUrl === 'string' && m.wpSourceUrl.length > 0 && m.wpSourceUrl) ||
     null
+  // next/image does not reliably serve remote SVGs — keep navy placeholder instead
+  const url = raw && !/\.svg(?:$|\?)/i.test(raw) ? raw : null
   return {
     featuredImageUrl: url,
     featuredImageAlt: typeof m.alt === 'string' ? m.alt : null,

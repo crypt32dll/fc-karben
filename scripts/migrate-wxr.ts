@@ -380,17 +380,14 @@ async function applyMigration() {
         .map((c) => categoryIdBySlug.get(c))
         .filter(Boolean) as Array<number | string>
 
-      let featuredImage: number | string | undefined
-      const childMedia = attachments(parsed.items).find(
-        (a) => a.parentId === post.id && a.attachmentUrl && mediaIdByWpId.has(a.id),
-      )
-      if (childMedia) featuredImage = mediaIdByWpId.get(childMedia.id)
-      if (!featuredImage && post.thumbnailId && mediaIdByWpId.has(post.thumbnailId)) {
-        featuredImage = mediaIdByWpId.get(post.thumbnailId)
-      }
+      // Only WordPress featured image (_thumbnail_id) — never invent from content attachments
+      const featuredImage =
+        post.thumbnailId && mediaIdByWpId.has(post.thumbnailId)
+          ? mediaIdByWpId.get(post.thumbnailId)
+          : null
 
       const publishedAt = post.publishedAt
-        ? new Date(post.publishedAt.replace(' ', 'T') + '+02:00').toISOString()
+        ? new Date(`${post.publishedAt.replace(' ', 'T')}+02:00`).toISOString()
         : undefined
 
       await upsertByWpId(payload, 'posts', post.id, {

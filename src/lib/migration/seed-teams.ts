@@ -29,7 +29,7 @@ export const DEFAULT_TEAMS: SeedTeam[] = [
     name: '1. Mannschaft',
     slug: '1-mannschaft',
     shortLabel: '01',
-    league: 'Gruppenliga · Günter-Reutzel-Sportfeld',
+    league: 'Gruppenliga',
     fussballDeUrl:
       'https://www.fussball.de/mannschaft/fc-karben-fc-karben-hessen/-/saison/2627/team-id/01OT7G9AUK000000VV0AG80NVT74RFIN#!/',
     widgetSpielplanId: 'b25a6f2a-3183-4001-a124-6de8af1c9b65',
