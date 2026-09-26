@@ -23,6 +23,37 @@ export type MatchKickoff = Date | string
 export const asKickoffDate = (kickoff: MatchKickoff): Date =>
   kickoff instanceof Date ? kickoff : new Date(kickoff)
 
+/**
+ * Clean club/competition labels from fussball.de HTML entities and zero-width chars.
+ * Safe to run on read and write — React cannot decode entities in text nodes.
+ */
+export function sanitizeMatchLabel(value: string): string {
+  let out = value
+  for (let i = 0; i < 3; i++) {
+    const next = out
+      .replace(/&amp;/gi, '&')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => {
+        const code = Number.parseInt(hex, 16)
+        return Number.isFinite(code) ? String.fromCodePoint(code) : ''
+      })
+      .replace(/&#(\d+);/g, (_, n: string) => {
+        const code = Number(n)
+        return Number.isFinite(code) ? String.fromCodePoint(code) : ''
+      })
+    if (next === out) break
+    out = next
+  }
+  return out
+    .replace(/[\u200B-\u200D\uFEFF\u00AD]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 const kickoffMs = (kickoff: MatchKickoff): number => asKickoffDate(kickoff).getTime()
 
 /** Pick the next upcoming match (kickoff >= now − 3h grace), or null */

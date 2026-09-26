@@ -4,6 +4,7 @@ import {
   normalizeFussballDeMatch,
   pickNextMatch,
   pickNextMatchForTeam,
+  sanitizeMatchLabel,
 } from '../../src/lib/match-feed/dto'
 import { parseBerlinKickoff } from '../../src/lib/match-feed/kickoff'
 import {
@@ -12,6 +13,12 @@ import {
 } from '../../src/lib/match-feed/parse-html'
 
 describe('MatchFeed', () => {
+  it('strips fussball.de HTML entities and zero-width chars from labels', () => {
+    expect(sanitizeMatchLabel('SG Rosbach/&#8203;Ockstadt II')).toBe('SG Rosbach/Ockstadt II')
+    expect(sanitizeMatchLabel('SG Rosbach/&amp;#8203;Ockstadt II')).toBe('SG Rosbach/Ockstadt II')
+    expect(sanitizeMatchLabel('FC\u200B Karben')).toBe('FC Karben')
+  })
+
   it('normalizes fussball.de-like payload', () => {
     const match = normalizeFussballDeMatch({
       id: 'abc',

@@ -12,6 +12,7 @@ import {
   type MatchDto,
   pickNextMatch,
   pickNextMatchForTeam,
+  sanitizeMatchLabel,
   SECOND_TEAM_FUSSBALL_DE_ID,
   THIRD_TEAM_FUSSBALL_DE_ID,
 } from './dto'
@@ -94,10 +95,10 @@ export async function syncMatchFeed(payload?: Payload): Promise<SyncMatchFeedRes
       const data = {
         team: team.id,
         kickoff: match.kickoff.toISOString(),
-        homeName: match.homeName,
-        awayName: match.awayName,
-        competition: match.competition || null,
-        venue: match.venue || null,
+        homeName: sanitizeMatchLabel(match.homeName),
+        awayName: sanitizeMatchLabel(match.awayName),
+        competition: match.competition ? sanitizeMatchLabel(match.competition) : null,
+        venue: match.venue ? sanitizeMatchLabel(match.venue) : null,
         homeScore: match.homeScore ?? null,
         awayScore: match.awayScore ?? null,
         status: match.status,
@@ -157,11 +158,18 @@ const SCOREBOARD_ROWS = [
 
 /** Upcoming fixtures from CMS (tag-cached). Dates are revived after the JSON cache. */
 export async function listUpcomingMatches(): Promise<MatchDto[]> {
-  const cached = await unstable_cache(() => loadUpcomingMatches(), ['upcoming-matches-by-team'], {
+  const cached = await unstable_cache(() => loadUpcomingMatches(), ['upcoming-matches-sanitized'], {
     revalidate: CATALOG_REVALIDATE,
     tags: [CACHE_TAGS.matches],
   })()
-  return cached.map((match) => ({ ...match, kickoff: asKickoffDate(match.kickoff) }))
+  return cached.map((match) => ({
+    ...match,
+    kickoff: asKickoffDate(match.kickoff),
+    homeName: sanitizeMatchLabel(match.homeName),
+    awayName: sanitizeMatchLabel(match.awayName),
+    competition: match.competition ? sanitizeMatchLabel(match.competition) : undefined,
+    venue: match.venue ? sanitizeMatchLabel(match.venue) : undefined,
+  }))
 }
 
 /** Scoreboard rows: next fixture per Mannschaft (no live fussball.de on pageview). */
@@ -226,10 +234,10 @@ function mapMatchDoc(doc: {
   return {
     externalId: doc.externalId || String(doc.id),
     kickoff: new Date(doc.kickoff),
-    homeName: doc.homeName,
-    awayName: doc.awayName,
-    competition: doc.competition || undefined,
-    venue: doc.venue || undefined,
+    homeName: sanitizeMatchLabel(doc.homeName),
+    awayName: sanitizeMatchLabel(doc.awayName),
+    competition: doc.competition ? sanitizeMatchLabel(doc.competition) : undefined,
+    venue: doc.venue ? sanitizeMatchLabel(doc.venue) : undefined,
     homeScore: doc.homeScore ?? null,
     awayScore: doc.awayScore ?? null,
     status: (doc.status as MatchDto['status']) || 'scheduled',

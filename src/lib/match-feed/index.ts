@@ -5,6 +5,7 @@ export {
   normalizeFussballDeMatch,
   pickNextMatch,
   pickNextMatchForTeam,
+  sanitizeMatchLabel,
   SECOND_TEAM_FUSSBALL_DE_ID,
   THIRD_TEAM_FUSSBALL_DE_ID,
 } from './dto'
