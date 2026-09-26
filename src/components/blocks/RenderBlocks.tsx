@@ -285,11 +285,11 @@ function SocialGridFromBlock({
       <div className="mb-10 grid grid-cols-3 gap-0.5 md:grid-cols-6">
         {(tiles.length
           ? tiles
-          : Array.from({ length: block.maxTiles ?? 6 }).map((_, i) => ({
+          : Array.from({ length: block.maxTiles ?? 6 }, (_, i): SocialTileDto => ({
               id: `ph-${i}`,
-              imageUrl: null as string | null,
-              url: null as string | null,
-              caption: null as string | null,
+              imageUrl: null,
+              url: null,
+              caption: null,
               sortOrder: i,
             }))
         ).map((tile) =>
